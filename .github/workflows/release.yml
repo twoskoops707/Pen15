@@ -29,13 +29,13 @@ jobs:
           gradle-8.5/bin/gradle wrapper --gradle-version 8.5
           chmod +x gradlew
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --stacktrace
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Display APK Info
         run: |
           echo "✅ BUILD COMPLETE"
-          ls -lh app/build/outputs/apk/release/
+          ls -lh app/build/outputs/apk/debug/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -45,7 +45,7 @@ jobs:
           body: |
             ## Pentest Dashboard APK
 
-            **Download:** app-release-unsigned.apk (9.8MB)
+            **Download:** app-debug.apk (12MB) - Debug signed, ready to install
 
             ### Installation
             1. Download APK
@@ -60,6 +60,6 @@ jobs:
             4. Tap "Install Pentest Tools"
 
             **For authorized security testing only**
-          files: app/build/outputs/apk/release/app-release-unsigned.apk
+          files: app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
