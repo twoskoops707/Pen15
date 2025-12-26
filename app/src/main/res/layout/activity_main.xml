@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🛡️ Pentest Dashboard"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:gravity="center"
+                android:paddingBottom="8dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Authorized Testing Only"
+                android:textSize="14sp"
+                android:textColor="@color/error"
+                android:gravity="center"
+                android:paddingBottom="16dp"/>
+
+            <!-- Target Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Target IP/Network (e.g., 192.168.1.0/24)"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/targetInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:text="192.168.1.0/24"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Setup Commands Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📦 Setup Commands"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpdatePackages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Update Packages"
+                android:layout_marginBottom="8dp"
+                app:icon="@android:drawable/ic_menu_rotate"
+                app:iconGravity="start"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInstallTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Install Pentest Tools"
+                android:layout_marginBottom="16dp"
+                app:icon="@android:drawable/ic_menu_add"
+                app:iconGravity="start"/>
+
+            <!-- Network Scanning Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🌐 Network Scanning"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNmapQuick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nmap Quick Scan (-sn)"
+                android:layout_marginBottom="8dp"
+                app:icon="@android:drawable/ic_menu_search"
+                app:iconGravity="start"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNmapDetailed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nmap Detailed Scan (-A)"
+                android:layout_marginBottom="8dp"
+                app:icon="@android:drawable/ic_menu_info_details"
+                app:iconGravity="start"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnArpScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ARP Scan (Local Network)"
+                android:layout_marginBottom="16dp"
+                app:icon="@android:drawable/ic_menu_mylocation"
+                app:iconGravity="start"/>
+
+            <!-- Other Tools Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔧 Other Tools"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBluetoothScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bluetooth Scan"
+                android:layout_marginBottom="8dp"
+                app:icon="@android:drawable/stat_sys_data_bluetooth"
+                app:iconGravity="start"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCheckHashcat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Check Hashcat Version"
+                android:layout_marginBottom="16dp"
+                app:icon="@android:drawable/ic_menu_manage"
+                app:iconGravity="start"/>
+
+            <!-- Utility Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⚙️ Utilities"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenTermux"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Open Termux"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:icon="@android:drawable/ic_menu_send"
+                    app:iconGravity="start"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnClearOutput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Clear Output"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                    app:iconGravity="start"/>
+            </LinearLayout>
+
+            <!-- Output Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📋 Command Output"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@color/output_background"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/outputTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/output_text"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp"
+                    android:text=""/>
+            </ScrollView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
