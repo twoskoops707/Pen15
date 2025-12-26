@@ -126,11 +126,11 @@
                 app:icon="@android:drawable/ic_menu_mylocation"
                 app:iconGravity="start"/>
 
-            <!-- Other Tools Section -->
+            <!-- Build from Source (GitHub) -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔧 Other Tools"
+                android:text="🔨 Build from Source (Takes 30-60 min)"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -138,22 +138,24 @@
                 android:paddingBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBluetoothScan"
+                android:id="@+id/btnInstallAircrack"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bluetooth Scan"
+                android:text="Install Aircrack-ng (GitHub)"
                 android:layout_marginBottom="8dp"
-                app:icon="@android:drawable/stat_sys_data_bluetooth"
-                app:iconGravity="start"/>
+                app:icon="@android:drawable/ic_menu_add"
+                app:iconGravity="start"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCheckHashcat"
+                android:id="@+id/btnInstallHashcat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Check Hashcat Version"
+                android:text="Install Hashcat (GitHub)"
                 android:layout_marginBottom="16dp"
-                app:icon="@android:drawable/ic_menu_manage"
-                app:iconGravity="start"/>
+                app:icon="@android:drawable/ic_menu_add"
+                app:iconGravity="start"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             <!-- Utility Section -->
             <TextView
