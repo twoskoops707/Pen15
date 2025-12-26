@@ -33,6 +33,30 @@ jobs:
         run: |
           echo "✅ BUILD COMPLETE"
           ls -lh app/build/outputs/apk/release/
-          echo ""
-          echo "Download APK from: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo "APK location: app/build/outputs/apk/release/app-release-unsigned.apk"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Pentest Dashboard v1.0.${{ github.run_number }}
+          body: |
+            ## Pentest Dashboard APK
+
+            **Download:** app-release-unsigned.apk (9.8MB)
+
+            ### Installation
+            1. Download APK
+            2. Transfer to your Android phone
+            3. Enable "Install Unknown Apps"
+            4. Install APK
+
+            ### First Setup
+            1. Install Termux from F-Droid
+            2. Open Pentest Dashboard
+            3. Tap "Update Packages"
+            4. Tap "Install Pentest Tools"
+
+            **For authorized security testing only**
+          files: app/build/outputs/apk/release/app-release-unsigned.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
