@@ -158,7 +158,10 @@ jobs:
             ls -lah gradlew
           else
             echo "⚠️  gradlew not found, generating..."
-            gradle wrapper --gradle-version 8.2
+            # Install Gradle 8.5 (compatible with AGP 8.2.0 and Kotlin 1.9.20)
+            wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
+            unzip -q gradle-8.5-bin.zip
+            gradle-8.5/bin/gradle wrapper --gradle-version 8.5
             echo ""
             echo "✅ Gradle wrapper generated:"
             ls -lah gradlew gradle/
