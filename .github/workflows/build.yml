@@ -302,6 +302,7 @@ jobs:
       # ============================================
       - name: 📤 Upload Debug APK
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: pentest-dashboard-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
@@ -322,10 +323,19 @@ jobs:
           echo "📦 Artifacts Generated:"
           find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) -exec ls -lh {} \;
           echo ""
+          echo "📊 APK File Info:"
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          file app/build/outputs/apk/debug/app-debug.apk
+          echo ""
           echo "📊 Total Build Size:"
           du -sh app/build
           echo ""
-          echo "🎉 APK ready for download in GitHub Actions Artifacts!"
+          echo "🎉 APK BUILD COMPLETE!"
+          echo ""
+          echo "If artifact upload failed (storage quota), you can:"
+          echo "1. Delete old workflow runs to free up space"
+          echo "2. Re-run this workflow"
+          echo "3. Or build locally: ./gradlew assembleDebug"
           echo ""
           echo "=================================================="
 
