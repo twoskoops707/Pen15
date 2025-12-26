@@ -1,0 +1,38 @@
+name: Build Release APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+          unzip -q gradle-8.5-bin.zip
+          gradle-8.5/bin/gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Display APK Info
+        run: |
+          echo "✅ BUILD COMPLETE"
+          ls -lh app/build/outputs/apk/release/
+          echo ""
+          echo "Download APK from: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "APK location: app/build/outputs/apk/release/app-release-unsigned.apk"
