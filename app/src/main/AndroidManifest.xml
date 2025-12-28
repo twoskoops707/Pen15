@@ -11,6 +11,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
+    <!-- Termux Integration Permission -->
+    <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
+
     <!-- Queries declaration for Termux package visibility -->
     <queries>
         <package android:name="com.termux" />
