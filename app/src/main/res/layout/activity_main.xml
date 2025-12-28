@@ -6,8 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="16dp"
     tools:context=".MainActivity">
+
+    <!-- Gradient Header -->
+    <View
+        android:id="@+id/headerGradient"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="@drawable/gradient_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <ScrollView
         android:id="@+id/mainScrollView"
@@ -21,208 +30,338 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <!-- Header -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="🛡️ Pentest Dashboard"
-                android:textSize="28sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
-                android:textColor="@color/primary"
+                android:textColor="@color/white"
                 android:gravity="center"
-                android:paddingBottom="8dp"/>
+                android:paddingTop="32dp"
+                android:paddingBottom="8dp"
+                android:shadowColor="#40000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Authorized Testing Only"
-                android:textSize="14sp"
-                android:textColor="@color/error"
+                android:text="Authorized Testing Only • Termux Required"
+                android:textSize="13sp"
+                android:textColor="@color/white"
                 android:gravity="center"
-                android:paddingBottom="16dp"/>
+                android:paddingBottom="24dp"
+                android:alpha="0.9"/>
 
-            <!-- Target Input -->
-            <com.google.android.material.textfield.TextInputLayout
+            <!-- Device Info Card -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Target IP/Network (e.g., 192.168.1.0/24)"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/targetInput"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:text="192.168.1.0/24"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <!-- Setup Commands Section -->
-            <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📱 Device Info"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="12dp"/>
+
+                    <TextView
+                        android:id="@+id/deviceInfoText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary"
+                        android:fontFamily="monospace"
+                        android:text="Loading..."/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRefreshInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Refresh"
+                        android:layout_marginTop="8dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        app:iconGravity="start"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Setup Commands Card -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="📦 Setup Commands"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnUpdatePackages"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Update Packages"
-                android:layout_marginBottom="8dp"
-                app:icon="@android:drawable/ic_menu_rotate"
-                app:iconGravity="start"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInstallTools"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Install Pentest Tools"
                 android:layout_marginBottom="16dp"
-                app:icon="@android:drawable/ic_menu_add"
-                app:iconGravity="start"/>
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
 
-            <!-- Network Scanning Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🌐 Network Scanning"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNmapQuick"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nmap Quick Scan (-sn)"
-                android:layout_marginBottom="8dp"
-                app:icon="@android:drawable/ic_menu_search"
-                app:iconGravity="start"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNmapDetailed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nmap Detailed Scan (-A)"
-                android:layout_marginBottom="8dp"
-                app:icon="@android:drawable/ic_menu_info_details"
-                app:iconGravity="start"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnArpScan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ARP Scan (Local Network)"
-                android:layout_marginBottom="16dp"
-                app:icon="@android:drawable/ic_menu_mylocation"
-                app:iconGravity="start"/>
-
-            <!-- Build from Source (GitHub) -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🔨 Build from Source (Takes 30-60 min)"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInstallAircrack"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Install Aircrack-ng (GitHub)"
-                android:layout_marginBottom="8dp"
-                app:icon="@android:drawable/ic_menu_add"
-                app:iconGravity="start"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInstallHashcat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Install Hashcat (GitHub)"
-                android:layout_marginBottom="16dp"
-                app:icon="@android:drawable/ic_menu_add"
-                app:iconGravity="start"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-            <!-- Utility Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="⚙️ Utilities"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOpenTermux"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Open Termux"
-                    android:layout_marginEnd="8dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:icon="@android:drawable/ic_menu_send"
-                    app:iconGravity="start"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnClearOutput"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Clear Output"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:icon="@android:drawable/ic_menu_close_clear_cancel"
-                    app:iconGravity="start"/>
-            </LinearLayout>
-
-            <!-- Output Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="📋 Command Output"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
-
-            <ScrollView
-                android:id="@+id/scrollView"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@color/output_background"
-                android:padding="12dp">
-
-                <TextView
-                    android:id="@+id/outputTextView"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/output_text"
-                    android:fontFamily="monospace"
-                    android:textSize="12sp"
-                    android:text=""/>
-            </ScrollView>
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📦 Setup Commands"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnUpdatePackages"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Update Packages"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInstallTools"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Install Pentest Tools"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconGravity="start"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Network Scanning Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🌐 Network Scanning"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="12dp"/>
+
+                    <!-- Target Input -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Target IP/Network (e.g., 192.168.1.0/24)"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/targetInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:text="192.168.1.0/24"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNmapQuick"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nmap Quick Scan (-sn)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_search"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNmapDetailed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nmap Detailed Scan (-A)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_info_details"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnArpScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ARP Scan (Local Network)"
+                        app:icon="@android:drawable/ic_menu_mylocation"
+                        app:iconGravity="start"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Build from Source Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🔨 Build from Source"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Advanced tools (Takes 30-60 min)"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInstallAircrack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Install Aircrack-ng (GitHub)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInstallHashcat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Install Hashcat (GitHub)"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Utilities Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️ Utilities"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="12dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnOpenTermux"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Open Termux"
+                            android:layout_marginEnd="8dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:icon="@android:drawable/ic_menu_send"
+                            app:iconGravity="start"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnClearOutput"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Clear Output"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                            app:iconGravity="start"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Output Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📋 Command Output"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="12dp"/>
+
+                    <ScrollView
+                        android:id="@+id/scrollView"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:background="@color/output_background"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/outputTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/output_text"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp"
+                            android:text=""/>
+                    </ScrollView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </ScrollView>

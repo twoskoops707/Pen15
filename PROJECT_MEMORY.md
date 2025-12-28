@@ -2,8 +2,8 @@
 
 ## Current Status
 ✅ **Android APK app - fully functional code**
-❌ **GitHub storage quota full - can't upload artifacts**
-✅ **APK builds successfully on GitHub Actions**
+✅ **Release APK available on GitHub Releases**
+✅ **APK installed on user's phone**
 
 ## What Works
 - Kotlin Android app with Material Design UI
@@ -30,13 +30,17 @@
 - Commits: 7 total
 - All code is complete and working
 
-## Current Issue
-GitHub Actions artifact storage quota exceeded. Need to either:
-1. Wait 6-12 hours for quota reset
-2. Build locally with: `./gradlew assembleRelease`
-3. Use new release workflow (no artifacts)
+## Latest Release
+- **Version:** v1.0.6
+- **Download:** https://github.com/twoskoops707/Pen15/releases
+- **APK:** app-release-unsigned.apk (9.8MB)
+- **Status:** Successfully installed on user's phone
 
 ## Next Steps
-- Trigger release.yml workflow
-- APK will build but not upload (storage quota)
-- User can view build logs to confirm success
+1. First-time setup:
+   - Install Termux from F-Droid
+   - Open Pentest Dashboard app
+   - Tap "Update Packages"
+   - Tap "Install Pentest Tools"
+2. Optional: Build advanced tools (aircrack-ng, hashcat)
+3. Test with Flipper Zero and AWOK Dual Mini v3

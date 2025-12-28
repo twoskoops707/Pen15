@@ -1,0 +1,26 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#667eea"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+
+    <!-- Shield outline -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M54,25L40,32L40,45C40,56,46,66,54,70C62,66,68,56,68,45L68,32L54,25Z"/>
+
+    <!-- Lock symbol inside shield -->
+    <path
+        android:fillColor="#667eea"
+        android:pathData="M54,40C52.9,40,52,40.9,52,42L52,44L50,44L50,52L58,52L58,44L56,44L56,42C56,40.9,55.1,40,54,40Z"/>
+
+    <!-- Terminal cursor -->
+    <path
+        android:fillColor="#00ff00"
+        android:pathData="M46,56L48,56L48,60L46,60Z"/>
+</vector>
