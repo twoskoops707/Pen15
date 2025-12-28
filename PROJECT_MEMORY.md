@@ -35,10 +35,11 @@
 - All code is complete and working
 
 ## Latest Release
-- **Version:** v1.0.6
-- **Download:** https://github.com/twoskoops707/Pen15/releases
-- **APK:** app-release-unsigned.apk (9.8MB)
-- **Status:** Successfully installed on user's phone
+- **Version:** v1.0.11 ✅ WORKING
+- **Download:** https://github.com/twoskoops707/Pen15/releases/tag/v1.0.11
+- **APK:** app-debug.apk (12MB)
+- **Status:** Clipboard-based solution - TESTED AND WORKING
+- **How It Works:** Commands copy to clipboard → Termux opens → User pastes and runs
 
 ## Next Steps
 1. First-time setup:
