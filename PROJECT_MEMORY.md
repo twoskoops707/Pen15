@@ -1,9 +1,13 @@
 # Project Memory - Pen15 Pentest Dashboard
 
+## CRITICAL RULES
+⚠️ **ALWAYS TEST CODE BEFORE COMMITTING TO BUILD**
+⚠️ **NEVER STATE PROJECT COMPLETED WITHOUT TESTING**
+
 ## Current Status
 ✅ **Android APK app - fully functional code**
 ✅ **Release APK available on GitHub Releases**
-✅ **APK installed on user's phone**
+🔧 **Testing v1.0.8 - Termux permission fix**
 
 ## What Works
 - Kotlin Android app with Material Design UI
