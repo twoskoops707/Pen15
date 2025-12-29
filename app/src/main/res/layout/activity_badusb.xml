@@ -150,11 +150,11 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="UPLOAD CUSTOM SCRIPT"
+                android:text="CUSTOM SCRIPT BUILDER"
                 android:textSize="14sp"
                 android:letterSpacing="0.1"
-                app:strokeColor="@color/text_gray"
-                android:textColor="@color/text_gray"/>
+                app:strokeColor="@color/electric_blue"
+                android:textColor="@color/electric_blue"/>
 
             <!-- Output Log -->
             <TextView

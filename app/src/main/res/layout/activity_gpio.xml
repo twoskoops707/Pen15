@@ -131,6 +131,42 @@
                 android:textColor="@color/func_gpio"
                 android:layout_marginBottom="12dp"/>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBeaconSpam"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="BEACON SPAM"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/func_gpio"
+                android:textColor="@color/func_gpio"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnProbeSniff"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="PROBE REQUEST SNIFF"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/func_gpio"
+                android:textColor="@color/func_gpio"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPacketCapture"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="PACKET CAPTURE → CRACK"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/electric_blue"
+                android:textColor="@color/electric_blue"
+                android:layout_marginBottom="12dp"/>
+
             <!-- GPIO Controls -->
             <TextView
                 android:layout_width="wrap_content"

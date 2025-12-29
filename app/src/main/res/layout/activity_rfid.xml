@@ -132,6 +132,30 @@
                 android:layout_marginBottom="12dp"/>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRollingCode"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="ROLLING CODE RECORDER"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/func_rfid"
+                android:textColor="@color/func_rfid"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBruteFob"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="BRUTE FOB OPENER"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/func_rfid"
+                android:textColor="@color/func_rfid"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSavedCards"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
