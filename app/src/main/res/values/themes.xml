@@ -1,36 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Modern Professional Theme - Purple & Orange -->
     <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Background -->
-        <item name="android:windowBackground">@color/background_dark</item>
-        <item name="android:colorBackground">@color/background_dark</item>
-        <item name="colorSurface">@color/surface_dark</item>
-        <item name="colorSurfaceVariant">@color/surface_elevated</item>
+        <item name="android:windowBackground">@color/black_bg</item>
+        <item name="android:colorBackground">@color/dark_bg</item>
+        <item name="colorSurface">@color/surface_bg</item>
+        <item name="colorSurfaceVariant">@color/elevated_bg</item>
 
-        <!-- Primary Color (Purple) -->
-        <item name="colorPrimary">@color/primary_purple</item>
-        <item name="colorPrimaryVariant">@color/primary_purple_dark</item>
-        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorPrimary">@color/electric_blue</item>
+        <item name="colorPrimaryVariant">@color/electric_blue_dim</item>
+        <item name="colorOnPrimary">@color/black_bg</item>
 
-        <!-- Secondary Color (Orange) -->
-        <item name="colorSecondary">@color/accent_orange</item>
-        <item name="colorSecondaryVariant">@color/accent_orange_light</item>
-        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="colorSecondary">@color/electric_blue</item>
+        <item name="colorOnSecondary">@color/black_bg</item>
 
-        <!-- Error Color (Red) -->
-        <item name="colorError">@color/error</item>
-        <item name="colorOnError">@color/text_primary</item>
+        <item name="colorError">@color/status_disconnected</item>
 
-        <!-- Text Colors -->
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/text_white</item>
+        <item name="android:textColorSecondary">@color/text_gray</item>
 
-        <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/primary_purple_dark</item>
+        <item name="android:statusBarColor">@color/black_bg</item>
+        <item name="android:navigationBarColor">@color/black_bg</item>
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Navigation Bar -->
-        <item name="android:navigationBarColor">@color/background_dark</item>
-        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

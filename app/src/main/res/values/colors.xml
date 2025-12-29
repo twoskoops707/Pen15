@@ -1,49 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- New Professional Color Scheme - Purple & Orange -->
+    <!-- Professional Tool Color Scheme -->
 
-    <!-- Primary Colors -->
-    <color name="primary_purple">#5E35B1</color>
-    <color name="primary_purple_dark">#4527A0</color>
-    <color name="primary_purple_light">#7E57C2</color>
+    <!-- Base Colors -->
+    <color name="black_bg">#000000</color>
+    <color name="dark_bg">#0D0D0D</color>
+    <color name="surface_bg">#1A1A1A</color>
+    <color name="elevated_bg">#242424</color>
 
-    <!-- Accent Colors -->
-    <color name="accent_orange">#FF6F00</color>
-    <color name="accent_orange_light">#FF8F00</color>
+    <!-- Accent -->
+    <color name="electric_blue">#00D9FF</color>
+    <color name="electric_blue_dim">#0088AA</color>
 
-    <!-- Background Colors -->
-    <color name="background_dark">#121212</color>
-    <color name="surface_dark">#1E1E1E</color>
-    <color name="surface_elevated">#2C2C2C</color>
+    <!-- Text -->
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_gray">#999999</color>
+    <color name="text_dim">#666666</color>
 
-    <!-- Text Colors -->
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B0B0B0</color>
-    <color name="text_disabled">#707070</color>
+    <!-- Status -->
+    <color name="status_connected">#00FF88</color>
+    <color name="status_disconnected">#FF4444</color>
+    <color name="status_scanning">#FFAA00</color>
 
-    <!-- Flipper Function Colors (8 distinct colors) -->
-    <color name="subghz_color">#7C4DFF</color>      <!-- Purple for Sub-GHz -->
-    <color name="rfid_color">#00E676</color>        <!-- Green for RFID -->
-    <color name="nfc_color">#00B0FF</color>         <!-- Blue for NFC -->
-    <color name="infrared_color">#FF3D00</color>    <!-- Red for Infrared -->
-    <color name="gpio_color">#FFD600</color>        <!-- Yellow for GPIO -->
-    <color name="badusb_color">#FF6D00</color>      <!-- Orange for BadUSB -->
-    <color name="ibutton_color">#00E5FF</color>     <!-- Cyan for iButton -->
-    <color name="bluetooth_color">#2979FF</color>   <!-- Light Blue for Bluetooth -->
+    <!-- Function Colors (subtle, professional) -->
+    <color name="func_subghz">#4A90E2</color>
+    <color name="func_rfid">#7ED321</color>
+    <color name="func_nfc">#F5A623</color>
+    <color name="func_ir">#D0021B</color>
+    <color name="func_gpio">#BD10E0</color>
+    <color name="func_badusb">#F8E71C</color>
+    <color name="func_ibutton">#50E3C2</color>
+    <color name="func_ble">#B8E986</color>
 
-    <!-- Legacy Support (mapped to new colors for compatibility) -->
-    <color name="primary">@color/primary_purple</color>
-    <color name="primary_dark">@color/primary_purple_dark</color>
-    <color name="accent">@color/accent_orange</color>
-    <color name="background">@color/background_dark</color>
+    <!-- Legacy -->
+    <color name="primary">@color/electric_blue</color>
+    <color name="primary_dark">@color/electric_blue_dim</color>
+    <color name="accent">@color/electric_blue</color>
+    <color name="background">@color/black_bg</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="card_background">@color/surface_elevated</color>
-    <color name="ic_launcher_background">@color/background_dark</color>
-
-    <!-- Status Colors -->
-    <color name="success">#00E676</color>
-    <color name="error">#FF3D00</color>
-    <color name="warning">#FFD600</color>
-    <color name="info">#00B0FF</color>
+    <color name="card_background">@color/surface_bg</color>
+    <color name="ic_launcher_background">@color/black_bg</color>
+    <color name="error">@color/status_disconnected</color>
+    <color name="success">@color/status_connected</color>
 </resources>
