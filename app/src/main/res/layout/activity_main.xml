@@ -233,7 +233,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="📡 WiFi Packet Capture & Cracking"
+                        android:text="📡 WiFi Packet Capture &amp; Cracking"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/primary"
@@ -336,7 +336,7 @@
                         android:id="@+id/btnFlipperRFIDRead"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="RFID Read & Clone"
+                        android:text="RFID Read &amp; Clone"
                         android:layout_marginBottom="8dp"
                         app:icon="@android:drawable/ic_menu_save"
                         app:iconGravity="start"
