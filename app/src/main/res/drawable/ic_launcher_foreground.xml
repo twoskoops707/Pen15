@@ -1,26 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-
-    <!-- Background circle -->
-    <path
-        android:fillColor="#667eea"
-        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
-
-    <!-- Shield outline -->
-    <path
-        android:fillColor="#ffffff"
-        android:pathData="M54,25L40,32L40,45C40,56,46,66,54,70C62,66,68,56,68,45L68,32L54,25Z"/>
-
-    <!-- Lock symbol inside shield -->
-    <path
-        android:fillColor="#667eea"
-        android:pathData="M54,40C52.9,40,52,40.9,52,42L52,44L50,44L50,52L58,52L58,44L56,44L56,42C56,40.9,55.1,40,54,40Z"/>
-
-    <!-- Terminal cursor -->
-    <path
-        android:fillColor="#00ff00"
-        android:pathData="M46,56L48,56L48,60L46,60Z"/>
+    
+    <!-- Terminal skull icon -->
+    <group android:translateX="54" android:translateY="54">
+        <!-- Skull outline -->
+        <path
+            android:fillColor="#00ff41"
+            android:pathData="M-20,-25 L-20,0 L-15,10 L15,10 L20,0 L20,-25 Q18,-30 10,-30 L-10,-30 Q-18,-30 -20,-25 Z"/>
+        
+        <!-- Eye sockets -->
+        <path
+            android:fillColor="#000000"
+            android:pathData="M-12,-18 Q-12,-14 -8,-14 Q-4,-14 -4,-18 Q-4,-22 -8,-22 Q-12,-22 -12,-18 Z"/>
+        <path
+            android:fillColor="#000000"
+            android:pathData="M4,-18 Q4,-14 8,-14 Q12,-14 12,-18 Q12,-22 8,-22 Q4,-22 4,-18 Z"/>
+        
+        <!-- Terminal cursor in left eye -->
+        <path
+            android:fillColor="#00ff41"
+            android:pathData="M-10,-17 L-10,-19 L-6,-19 L-6,-17 Z"/>
+        
+        <!-- Nose -->
+        <path
+            android:fillColor="#000000"
+            android:pathData="M-3,-10 L-3,-6 L3,-6 L3,-10 L0,-12 Z"/>
+        
+        <!-- Teeth -->
+        <path
+            android:fillColor="#000000"
+            android:pathData="M-12,0 L-12,8 L-8,8 L-8,0 Z"/>
+        <path
+            android:fillColor="#000000"
+            android:pathData="M-6,0 L-6,8 L-2,8 L-2,0 Z"/>
+        <path
+            android:fillColor="#000000"
+            android:pathData="M2,0 L2,8 L6,8 L6,0 Z"/>
+        <path
+            android:fillColor="#000000"
+            android:pathData="M8,0 L8,8 L12,8 L12,0 Z"/>
+        
+        <!-- Terminal brackets around skull -->
+        <path
+            android:fillColor="#00ff41"
+            android:strokeWidth="2"
+            android:strokeColor="#00ff41"
+            android:pathData="M-28,-28 L-32,-28 L-32,12 L-28,12"/>
+        <path
+            android:fillColor="#00ff41"
+            android:strokeWidth="2"
+            android:strokeColor="#00ff41"
+            android:pathData="M28,-28 L32,-28 L32,12 L28,12"/>
+    </group>
 </vector>
