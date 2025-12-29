@@ -215,6 +215,246 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- WiFi Hacking Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📡 WiFi Packet Capture & Cracking"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="One-click WiFi hacking with AWOK Mini V3"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="12dp"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="WiFi SSID (Target Network)"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/wifiSsidInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnWifiAutoCaptureCrack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="AUTO: Capture + Crack WiFi"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_compass"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnWifiCaptureHandshake"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1. Capture WPA Handshake"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_save"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnWifiCrackWithWordlist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="2. Crack with Online Wordlist"
+                        app:icon="@android:drawable/ic_menu_search"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Flipper Zero Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🐬 Flipper Zero Operations"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sub-GHz, RFID, NFC, IR, BadUSB, GPIO"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperGarageDoor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Garage Door Brute Force"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_send"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperRFIDRead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="RFID Read & Clone"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_save"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperNFCRead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="NFC Card Read (Full Dump)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_info_details"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperSubGHzScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Sub-GHz Frequency Scan"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_search"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperCarKeyFob"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Car Key Fob Brute Force"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_lock_idle_lock"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFlipperBadUSB"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="BadUSB Payload Execute"
+                        app:icon="@android:drawable/ic_menu_upload"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- AWOK Mini V3 Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📶 AWOK Mini V3 (ESP32 Marauder)"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:paddingBottom="4dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dual ESP32 WiFi/BLE attacks with GPS"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary"
+                        android:paddingBottom="12dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAwokWiFiWardriving"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="WiFi Wardriving (GPS Logged)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_mylocation"
+                        app:iconGravity="start"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAwokDeauthAttack"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Deauth Attack (Disconnect Clients)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_delete"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAwokEvilPortal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Evil Portal (Captive Portal Attack)"
+                        android:layout_marginBottom="8dp"
+                        app:icon="@android:drawable/ic_menu_share"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAwokBLEScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="BLE Device Scanner"
+                        app:icon="@android:drawable/stat_sys_data_bluetooth"
+                        app:iconGravity="start"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <!-- Build from Source Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -233,7 +473,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🔨 Build from Source"
+                        android:text="🔨 Install Tools"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/primary"
@@ -242,7 +482,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Advanced tools (Takes 30-60 min)"
+                        android:text="Required for WiFi cracking (30-60 min)"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         android:paddingBottom="12dp"/>
@@ -251,7 +491,7 @@
                         android:id="@+id/btnInstallAircrack"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Install Aircrack-ng (GitHub)"
+                        android:text="Install Aircrack-ng Suite"
                         android:layout_marginBottom="8dp"
                         app:icon="@android:drawable/ic_menu_add"
                         app:iconGravity="start"
@@ -261,7 +501,7 @@
                         android:id="@+id/btnInstallHashcat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Install Hashcat (GitHub)"
+                        android:text="Install Hashcat"
                         app:icon="@android:drawable/ic_menu_add"
                         app:iconGravity="start"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
