@@ -35,7 +35,7 @@
         <item name="android:windowLightNavigationBar">false</item>
 
         <!-- Material Components -->
-        <item name="materialButtonStyle">@style/Widget.CyberpunkButtonPrimary</item>
-        <item name="materialCardViewStyle">@style/Widget.CyberpunkCard</item>
+        <item name="materialButtonStyle">@style/CyberpunkButtonPrimary</item>
+        <item name="materialCardViewStyle">@style/CyberpunkCard</item>
     </style>
 </resources>
