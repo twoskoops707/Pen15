@@ -1,6 +1,7 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <!-- Terminal Noir Cyberpunk Theme -->
-    <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Base.Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Background -->
         <item name="android:windowBackground">@color/background_primary</item>
         <item name="android:colorBackground">@color/background_primary</item>
@@ -33,9 +34,7 @@
         <!-- Navigation Bar -->
         <item name="android:navigationBarColor">@color/background_primary</item>
         <item name="android:windowLightNavigationBar">false</item>
-
-        <!-- Material Components -->
-        <item name="materialButtonStyle">@style/Widget.Cyberpunk.Button.Primary</item>
-        <item name="materialCardViewStyle">@style/Widget.Cyberpunk.Card</item>
     </style>
+
+    <style name="Theme.PentestDashboard" parent="Base.Theme.PentestDashboard" />
 </resources>
