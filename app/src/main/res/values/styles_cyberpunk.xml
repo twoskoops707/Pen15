@@ -38,7 +38,7 @@
     </style>
 
     <!-- Button Styles -->
-    <style name="Widget.Cyberpunk.Button.Primary" parent="Widget.Material3.Button">
+    <style name="Widget.CyberpunkButtonPrimary" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_button_primary</item>
         <item name="android:textColor">@color/neon_green</item>
         <item name="android:fontFamily">monospace</item>
@@ -51,7 +51,7 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
-    <style name="Widget.Cyberpunk.Button.Danger" parent="Widget.Material3.Button">
+    <style name="Widget.CyberpunkButtonDanger" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_button_danger</item>
         <item name="android:textColor">@color/neon_red</item>
         <item name="android:fontFamily">monospace</item>
@@ -64,7 +64,7 @@
         <item name="android:minHeight">48dp</item>
     </style>
 
-    <style name="Widget.Cyberpunk.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="Widget.CyberpunkButtonSecondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:background">@drawable/bg_button_secondary</item>
         <item name="android:textColor">@color/neon_cyan</item>
         <item name="android:fontFamily">monospace</item>
@@ -77,7 +77,7 @@
     </style>
 
     <!-- Card Style -->
-    <style name="Widget.Cyberpunk.Card" parent="Widget.Material3.CardView.Elevated">
+    <style name="Widget.CyberpunkCard" parent="Widget.Material3.CardView.Elevated">
         <item name="cardBackgroundColor">@color/surface_elevated</item>
         <item name="cardCornerRadius">8dp</item>
         <item name="cardElevation">0dp</item>
@@ -85,7 +85,7 @@
     </style>
 
     <!-- Console Style -->
-    <style name="Widget.Cyberpunk.Console">
+    <style name="Widget.CyberpunkConsole">
         <item name="android:background">@drawable/bg_console</item>
         <item name="android:padding">12dp</item>
         <item name="android:textColor">@color/text_console</item>
