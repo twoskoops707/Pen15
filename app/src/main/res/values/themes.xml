@@ -1,41 +1,36 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Terminal Noir Cyberpunk Theme -->
+    <!-- Modern Professional Theme - Purple & Orange -->
     <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Background -->
-        <item name="android:windowBackground">@color/background_primary</item>
-        <item name="android:colorBackground">@color/background_primary</item>
-        <item name="colorSurface">@color/surface_default</item>
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
         <item name="colorSurfaceVariant">@color/surface_elevated</item>
 
-        <!-- Primary Color (Neon Green) -->
-        <item name="colorPrimary">@color/neon_green</item>
-        <item name="colorPrimaryVariant">@color/neon_cyan</item>
-        <item name="colorOnPrimary">@color/background_primary</item>
+        <!-- Primary Color (Purple) -->
+        <item name="colorPrimary">@color/primary_purple</item>
+        <item name="colorPrimaryVariant">@color/primary_purple_dark</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
 
-        <!-- Secondary Color (Cyan) -->
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="colorSecondaryVariant">@color/neon_purple</item>
-        <item name="colorOnSecondary">@color/background_primary</item>
+        <!-- Secondary Color (Orange) -->
+        <item name="colorSecondary">@color/accent_orange</item>
+        <item name="colorSecondaryVariant">@color/accent_orange_light</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
 
-        <!-- Error Color (Neon Red) -->
-        <item name="colorError">@color/neon_red</item>
+        <!-- Error Color (Red) -->
+        <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/text_primary</item>
 
         <!-- Text Colors -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="android:textColorTertiary">@color/text_tertiary</item>
 
         <!-- Status Bar -->
-        <item name="android:statusBarColor">@color/background_primary</item>
+        <item name="android:statusBarColor">@color/primary_purple_dark</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Navigation Bar -->
-        <item name="android:navigationBarColor">@color/background_primary</item>
+        <item name="android:navigationBarColor">@color/background_dark</item>
         <item name="android:windowLightNavigationBar">false</item>
-
-        <!-- Material Components -->
-        <item name="materialButtonStyle">@style/CyberpunkButtonPrimary</item>
-        <item name="materialCardViewStyle">@style/CyberpunkCard</item>
     </style>
 </resources>
