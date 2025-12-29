@@ -1,50 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Terminal Noir Cyberpunk Theme -->
+    <!-- New Professional Color Scheme - Purple & Orange -->
+
+    <!-- Primary Colors -->
+    <color name="primary_purple">#5E35B1</color>
+    <color name="primary_purple_dark">#4527A0</color>
+    <color name="primary_purple_light">#7E57C2</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_orange">#FF6F00</color>
+    <color name="accent_orange_light">#FF8F00</color>
 
     <!-- Background Colors -->
-    <color name="background_primary">#000000</color>
-    <color name="background_secondary">#0a0a0a</color>
-    <color name="background_tertiary">#050505</color>
-
-    <!-- Surface/Card Colors -->
-    <color name="surface_default">#0a0a0a</color>
-    <color name="surface_elevated">#0a0a0a</color>
-    <color name="surface_console">#000000</color>
-
-    <!-- Neon Accent Colors -->
-    <color name="neon_green">#00ff41</color>
-    <color name="neon_cyan">#00ffff</color>
-    <color name="neon_red">#ff0000</color>
-    <color name="neon_purple">#ff00ff</color>
-    <color name="neon_yellow">#ffff00</color>
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="surface_elevated">#2C2C2C</color>
 
     <!-- Text Colors -->
-    <color name="text_primary">#00ff41</color>
-    <color name="text_secondary">#008f11</color>
-    <color name="text_tertiary">#006400</color>
-    <color name="text_console">#00ff41</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_disabled">#707070</color>
 
-    <!-- Border & Glow -->
-    <color name="border_default">#30363D</color>
-    <color name="border_neon">#00FF41</color>
-    <color name="glow_green">#00FF4140</color>
-    <color name="glow_cyan">#00F0FF40</color>
-    <color name="glow_red">#FF073A40</color>
+    <!-- Flipper Function Colors (8 distinct colors) -->
+    <color name="subghz_color">#7C4DFF</color>      <!-- Purple for Sub-GHz -->
+    <color name="rfid_color">#00E676</color>        <!-- Green for RFID -->
+    <color name="nfc_color">#00B0FF</color>         <!-- Blue for NFC -->
+    <color name="infrared_color">#FF3D00</color>    <!-- Red for Infrared -->
+    <color name="gpio_color">#FFD600</color>        <!-- Yellow for GPIO -->
+    <color name="badusb_color">#FF6D00</color>      <!-- Orange for BadUSB -->
+    <color name="ibutton_color">#00E5FF</color>     <!-- Cyan for iButton -->
+    <color name="bluetooth_color">#2979FF</color>   <!-- Light Blue for Bluetooth -->
 
-    <!-- Legacy Support (mapped to new colors) -->
-    <color name="primary">@color/neon_green</color>
-    <color name="primary_dark">@color/neon_cyan</color>
-    <color name="accent">@color/neon_purple</color>
-    <color name="background">@color/background_primary</color>
-    <color name="output_background">@color/surface_console</color>
-    <color name="output_text">@color/text_console</color>
-    <color name="error">@color/neon_red</color>
-    <color name="success">@color/neon_green</color>
-    <color name="warning">@color/neon_yellow</color>
-    <color name="info">@color/neon_cyan</color>
-    <color name="white">#E6EDF3</color>
-    <color name="black">#0A0E14</color>
+    <!-- Legacy Support (mapped to new colors for compatibility) -->
+    <color name="primary">@color/primary_purple</color>
+    <color name="primary_dark">@color/primary_purple_dark</color>
+    <color name="accent">@color/accent_orange</color>
+    <color name="background">@color/background_dark</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="card_background">@color/surface_elevated</color>
-    <color name="ic_launcher_background">@color/background_primary</color>
+    <color name="ic_launcher_background">@color/background_dark</color>
+
+    <!-- Status Colors -->
+    <color name="success">#00E676</color>
+    <color name="error">#FF3D00</color>
+    <color name="warning">#FFD600</color>
+    <color name="info">#00B0FF</color>
 </resources>
