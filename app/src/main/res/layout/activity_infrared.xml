@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_bg">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:background="@color/dark_bg"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:tint="@color/text_white"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="INFRARED"
+            android:textColor="@color/func_infrared"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.1"
+            android:layout_marginStart="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Universal Remote"
+            android:textColor="@color/text_dim"
+            android:textSize="12sp"
+            android:fontFamily="monospace"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Remote Type Selector -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REMOTE LIBRARY"
+                android:textColor="@color/text_gray"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="12dp"/>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="3"
+                android:layout_marginBottom="32dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnTV"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:text="TV"
+                    android:textSize="14sp"
+                    app:strokeColor="@color/func_infrared"
+                    android:textColor="@color/func_infrared"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAC"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:text="AIR CONDITIONER"
+                    android:textSize="14sp"
+                    app:strokeColor="@color/func_infrared"
+                    android:textColor="@color/func_infrared"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAudio"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:text="AUDIO SYSTEM"
+                    android:textSize="14sp"
+                    app:strokeColor="@color/func_infrared"
+                    android:textColor="@color/func_infrared"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnProjector"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    android:text="PROJECTOR"
+                    android:textSize="14sp"
+                    app:strokeColor="@color/func_infrared"
+                    android:textColor="@color/func_infrared"/>
+
+            </GridLayout>
+
+            <!-- Actions -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLearn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="LEARN NEW REMOTE"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                app:cornerRadius="4dp"
+                android:backgroundTint="@color/func_infrared"
+                android:textColor="@color/black_bg"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTest"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="TEST SIGNAL"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/func_infrared"
+                android:textColor="@color/func_infrared"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSavedRemotes"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="SAVED REMOTES"
+                android:textSize="14sp"
+                android:letterSpacing="0.1"
+                app:strokeColor="@color/text_gray"
+                android:textColor="@color/text_gray"/>
+
+            <!-- Output Log -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STATUS"
+                android:textColor="@color/text_gray"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:id="@+id/irOutput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="120dp"
+                android:text="Select remote type or learn a new one..."
+                android:textColor="@color/text_dim"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:padding="16dp"
+                android:background="@color/surface_bg"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
