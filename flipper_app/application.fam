@@ -1,0 +1,13 @@
+App(
+    appid="pentest_companion",
+    name="Pentest Companion",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="pentest_companion_app",
+    requires=["gui", "dialogs", "subghz", "rfid", "nfc"],
+    stack_size=2 * 1024,
+    fap_icon="icon.png",
+    fap_category="Tools",
+    fap_description="Companion app for Android Pentest Dashboard - enables remote control via USB/BT",
+    fap_author="Pentest Team",
+    fap_version="1.0",
+)
