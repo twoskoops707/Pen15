@@ -109,6 +109,18 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Configure Attack Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfigureAttack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CONFIGURE ATTACK PARAMETERS"
+                android:backgroundTint="@color/terminal_yellow"
+                android:textColor="@color/terminal_black"
+                android:fontFamily="monospace"
+                android:enabled="false"
+                android:layout_marginBottom="8dp" />
+
             <!-- Deauth Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeauth"
