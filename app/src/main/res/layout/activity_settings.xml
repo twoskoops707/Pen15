@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_back"
+                android:tint="@color/text_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Settings"
+                android:textColor="@color/text_white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <!-- Connection Settings -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CONNECTION"
+            android:textColor="@color/electric_blue"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchAutoConnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Auto-connect on launch"
+            android:textColor="@color/text_white"
+            android:layout_marginBottom="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBluetoothSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OPEN BLUETOOTH SETTINGS"
+            android:textColor="@color/text_white"
+            app:backgroundTint="@color/surface_bg"
+            android:layout_marginBottom="24dp" />
+
+        <!-- App Settings -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="APP SETTINGS"
+            android:textColor="@color/electric_blue"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchShowTutorial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show tutorial on launch"
+            android:textColor="@color/text_white"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchVerboseLogging"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Verbose logging (debug)"
+            android:textColor="@color/text_white"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchKeepScreenOn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Keep screen on during scans"
+            android:textColor="@color/text_white"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Termux Integration -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TERMUX INTEGRATION"
+            android:textColor="@color/electric_blue"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInstallTermux"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INSTALL TERMUX (F-DROID)"
+            android:textColor="@color/text_white"
+            app:backgroundTint="@color/surface_bg"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Actions -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ACTIONS"
+            android:textColor="@color/electric_blue"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnResetTutorial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RESET TUTORIAL"
+            android:textColor="@color/text_white"
+            app:backgroundTint="@color/surface_bg"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearCache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CLEAR CACHE"
+            android:textColor="@color/text_white"
+            app:backgroundTint="@color/surface_bg"
+            android:layout_marginBottom="24dp" />
+
+        <!-- About -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAbout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ABOUT"
+            android:textColor="@color/text_white"
+            app:backgroundTint="@color/electric_blue" />
+
+    </LinearLayout>
+</ScrollView>

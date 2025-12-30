@@ -101,6 +101,12 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".BadUSBActivity" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
     </application>
 
 </manifest>
