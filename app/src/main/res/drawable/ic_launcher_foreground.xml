@@ -4,56 +4,82 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    
-    <!-- Terminal skull icon -->
+
+    <!-- Professional Security Shield Icon -->
     <group android:translateX="54" android:translateY="54">
-        <!-- Skull outline -->
+
+        <!-- Outer glow -->
         <path
-            android:fillColor="#00ff41"
-            android:pathData="M-20,-25 L-20,0 L-15,10 L15,10 L20,0 L20,-25 Q18,-30 10,-30 L-10,-30 Q-18,-30 -20,-25 Z"/>
-        
-        <!-- Eye sockets -->
+            android:fillColor="#1A4A8A"
+            android:fillAlpha="0.3"
+            android:pathData="M0,-38 L32,-22 L32,10 L0,32 L-32,10 L-32,-22 Z"/>
+
+        <!-- Main shield (hexagon) -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M-12,-18 Q-12,-14 -8,-14 Q-4,-14 -4,-18 Q-4,-22 -8,-22 Q-12,-22 -12,-18 Z"/>
+            android:fillColor="#2563EB"
+            android:pathData="M0,-35 L30,-20 L30,8 L0,28 L-30,8 L-30,-20 Z"/>
+
+        <!-- Inner shield gradient effect -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M4,-18 Q4,-14 8,-14 Q12,-14 12,-18 Q12,-22 8,-22 Q4,-22 4,-18 Z"/>
-        
-        <!-- Terminal cursor in left eye -->
+            android:fillColor="#3B82F6"
+            android:pathData="M0,-32 L27,-18 L27,6 L0,24 L-27,6 L-27,-18 Z"/>
+
+        <!-- Lock body -->
         <path
-            android:fillColor="#00ff41"
-            android:pathData="M-10,-17 L-10,-19 L-6,-19 L-6,-17 Z"/>
-        
-        <!-- Nose -->
+            android:fillColor="#FFFFFF"
+            android:pathData="M-12,2 L12,2 L12,16 Q12,18 10,18 L-10,18 Q-12,18 -12,16 Z"/>
+
+        <!-- Lock shackle (top arc) -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M-3,-10 L-3,-6 L3,-6 L3,-10 L0,-12 Z"/>
-        
-        <!-- Teeth -->
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="3"
+            android:strokeLineCap="round"
+            android:pathData="M-8,-4 Q-8,-12 0,-12 Q8,-12 8,-4"/>
+
+        <!-- Keyhole -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M-12,0 L-12,8 L-8,8 L-8,0 Z"/>
+            android:fillColor="#2563EB"
+            android:pathData="M0,6 Q2,6 2,8 Q2,10 1,11 L1,14 L-1,14 L-1,11 Q-2,10 -2,8 Q-2,6 0,6 Z"/>
+
+        <!-- Circuit lines (top-left) -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M-6,0 L-6,8 L-2,8 L-2,0 Z"/>
+            android:strokeColor="#60A5FA"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M-24,-12 L-18,-12 M-18,-12 L-18,-8"/>
+
+        <!-- Circuit lines (top-right) -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M2,0 L2,8 L6,8 L6,0 Z"/>
+            android:strokeColor="#60A5FA"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M24,-12 L18,-12 M18,-12 L18,-8"/>
+
+        <!-- Circuit lines (bottom-left) -->
         <path
-            android:fillColor="#000000"
-            android:pathData="M8,0 L8,8 L12,8 L12,0 Z"/>
-        
-        <!-- Terminal brackets around skull -->
+            android:strokeColor="#60A5FA"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M-24,12 L-18,12 M-18,12 L-18,8"/>
+
+        <!-- Circuit lines (bottom-right) -->
         <path
-            android:fillColor="#00ff41"
-            android:strokeWidth="2"
-            android:strokeColor="#00ff41"
-            android:pathData="M-28,-28 L-32,-28 L-32,12 L-28,12"/>
+            android:strokeColor="#60A5FA"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M24,12 L18,12 M18,12 L18,8"/>
+
+        <!-- Circuit dots -->
         <path
-            android:fillColor="#00ff41"
-            android:strokeWidth="2"
-            android:strokeColor="#00ff41"
-            android:pathData="M28,-28 L32,-28 L32,12 L28,12"/>
+            android:fillColor="#60A5FA"
+            android:pathData="M-18,-12 Q-18,-10 -18,-12 M18,-12 Q18,-10 18,-12 M-18,12 Q-18,10 -18,12 M18,12 Q18,10 18,12"/>
+
+        <!-- Small accent dots in corners -->
+        <circle android:fillColor="#93C5FD" android:cx="-22" android:cy="-16" android:radius="1.5"/>
+        <circle android:fillColor="#93C5FD" android:cx="22" android:cy="-16" android:radius="1.5"/>
+        <circle android:fillColor="#93C5FD" android:cx="-22" android:cy="14" android:radius="1.5"/>
+        <circle android:fillColor="#93C5FD" android:cx="22" android:cy="14" android:radius="1.5"/>
+
     </group>
 </vector>
