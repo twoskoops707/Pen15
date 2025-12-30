@@ -76,10 +76,18 @@
             android:pathData="M-18,-12 Q-18,-10 -18,-12 M18,-12 Q18,-10 18,-12 M-18,12 Q-18,10 -18,12 M18,12 Q18,10 18,12"/>
 
         <!-- Small accent dots in corners -->
-        <circle android:fillColor="#93C5FD" android:cx="-22" android:cy="-16" android:radius="1.5"/>
-        <circle android:fillColor="#93C5FD" android:cx="22" android:cy="-16" android:radius="1.5"/>
-        <circle android:fillColor="#93C5FD" android:cx="-22" android:cy="14" android:radius="1.5"/>
-        <circle android:fillColor="#93C5FD" android:cx="22" android:cy="14" android:radius="1.5"/>
+        <path
+            android:fillColor="#93C5FD"
+            android:pathData="M-20.5,-16 Q-22,-16 -22,-17.5 Q-22,-19 -23.5,-19 Q-25,-19 -25,-17.5 Q-25,-16 -23.5,-16 Q-22,-16 -20.5,-16 Z"/>
+        <path
+            android:fillColor="#93C5FD"
+            android:pathData="M23.5,-16 Q22,-16 22,-17.5 Q22,-19 20.5,-19 Q19,-19 19,-17.5 Q19,-16 20.5,-16 Q22,-16 23.5,-16 Z"/>
+        <path
+            android:fillColor="#93C5FD"
+            android:pathData="M-20.5,14 Q-22,14 -22,12.5 Q-22,11 -23.5,11 Q-25,11 -25,12.5 Q-25,14 -23.5,14 Q-22,14 -20.5,14 Z"/>
+        <path
+            android:fillColor="#93C5FD"
+            android:pathData="M23.5,14 Q22,14 22,12.5 Q22,11 20.5,11 Q19,11 19,12.5 Q19,14 20.5,14 Q22,14 23.5,14 Z"/>
 
     </group>
 </vector>
