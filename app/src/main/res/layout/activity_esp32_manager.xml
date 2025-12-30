@@ -145,7 +145,7 @@
                         android:id="@+id/btnBleScan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="BLE SCAN & SPAM"
+                        android:text="BLE SCAN &amp; SPAM"
                         android:backgroundTint="@color/terminal_cyan"
                         android:textColor="@color/terminal_black"
                         android:fontFamily="monospace" />
