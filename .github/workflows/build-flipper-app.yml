@@ -1,0 +1,37 @@
+name: Build Flipper Companion App
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'flipper_app/**'
+  workflow_dispatch:
+
+jobs:
+  build-fap:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install ufbt
+      run: |
+        pip3 install --upgrade ufbt
+        ufbt update --channel=release
+
+    - name: Build Flipper app
+      run: |
+        cd flipper_app
+        ufbt
+
+    - name: Upload FAP artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pentest_companion.fap
+        path: flipper_app/dist/pentest_companion.fap
