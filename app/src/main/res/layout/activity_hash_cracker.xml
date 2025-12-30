@@ -26,8 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
-            android:textColor="@color/terminal_red"
+            android:text="HASH CRACKER"
+            android:textColor="@color/terminal_yellow"
             android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -61,19 +61,73 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
+                        android:text="HASH INPUT"
                         android:textColor="@color/terminal_green"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
-                    <ListView
-                        android:id="@+id/payloadList"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundColor="@color/terminal_black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputHash"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Enter hash to crack"
+                            android:textColor="@color/terminal_green"
+                            android:textColorHint="@color/terminal_gray"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/terminal_dark_gray"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HASH TYPE"
+                        android:textColor="@color/terminal_green"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerHashType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WORDLIST"
+                        android:textColor="@color/terminal_green"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerWordlist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/terminal_black" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -92,20 +146,30 @@
                     android:padding="16dp">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
+                        android:id="@+id/btnIdentifyHash"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
-                        android:backgroundTint="@color/terminal_red"
-                        android:textColor="@color/white"
+                        android:text="IDENTIFY HASH"
+                        android:backgroundTint="@color/terminal_cyan"
+                        android:textColor="@color/terminal_black"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
+                        android:id="@+id/btnCrackHashcat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
+                        android:text="CRACK WITH HASHCAT"
+                        android:backgroundTint="@color/terminal_green"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCrackJohn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="CRACK WITH JOHN"
                         android:backgroundTint="@color/terminal_yellow"
                         android:textColor="@color/terminal_black"
                         android:fontFamily="monospace" />
@@ -121,14 +185,14 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="300dp"
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/payloadDetails"
+                        android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
+                        android:text="Enter a hash to crack..."
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />

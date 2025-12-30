@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="@color/terminal_black">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -26,8 +27,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
-            android:textColor="@color/terminal_red"
+            android:text="NETWORK SCANNER"
+            android:textColor="@color/terminal_green"
             android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -44,6 +45,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Target Input -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,22 +63,30 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
+                        android:text="TARGET"
                         android:textColor="@color/terminal_green"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
-                    <ListView
-                        android:id="@+id/payloadList"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundColor="@color/terminal_black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputTarget"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="IP or hostname (e.g. 192.168.1.1)"
+                            android:textColor="@color/terminal_green"
+                            android:textColorHint="@color/terminal_gray"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Scan Buttons -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,27 +101,57 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
-                        android:backgroundTint="@color/terminal_red"
-                        android:textColor="@color/white"
+                        android:text="SCAN TYPES"
+                        android:textColor="@color/terminal_green"
+                        android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
+                        android:id="@+id/btnQuickScan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
+                        android:text="QUICK SCAN (-sn)"
+                        android:backgroundTint="@color/terminal_green"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDeepScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="DEEP SCAN (-sV -sC -O)"
+                        android:backgroundTint="@color/terminal_cyan"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPortScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ALL PORTS (-p- -T4)"
                         android:backgroundTint="@color/terminal_yellow"
                         android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnVulnScan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="VULN SCAN (--script vuln)"
+                        android:backgroundTint="@color/terminal_red"
+                        android:textColor="@color/white"
                         android:fontFamily="monospace" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Log Output -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,14 +161,14 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="300dp"
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/payloadDetails"
+                        android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
+                        android:text="Ready to scan...\nEnter target IP/hostname and select scan type."
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />

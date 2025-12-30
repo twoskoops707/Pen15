@@ -26,8 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
-            android:textColor="@color/terminal_red"
+            android:text="ESP32 / AWOK MANAGER"
+            android:textColor="@color/terminal_cyan"
             android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -43,6 +43,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CONNECT TO ESP32"
+                android:backgroundTint="@color/terminal_green"
+                android:textColor="@color/terminal_black"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="16dp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -61,19 +71,50 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
+                        android:text="WIFI ATTACKS"
                         android:textColor="@color/terminal_green"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
-                    <ListView
-                        android:id="@+id/payloadList"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnScanNetworks"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="wrap_content"
+                        android:text="SCAN NETWORKS"
+                        android:backgroundTint="@color/terminal_cyan"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCreateAP"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="EVIL TWIN AP"
+                        android:backgroundTint="@color/terminal_yellow"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDeauth"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="DEAUTH ATTACK"
+                        android:backgroundTint="@color/terminal_red"
+                        android:textColor="@color/white"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSniff"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="PACKET SNIFFING"
+                        android:backgroundTint="@color/terminal_green"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -91,22 +132,21 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
-                        android:backgroundTint="@color/terminal_red"
-                        android:textColor="@color/white"
+                        android:text="BLE ATTACKS"
+                        android:textColor="@color/terminal_green"
+                        android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
+                        android:id="@+id/btnBleScan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
-                        android:backgroundTint="@color/terminal_yellow"
+                        android:text="BLE SCAN & SPAM"
+                        android:backgroundTint="@color/terminal_cyan"
                         android:textColor="@color/terminal_black"
                         android:fontFamily="monospace" />
                 </LinearLayout>
@@ -125,10 +165,10 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/payloadDetails"
+                        android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
+                        android:text="ESP32/AWOK Manager ready..."
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />

@@ -26,8 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
-            android:textColor="@color/terminal_red"
+            android:text="PACKET SNIFFER"
+            android:textColor="@color/terminal_cyan"
             android:textSize="18sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -61,19 +61,42 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
+                        android:text="CAPTURE SETTINGS"
                         android:textColor="@color/terminal_green"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
-                    <ListView
-                        android:id="@+id/payloadList"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        app:boxBackgroundColor="@color/terminal_black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputInterface"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Interface (e.g. wlan0)"
+                            android:textColor="@color/terminal_green"
+                            android:textColorHint="@color/terminal_gray"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundColor="@color/terminal_black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputFilter"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Filter (e.g. port 80)"
+                            android:textColor="@color/terminal_green"
+                            android:textColorHint="@color/terminal_gray"
+                            android:fontFamily="monospace" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -92,21 +115,41 @@
                     android:padding="16dp">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
+                        android:id="@+id/btnStartCapture"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
+                        android:text="START CAPTURE"
+                        android:backgroundTint="@color/terminal_green"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStopCapture"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="STOP CAPTURE"
                         android:backgroundTint="@color/terminal_red"
                         android:textColor="@color/white"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
+                        android:id="@+id/btnSaveCapture"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
+                        android:text="SAVE CAPTURE"
                         android:backgroundTint="@color/terminal_yellow"
+                        android:textColor="@color/terminal_black"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAnalyze"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ANALYZE CAPTURE"
+                        android:backgroundTint="@color/terminal_cyan"
                         android:textColor="@color/terminal_black"
                         android:fontFamily="monospace" />
                 </LinearLayout>
@@ -125,10 +168,10 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/payloadDetails"
+                        android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
+                        android:text="Ready to capture packets..."
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />

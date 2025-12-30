@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="@color/terminal_black">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -26,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
+            android:text="WIFI DEAUTH ATTACK"
             android:textColor="@color/terminal_red"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -44,6 +45,37 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Warning -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/terminal_red"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="⚠ WARNING: Only use on networks you own or have permission to test!"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Scan Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnScan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SCAN FOR NETWORKS"
+                android:backgroundTint="@color/terminal_green"
+                android:textColor="@color/terminal_black"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Network List -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,14 +93,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
+                        android:text="NETWORKS"
                         android:textColor="@color/terminal_green"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp" />
 
                     <ListView
-                        android:id="@+id/payloadList"
+                        android:id="@+id/networkList"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:background="@color/terminal_black"
@@ -77,41 +109,19 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Deauth Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeauth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/terminal_dark_gray"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                android:text="START DEAUTH ATTACK"
+                android:backgroundTint="@color/terminal_red"
+                android:textColor="@color/white"
+                android:fontFamily="monospace"
+                android:enabled="false"
+                android:layout_marginBottom="16dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
-                        android:backgroundTint="@color/terminal_red"
-                        android:textColor="@color/white"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
-                        android:backgroundTint="@color/terminal_yellow"
-                        android:textColor="@color/terminal_black"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- Log Output -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,14 +131,14 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_height="300dp"
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/payloadDetails"
+                        android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
+                        android:text="Ready to scan WiFi networks...\n\nRequirements:\n- Monitor mode enabled\n- OR ESP32 Marauder on Flipper\n- OR AWOK ESP32 board"
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
                         android:textSize="12sp" />
