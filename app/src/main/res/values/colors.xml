@@ -26,11 +26,13 @@
     <color name="func_subghz">#4A90E2</color>
     <color name="func_rfid">#7ED321</color>
     <color name="func_nfc">#F5A623</color>
-    <color name="func_ir">#D0021B</color>
+    <color name="func_infrared">#D0021B</color>
+    <color name="func_ir">@color/func_infrared</color>
     <color name="func_gpio">#BD10E0</color>
     <color name="func_badusb">#F8E71C</color>
     <color name="func_ibutton">#50E3C2</color>
-    <color name="func_ble">#B8E986</color>
+    <color name="func_bluetooth">#B8E986</color>
+    <color name="func_ble">@color/func_bluetooth</color>
 
     <!-- Legacy -->
     <color name="primary">@color/electric_blue</color>
