@@ -11,9 +11,9 @@
 
 ### DOWNLOADS
 
-**Android App v1.0.69** (WORKING - NO FAKE RESULTS):
+**Android App v1.0.83** (LATEST - WITH TERMUX INTEGRATION):
 ```
-https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.apk
+https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.83/app-debug.apk
 ```
 
 **Flipper Companion v1.0.17** (✅ BUILD SUCCESS!):
