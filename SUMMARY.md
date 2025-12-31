@@ -31,30 +31,43 @@
 - ✅ Parameter questionnaires
 - ✅ Auto-discovery features
 
-### ✅ FLIPPER APP - COMPLETE CODE (Building)
-- ✅ ALL 8 modules implemented (573 lines)
-- ✅ App launcher - control all Flipper apps
-- ✅ SubGHz RX/TX
-- ✅ RFID read
-- ✅ NFC read
-- ✅ Infrared RX
-- ✅ iButton read
+### ✅ FLIPPER APP - BUILD SUCCESSFUL!
+- ✅ ALL modules implemented (541 lines)
+- ✅ App launcher - launch ANY Flipper built-in app from Android
+- ✅ SubGHz RX/TX with frequency validation
+- ✅ RFID - launches built-in app
+- ✅ NFC - launches built-in app
+- ✅ Infrared RX - launches built-in app
+- ✅ iButton - launches built-in app
 - ✅ BadUSB keyboard injection
-- ✅ Bluetooth advertising
+- ✅ Bluetooth BLE advertising
 - ✅ GPIO read/write pins 2-7
 - ✅ ESP32 Marauder UART forwarding
+- ✅ Device info command
 - ✅ Fixed all SDK compilation errors
-- ⏳ Building .fap file now
+- ✅ Built successfully - ready to install!
 
-### 🎯 Latest Android Release: v1.0.69
+### 🎯 DOWNLOAD LINKS
 
-**Download APK:**
+**Android App v1.0.69:**
 ```
 https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.apk
 ```
 
-**Flipper .fap:**
-Building now - will be available at releases page
+**Flipper Companion v1.0.17:**
+```
+https://github.com/twoskoops707/Pen15/releases/download/flipper-v1.0.17/pentest_companion.fap
+```
+
+**Installation:**
+1. Download both files above
+2. Install APK on Android phone
+3. Copy .fap to Flipper at `/apps/Tools/pentest_companion.fap` using qFlipper
+4. Reboot Flipper
+5. Launch app: Flipper → Apps → Tools → Pentest Companion
+6. Connect Android app via USB
+7. Click CONNECT on Android
+8. Test commands!
 
 **Test Steps:**
 1. Download and install v1.0.69 APK from link above

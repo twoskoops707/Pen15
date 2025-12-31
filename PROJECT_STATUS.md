@@ -16,10 +16,14 @@
 https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.apk
 ```
 
-**Flipper Companion v2.0** (BUILDING NOW):
-- File: `flipper_app/pentest_companion.c` (573 lines)
-- Status: Complete code committed, build in progress
-- ALL 8 modules + app launcher implemented
+**Flipper Companion v1.0.17** (✅ BUILD SUCCESS!):
+```
+https://github.com/twoskoops707/Pen15/releases/download/flipper-v1.0.17/pentest_companion.fap
+```
+- File: `flipper_app/pentest_companion.c` (541 lines)
+- Status: ✅ BUILT AND READY TO INSTALL
+- ALL modules implemented + app launcher
+- Install to: `/apps/Tools/pentest_companion.fap`
 
 ### WHAT WORKS RIGHT NOW
 
