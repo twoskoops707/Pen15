@@ -5,89 +5,104 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Professional Security Shield Icon -->
+    <!-- Modern Cyberpunk Pentest Icon -->
     <group android:translateX="54" android:translateY="54">
 
-        <!-- Outer glow -->
+        <!-- Outer glow (purple) -->
         <path
-            android:fillColor="#1A4A8A"
-            android:fillAlpha="0.3"
-            android:pathData="M0,-38 L32,-22 L32,10 L0,32 L-32,10 L-32,-22 Z"/>
+            android:fillColor="#8B5CF6"
+            android:fillAlpha="0.2"
+            android:pathData="M0,-40 L35,-20 L35,20 L0,40 L-35,20 L-35,-20 Z"/>
 
-        <!-- Main shield (hexagon) -->
+        <!-- Main shield gradient (purple to pink) -->
         <path
-            android:fillColor="#2563EB"
-            android:pathData="M0,-35 L30,-20 L30,8 L0,28 L-30,8 L-30,-20 Z"/>
+            android:fillColor="#A855F7"
+            android:pathData="M0,-36 L32,-18 L32,18 L0,36 L-32,18 L-32,-18 Z"/>
 
-        <!-- Inner shield gradient effect -->
+        <!-- Inner shield layer -->
         <path
-            android:fillColor="#3B82F6"
-            android:pathData="M0,-32 L27,-18 L27,6 L0,24 L-27,6 L-27,-18 Z"/>
+            android:fillColor="#C026D3"
+            android:fillAlpha="0.6"
+            android:pathData="M0,-33 L29,-17 L29,17 L0,33 L-29,17 L-29,-17 Z"/>
 
-        <!-- Lock body -->
+        <!-- Terminal window background -->
         <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M-12,2 L12,2 L12,16 Q12,18 10,18 L-10,18 Q-12,18 -12,16 Z"/>
+            android:fillColor="#1E1B29"
+            android:pathData="M-18,-12 L18,-12 Q20,-12 20,-10 L20,16 Q20,18 18,18 L-18,18 Q-20,18 -20,16 L-20,-10 Q-20,-12 -18,-12 Z"/>
 
-        <!-- Lock shackle (top arc) -->
+        <!-- Terminal header bar -->
+        <path
+            android:fillColor="#34D399"
+            android:pathData="M-18,-12 L18,-12 Q20,-12 20,-10 L20,-6 L-20,-6 L-20,-10 Q-20,-12 -18,-12 Z"/>
+
+        <!-- Terminal dots (MacOS style) -->
+        <path
+            android:fillColor="#EF4444"
+            android:pathData="M-14,-9.5 Q-14,-8.5 -15,-8.5 Q-16,-8.5 -16,-9.5 Q-16,-10.5 -15,-10.5 Q-14,-10.5 -14,-9.5 Z"/>
+        <path
+            android:fillColor="#F59E0B"
+            android:pathData="M-10,-9.5 Q-10,-8.5 -11,-8.5 Q-12,-8.5 -12,-9.5 Q-12,-10.5 -11,-10.5 Q-10,-10.5 -10,-9.5 Z"/>
+        <path
+            android:fillColor="#10B981"
+            android:pathData="M-6,-9.5 Q-6,-8.5 -7,-8.5 Q-8,-8.5 -8,-9.5 Q-8,-10.5 -7,-10.5 Q-6,-10.5 -6,-9.5 Z"/>
+
+        <!-- Command prompt > symbol -->
+        <path
+            android:fillColor="#34D399"
+            android:strokeWidth="2"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M-14,-2 L-10,1 L-14,4"/>
+
+        <!-- Cursor blink -->
+        <path
+            android:fillColor="#34D399"
+            android:pathData="M-6,0 L-6,4 L-4,4 L-4,0 Z"/>
+
+        <!-- Code lines (text simulation) -->
+        <path
+            android:strokeColor="#8B5CF6"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M-8,9 L10,9"/>
+        <path
+            android:strokeColor="#C026D3"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:pathData="M-12,13 L14,13"/>
+
+        <!-- Lock icon (bottom right corner accent) -->
+        <path
+            android:fillColor="#EC4899"
+            android:pathData="M12,10 L16,10 L16,15 Q16,16 15,16 L13,16 Q12,16 12,15 Z"/>
+
+        <!-- Lock shackle -->
         <path
             android:fillColor="#00000000"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="3"
-            android:strokeLineCap="round"
-            android:pathData="M-8,-4 Q-8,-12 0,-12 Q8,-12 8,-4"/>
-
-        <!-- Keyhole -->
-        <path
-            android:fillColor="#2563EB"
-            android:pathData="M0,6 Q2,6 2,8 Q2,10 1,11 L1,14 L-1,14 L-1,11 Q-2,10 -2,8 Q-2,6 0,6 Z"/>
-
-        <!-- Circuit lines (top-left) -->
-        <path
-            android:strokeColor="#60A5FA"
+            android:strokeColor="#EC4899"
             android:strokeWidth="1.5"
             android:strokeLineCap="round"
-            android:pathData="M-24,-12 L-18,-12 M-18,-12 L-18,-8"/>
+            android:pathData="M13,10 Q13,8 14.5,8 Q16,8 16,10"/>
 
-        <!-- Circuit lines (top-right) -->
+        <!-- Cyber circuit accents -->
         <path
-            android:strokeColor="#60A5FA"
-            android:strokeWidth="1.5"
+            android:strokeColor="#34D399"
+            android:strokeWidth="1.2"
             android:strokeLineCap="round"
-            android:pathData="M24,-12 L18,-12 M18,-12 L18,-8"/>
-
-        <!-- Circuit lines (bottom-left) -->
+            android:pathData="M-30,-8 L-24,-8 M-30,8 L-24,8"/>
         <path
-            android:strokeColor="#60A5FA"
-            android:strokeWidth="1.5"
+            android:strokeColor="#EC4899"
+            android:strokeWidth="1.2"
             android:strokeLineCap="round"
-            android:pathData="M-24,12 L-18,12 M-18,12 L-18,8"/>
+            android:pathData="M30,-8 L24,-8 M30,8 L24,8"/>
 
-        <!-- Circuit lines (bottom-right) -->
+        <!-- Glowing dots -->
         <path
-            android:strokeColor="#60A5FA"
-            android:strokeWidth="1.5"
-            android:strokeLineCap="round"
-            android:pathData="M24,12 L18,12 M18,12 L18,8"/>
-
-        <!-- Circuit dots -->
+            android:fillColor="#34D399"
+            android:pathData="M-24,-8 Q-24,-6 -24,-8 M-24,8 Q-24,6 -24,8"/>
         <path
-            android:fillColor="#60A5FA"
-            android:pathData="M-18,-12 Q-18,-10 -18,-12 M18,-12 Q18,-10 18,-12 M-18,12 Q-18,10 -18,12 M18,12 Q18,10 18,12"/>
-
-        <!-- Small accent dots in corners -->
-        <path
-            android:fillColor="#93C5FD"
-            android:pathData="M-20.5,-16 Q-22,-16 -22,-17.5 Q-22,-19 -23.5,-19 Q-25,-19 -25,-17.5 Q-25,-16 -23.5,-16 Q-22,-16 -20.5,-16 Z"/>
-        <path
-            android:fillColor="#93C5FD"
-            android:pathData="M23.5,-16 Q22,-16 22,-17.5 Q22,-19 20.5,-19 Q19,-19 19,-17.5 Q19,-16 20.5,-16 Q22,-16 23.5,-16 Z"/>
-        <path
-            android:fillColor="#93C5FD"
-            android:pathData="M-20.5,14 Q-22,14 -22,12.5 Q-22,11 -23.5,11 Q-25,11 -25,12.5 Q-25,14 -23.5,14 Q-22,14 -20.5,14 Z"/>
-        <path
-            android:fillColor="#93C5FD"
-            android:pathData="M23.5,14 Q22,14 22,12.5 Q22,11 20.5,11 Q19,11 19,12.5 Q19,14 20.5,14 Q22,14 23.5,14 Z"/>
+            android:fillColor="#EC4899"
+            android:pathData="M24,-8 Q24,-6 24,-8 M24,8 Q24,6 24,8"/>
 
     </group>
 </vector>
