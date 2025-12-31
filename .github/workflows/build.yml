@@ -1,455 +1,62 @@
-name: Android CI Build with Debugging
+name: Android Debug Build - Creates Release
 
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  debug-and-build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # ============================================
-      # STEP 1: Checkout Repository
-      # ============================================
-      - name: 📥 Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Full history for better debugging
 
-      # ============================================
-      # STEP 2: System Environment Diagnostics
-      # ============================================
-      - name: 🔍 System Environment Diagnostics
-        run: |
-          echo "=================================================="
-          echo "SYSTEM DIAGNOSTICS"
-          echo "=================================================="
-          echo ""
-          echo "🖥️  Operating System:"
-          uname -a
-          lsb_release -a || cat /etc/os-release
-          echo ""
-          echo "💾 Disk Space:"
-          df -h
-          echo ""
-          echo "🧠 Memory:"
-          free -h
-          echo ""
-          echo "⚙️  CPU Info:"
-          lscpu | grep -E "Model name|CPU\(s\)|Thread"
-          echo ""
-          echo "🌐 Network:"
-          ip addr show || ifconfig
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 3: Repository Structure Validation
-      # ============================================
-      - name: 📂 Validate Repository Structure
-        run: |
-          echo "=================================================="
-          echo "REPOSITORY STRUCTURE VALIDATION"
-          echo "=================================================="
-          echo ""
-          echo "📁 Project Root Files:"
-          ls -lah
-          echo ""
-          echo "📁 App Directory Structure:"
-          find app -type f -name "*.gradle" -o -name "*.xml" -o -name "*.kt" | head -20
-          echo ""
-          echo "✅ Checking Required Files:"
-
-          required_files=(
-            "build.gradle"
-            "settings.gradle"
-            "gradle.properties"
-            "app/build.gradle"
-            "app/src/main/AndroidManifest.xml"
-            "app/src/main/java/com/pentest/dashboard/MainActivity.kt"
-          )
-
-          all_present=true
-          for file in "${required_files[@]}"; do
-            if [ -f "$file" ]; then
-              echo "  ✅ $file - EXISTS"
-            else
-              echo "  ❌ $file - MISSING"
-              all_present=false
-            fi
-          done
-
-          if [ "$all_present" = false ]; then
-            echo ""
-            echo "❌ ERROR: Required files are missing!"
-            exit 1
-          fi
-
-          echo ""
-          echo "✅ All required files present"
-          echo "=================================================="
-
-      # ============================================
-      # STEP 4: Gradle Configuration Validation
-      # ============================================
-      - name: 🔧 Validate Gradle Configuration
-        run: |
-          echo "=================================================="
-          echo "GRADLE CONFIGURATION VALIDATION"
-          echo "=================================================="
-          echo ""
-          echo "📄 build.gradle (root):"
-          cat build.gradle
-          echo ""
-          echo "📄 app/build.gradle:"
-          cat app/build.gradle
-          echo ""
-          echo "📄 settings.gradle:"
-          cat settings.gradle
-          echo ""
-          echo "📄 gradle.properties:"
-          cat gradle.properties
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 5: Set up JDK
-      # ============================================
-      - name: ☕ Set up JDK 17
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: ✅ Verify Java Installation
+      - name: Setup Gradle
         run: |
-          echo "=================================================="
-          echo "JAVA ENVIRONMENT VERIFICATION"
-          echo "=================================================="
-          echo ""
-          echo "☕ Java Version:"
-          java -version
-          echo ""
-          echo "📍 JAVA_HOME:"
-          echo $JAVA_HOME
-          echo ""
-          echo "🔍 Which Java:"
-          which java
-          echo ""
-          echo "=================================================="
+          chmod +x gradlew || (wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip && unzip -q gradle-8.5-bin.zip && gradle-8.5/bin/gradle wrapper --gradle-version 8.5 && chmod +x gradlew)
 
-      # ============================================
-      # STEP 6: Generate Gradle Wrapper
-      # ============================================
-      - name: 🔄 Generate Gradle Wrapper
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Display APK Info
         run: |
-          echo "=================================================="
-          echo "GRADLE WRAPPER GENERATION"
-          echo "=================================================="
-          echo ""
+          echo "✅ BUILD COMPLETE"
+          ls -lh app/build/outputs/apk/debug/
 
-          if [ -f "gradlew" ]; then
-            echo "✅ gradlew already exists"
-            ls -lah gradlew
-          else
-            echo "⚠️  gradlew not found, generating..."
-            # Install Gradle 8.5 (compatible with AGP 8.2.0 and Kotlin 1.9.20)
-            wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
-            unzip -q gradle-8.5-bin.zip
-            gradle-8.5/bin/gradle wrapper --gradle-version 8.5
-            echo ""
-            echo "✅ Gradle wrapper generated:"
-            ls -lah gradlew gradle/
-          fi
-
-          echo ""
-          echo "📄 Gradle Wrapper Properties:"
-          cat gradle/wrapper/gradle-wrapper.properties || echo "⚠️  gradle-wrapper.properties not found"
-          echo ""
-          echo "=================================================="
-
-      - name: 🔐 Grant Execute Permission for gradlew
-        run: |
-          chmod +x gradlew
-          echo "✅ Execute permission granted to gradlew"
-          ls -lah gradlew
-
-      # ============================================
-      # STEP 7: Gradle Dependencies Check
-      # ============================================
-      - name: 📦 Check Gradle Dependencies
-        run: |
-          echo "=================================================="
-          echo "GRADLE DEPENDENCIES CHECK"
-          echo "=================================================="
-          echo ""
-          ./gradlew dependencies --configuration debugCompileClasspath || echo "⚠️  Dependencies check completed with warnings"
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 8: Pre-Build Validation
-      # ============================================
-      - name: 🔍 Pre-Build Validation
-        run: |
-          echo "=================================================="
-          echo "PRE-BUILD VALIDATION"
-          echo "=================================================="
-          echo ""
-
-          echo "📋 Running Gradle Tasks List:"
-          ./gradlew tasks --all
-          echo ""
-
-          echo "📊 Project Information:"
-          ./gradlew projects
-          echo ""
-
-          echo "🔍 Build Environment:"
-          ./gradlew --version
-          echo ""
-
-          echo "=================================================="
-
-      # ============================================
-      # STEP 9: Clean Build (Remove Old Artifacts)
-      # ============================================
-      - name: 🧹 Clean Build Directory
-        run: |
-          echo "=================================================="
-          echo "CLEANING BUILD DIRECTORY"
-          echo "=================================================="
-          echo ""
-
-          echo "📊 Before Clean:"
-          du -sh app/build 2>/dev/null || echo "No build directory yet"
-          echo ""
-
-          ./gradlew clean
-          echo ""
-
-          echo "✅ Clean completed"
-          echo "=================================================="
-
-      # ============================================
-      # STEP 10: Build Debug APK (Verbose)
-      # ============================================
-      - name: 🏗️  Build Debug APK
-        run: |
-          echo "=================================================="
-          echo "BUILDING DEBUG APK"
-          echo "=================================================="
-          echo ""
-
-          ./gradlew assembleDebug \
-            --stacktrace \
-            --info \
-            --warning-mode all \
-            --build-cache
-
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 11: Post-Build Validation
-      # ============================================
-      - name: ✅ Validate Build Output
-        run: |
-          echo "=================================================="
-          echo "POST-BUILD VALIDATION"
-          echo "=================================================="
-          echo ""
-
-          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-
-          if [ -f "$APK_PATH" ]; then
-            echo "✅ APK Generated Successfully!"
-            echo ""
-            echo "📦 APK Details:"
-            ls -lh $APK_PATH
-            echo ""
-            echo "📊 APK Size:"
-            du -h $APK_PATH
-            echo ""
-            echo "🔍 APK Info (using aapt):"
-            # Try to get APK info if aapt is available
-            if command -v aapt &> /dev/null; then
-              aapt dump badging $APK_PATH | grep -E "package|sdkVersion|targetSdkVersion|application-label"
-            else
-              echo "⚠️  aapt not available, skipping APK analysis"
-            fi
-            echo ""
-            echo "📂 Build Outputs Directory:"
-            find app/build/outputs -type f -name "*.apk" -o -name "*.aab"
-          else
-            echo "❌ ERROR: APK not found at $APK_PATH"
-            echo ""
-            echo "📂 Checking build/outputs directory:"
-            ls -lR app/build/outputs/ || echo "Build outputs directory not found"
-            exit 1
-          fi
-
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 12: Upload Debug APK
-      # ============================================
-      - name: 📤 Upload Debug APK
-        uses: actions/upload-artifact@v4
-        continue-on-error: true
-        with:
-          name: pentest-dashboard-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
-          if-no-files-found: error
-
-      # ============================================
-      # STEP 13: Build Outputs Summary
-      # ============================================
-      - name: 📋 Build Summary
-        run: |
-          echo "=================================================="
-          echo "BUILD SUMMARY"
-          echo "=================================================="
-          echo ""
-          echo "✅ Build Status: SUCCESS"
-          echo ""
-          echo "📦 Artifacts Generated:"
-          find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) -exec ls -lh {} \;
-          echo ""
-          echo "📊 APK File Info:"
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
-          file app/build/outputs/apk/debug/app-debug.apk
-          echo ""
-          echo "📊 Total Build Size:"
-          du -sh app/build
-          echo ""
-          echo "🎉 APK BUILD COMPLETE!"
-          echo ""
-          echo "If artifact upload failed (storage quota), you can:"
-          echo "1. Delete old workflow runs to free up space"
-          echo "2. Re-run this workflow"
-          echo "3. Or build locally: ./gradlew assembleDebug"
-          echo ""
-          echo "=================================================="
-
-      # ============================================
-      # STEP 14: Optional - Build Release APK
-      # ============================================
-      - name: 🏗️  Build Release APK (Unsigned)
-        run: |
-          echo "=================================================="
-          echo "BUILDING RELEASE APK (UNSIGNED)"
-          echo "=================================================="
-          echo ""
-
-          ./gradlew assembleRelease --stacktrace --info || {
-            echo "⚠️  Release build failed (expected without signing config)"
-            echo "This is normal for unsigned builds"
-          }
-
-          echo "=================================================="
-        continue-on-error: true
-
-      - name: 📤 Upload Release APK (if exists)
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
         if: success()
+        uses: softprops/action-gh-release@v1
         with:
-          name: pentest-dashboard-release-apk
-          path: app/build/outputs/apk/release/*.apk
-          retention-days: 30
-          if-no-files-found: ignore
+          tag_name: debug-v1.0.${{ github.run_number }}
+          name: Debug Build v1.0.${{ github.run_number }}
+          body: |
+            ## Pentest Dashboard - Debug Build
 
-      # ============================================
-      # STEP 15: Lint Check (Code Quality)
-      # ============================================
-      - name: 🔍 Run Lint Checks
-        run: |
-          echo "=================================================="
-          echo "RUNNING LINT CHECKS"
-          echo "=================================================="
-          echo ""
+            **Auto-generated debug APK from latest commit**
 
-          ./gradlew lint || echo "⚠️  Lint found issues (non-blocking)"
+            ### Download
+            - app-debug.apk (Ready to install)
 
-          if [ -f "app/build/reports/lint-results-debug.html" ]; then
-            echo "📊 Lint report generated"
-          fi
+            ### Installation
+            1. Download APK to phone
+            2. Enable "Install Unknown Apps" for your browser
+            3. Tap APK to install
 
-          echo "=================================================="
-        continue-on-error: true
+            **Flipper Zero USB support included**
+            **All fake results removed**
 
-      - name: 📤 Upload Lint Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lint-report
-          path: app/build/reports/lint-results*.html
-          retention-days: 30
-          if-no-files-found: ignore
-
-      # ============================================
-      # STEP 16: Error Diagnostics (Only on Failure)
-      # ============================================
-      - name: 🚨 Build Failure Diagnostics
-        if: failure()
-        run: |
-          echo "=================================================="
-          echo "BUILD FAILURE DIAGNOSTICS"
-          echo "=================================================="
-          echo ""
-
-          echo "❌ Build failed! Collecting diagnostic information..."
-          echo ""
-
-          echo "📂 Build Logs:"
-          find . -name "*.log" -type f -exec echo "--- {} ---" \; -exec cat {} \;
-          echo ""
-
-          echo "📂 Build Directory Contents:"
-          ls -lR app/build/ || echo "Build directory not accessible"
-          echo ""
-
-          echo "📊 Gradle Daemon Status:"
-          ./gradlew --status || echo "Could not get daemon status"
-          echo ""
-
-          echo "=================================================="
-
-      # ============================================
-      # STEP 17: Upload Build Logs (Always)
-      # ============================================
-      - name: 📤 Upload Build Logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build-logs
-          path: |
-            app/build/outputs/logs/
-            **/*.log
-          retention-days: 7
-          if-no-files-found: ignore
-
-  # ============================================
-  # JOB 2: Notification (Optional)
-  # ============================================
-  notify:
-    runs-on: ubuntu-latest
-    needs: debug-and-build
-    if: always()
-    steps:
-      - name: 📢 Build Status Notification
-        run: |
-          if [ "${{ needs.debug-and-build.result }}" == "success" ]; then
-            echo "✅ BUILD SUCCESSFUL!"
-            echo "Download your APK from the Artifacts section above."
-          else
-            echo "❌ BUILD FAILED!"
-            echo "Check the logs above for error details."
-          fi
+            🤖 Auto-built by GitHub Actions
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
