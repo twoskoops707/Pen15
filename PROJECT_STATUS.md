@@ -27,13 +27,21 @@ https://github.com/twoskoops707/Pen15/releases/download/flipper-v1.0.17/pentest_
 
 ### WHAT WORKS RIGHT NOW
 
-**Android App:**
+**Android App v1.0.69:**
 - ✅ USB detection and connection to Flipper
 - ✅ Serial communication via USB at 115200 baud
 - ✅ Sends commands to Flipper
-- ✅ NO fake results (all removed in v1.0.69)
+- ✅ NO fake results (all removed)
 - ✅ Parameter questionnaires for attacks
 - ✅ Auto-discovery of WiFi networks, IPs, interfaces
+
+**NEW: Complete Termux Integration:**
+- ✅ WiFi Attacks - Automated aircrack-ng workflow
+- ✅ Hash Cracking - Hashcat & John with online wordlists
+- ✅ Packet Sniffing - tcpdump capture + tshark analysis
+- ✅ OSINT Scanner - Unified tool running SpiderFoot, ReconNG, TheHarvester, Sublist3r
+- ✅ API Key Manager - 20+ OSINT API keys (Shodan, VirusTotal, etc.)
+- ✅ Tool Installation - Auto-install all pentesting tools in Termux
 
 **Flipper Companion App (v2.0 - ALL FEATURES):**
 - ✅ Serial command parser (115200 baud)
@@ -101,9 +109,70 @@ Android: gpio write 2 1\r\n
 Flipper: GPIO_WRITE|pin:2,state:HIGH\r\n
 ```
 
-### IMMEDIATE NEXT STEPS
+## COMPLETE FEATURE LIST
 
-1. **COMMIT AND BUILD FLIPPER COMPANION:**
+### Flipper Zero Integration
+- SubGHz Scanner/Transmitter
+- RFID Tag Reader (via built-in app)
+- NFC Card Reader (via built-in app)
+- Infrared Remote (via built-in app)
+- iButton Key Reader (via built-in app)
+- BadUSB Keyboard Injection
+- Bluetooth BLE Scanner/Spammer
+- GPIO Pin Control (pins 2-7)
+- ESP32 Marauder Integration
+- App Launcher (launch ANY Flipper app from phone!)
+
+### WiFi Pentesting
+- Network Scanner (2.4GHz/5GHz)
+- WPA/WPA2 Handshake Capture
+- Deauth Attack (automated)
+- Handshake Cracking (aircrack-ng with online wordlists)
+- Monitor Mode Auto-Enable
+
+### Hash Cracking
+- Hashcat Support (MD5, SHA1, NTLM, SHA256, SHA512, bcrypt, etc.)
+- John the Ripper Support
+- Online Wordlists (SecLists - NO local storage)
+- Hash Identification
+- Custom Wordlist URLs
+
+### Packet Analysis
+- tcpdump Packet Capture
+- tshark Analysis
+- HTTP Credential Extraction
+- FTP Credential Extraction
+- DNS Query Enumeration
+- Top Talkers Analysis
+
+### OSINT/Reconnaissance
+- **Unified OSINT Scanner** - Enter target once, runs ALL tools:
+  - SpiderFoot (70+ modules)
+  - Recon-NG (50+ modules)
+  - TheHarvester (email/subdomain enum)
+  - Sublist3r (subdomain discovery)
+  - WHOIS lookup
+  - DNS enumeration
+  - Breach database check (HaveIBeenPwned)
+  - Shodan intelligence
+- **API Key Manager** - 20+ OSINT APIs:
+  - Network: Shodan, Censys, BinaryEdge, ZoomEye, Onyphe, GreyNoise
+  - Threat Intel: VirusTotal, AlienVault, IPQualityScore
+  - Domain/DNS: SecurityTrails, IPInfo
+  - People/Email: Hunter.io, FullContact, HaveIBeenPwned
+  - Social: GitHub, Twitter, Facebook, LinkedIn
+  - Search: Google, Bing
+- Auto-export to SpiderFoot/Recon-NG configs
+- HTML report generation
+
+### Tool Management
+- Auto-install all tools in Termux
+- Tool verification checker
+- Installation progress tracking
+
+## IMMEDIATE NEXT STEPS
+
+1. **TEST BUILD (in progress):**
    ```bash
    git add flipper_app/pentest_companion.c
    git commit -m "MINIMAL WORKING Flipper companion - SubGHz + GPIO only"
