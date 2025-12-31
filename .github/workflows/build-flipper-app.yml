@@ -7,6 +7,9 @@ on:
       - 'flipper_app/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-fap:
     runs-on: ubuntu-latest
@@ -30,8 +33,30 @@ jobs:
         cd flipper_app
         ufbt
 
-    - name: Upload FAP artifact
-      uses: actions/upload-artifact@v4
+    - name: Create GitHub Release
+      if: success()
+      uses: softprops/action-gh-release@v1
       with:
-        name: pentest_companion.fap
-        path: flipper_app/dist/pentest_companion.fap
+        tag_name: flipper-v1.0.${{ github.run_number }}
+        name: Flipper Companion v1.0.${{ github.run_number }}
+        body: |
+          ## Flipper Zero Companion App
+
+          **Install to Flipper:** `/apps/Tools/pentest_companion.fap`
+
+          ### Installation
+          1. Download pentest_companion.fap
+          2. Connect Flipper to computer
+          3. Open qFlipper
+          4. Copy FAP to `/apps/Tools/`
+          5. Reboot Flipper
+
+          ### Usage
+          - Run app on Flipper: Apps → Tools → Pentest Companion
+          - Connect Android app via USB
+          - Send SubGHz/RFID commands from phone
+
+          🤖 Auto-built by GitHub Actions
+        files: flipper_app/dist/pentest_companion.fap
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
