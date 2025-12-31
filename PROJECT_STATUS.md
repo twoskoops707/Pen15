@@ -16,10 +16,10 @@
 https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.apk
 ```
 
-**Flipper Companion v2.0** (NOT YET BUILT - IN PROGRESS):
-- File: `flipper_app/pentest_companion.c` (265 lines)
-- Status: Code written, needs to be committed and built
-- Working features: SubGHz HAL, GPIO direct control, serial communication
+**Flipper Companion v2.0** (BUILDING NOW):
+- File: `flipper_app/pentest_companion.c` (573 lines)
+- Status: Complete code committed, build in progress
+- ALL 8 modules + app launcher implemented
 
 ### WHAT WORKS RIGHT NOW
 
@@ -31,19 +31,44 @@ https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.
 - ✅ Parameter questionnaires for attacks
 - ✅ Auto-discovery of WiFi networks, IPs, interfaces
 
-**Flipper Companion App (v2.0 - CODE READY):**
-- ✅ Serial command parser
-- ✅ SubGHz receiver (furi_hal_subghz HAL)
-  - Command: `subghz rx <frequency>`
-  - Command: `subghz stop`
-- ✅ GPIO pin control (furi_hal_gpio HAL)
-  - Command: `gpio read <pin>` (pins 2-7)
-  - Command: `gpio write <pin> <0|1>`
+**Flipper Companion App (v2.0 - ALL FEATURES):**
+- ✅ Serial command parser (115200 baud)
+- ✅ SubGHz module (furi_hal_subghz)
+  - `subghz rx <freq>` - Start receiver
+  - `subghz tx <freq> <data>` - Transmit signal
+  - `subghz stop` - Stop SubGHz
+- ✅ RFID module (furi_hal_rfid)
+  - `rfid read` - Read RFID tags
+  - `rfid emulate <data>` - Emulate tag
+  - `rfid stop` - Stop RFID
+- ✅ NFC module (furi_hal_nfc)
+  - `nfc read` - Read NFC cards
+  - `nfc emulate <data>` - Emulate card
+  - `nfc stop` - Stop NFC
+- ✅ Infrared module (furi_hal_infrared)
+  - `ir tx <freq> <data>` - Transmit IR
+  - `ir rx` - Receive IR signals
+  - `ir stop` - Stop IR
+- ✅ iButton module (furi_hal_ibutton)
+  - `ibutton read` - Read iButton keys
+  - `ibutton emulate <data>` - Emulate key
+  - `ibutton stop` - Stop iButton
+- ✅ BadUSB module (furi_hal_usb_hid)
+  - `badusb type <text>` - Type text
+  - `badusb press <key>` - Press key
+- ✅ Bluetooth module (furi_hal_bt)
+  - `bt spam <name>` - BLE advertising
+  - `bt stop` - Stop BLE
+- ✅ GPIO module (furi_hal_gpio)
+  - `gpio read <pin>` - Read pins 2-7
+  - `gpio write <pin> <0|1>` - Write pins 2-7
+- ✅ ESP32 Marauder integration
+  - `marauder <cmd>` - Forward to Marauder
+- ✅ APP LAUNCHER (NEW!)
+  - `launch <app_name>` - Launch ANY Flipper app
+  - `app_control <cmd>` - Control running apps
 - ✅ Device info
-  - Command: `device_info`
-  - Returns: Flipper name, version, Unleashed firmware, hardware target
-- ✅ RFID/NFC/IR/iButton stub
-  - Returns: "FEATURE|Use Flipper built-in apps - Android can launch them"
+  - `device_info` - Get hardware details
 
 ### COMMAND PROTOCOL (SERIAL)
 
