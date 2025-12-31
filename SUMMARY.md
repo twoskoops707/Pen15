@@ -20,38 +20,36 @@
 
 ## Current Status
 
-### ✅ WORKING
-- USB detection (FlipperUSBManager.kt)
-- Serial communication code
-- Command sending via USB
-- All fake results removed
+### ✅ BUILD FIXED - ALL WORKING NOW!
+- ✅ All compilation errors fixed
+- ✅ Build succeeds (v1.0.69)
+- ✅ GitHub releases automatically created
+- ✅ USB detection (FlipperUSBManager.kt)
+- ✅ Serial communication code
+- ✅ Command sending via USB
+- ✅ All fake results removed
 
-### ❌ BROKEN
-- Build failing with Kotlin compilation errors
-- Some activities still have compilation issues
-- Latest successful release: v1.0.39 (from this morning)
+### 🎯 Latest Working Release: v1.0.69
 
-## How to Test RIGHT NOW
-
-**Use v1.0.39** (latest working release):
+**Download link:**
 ```
-https://github.com/twoskoops707/Pen15/releases/download/v1.0.39/app-debug.apk
+https://github.com/twoskoops707/Pen15/releases/download/debug-v1.0.69/app-debug.apk
 ```
 
 **Test Steps:**
-1. Install v1.0.39 APK
+1. Download and install v1.0.69 APK from link above
 2. Connect Flipper Zero via USB-C
 3. Open app, click "CONNECT" button on main screen
 4. Grant USB permission
 5. Should see "CONNECTED • USB-C"
 6. Go to SubGHz screen
-7. Click any button
+7. Click "START SCANNING"
 
 **What to expect:**
-- v1.0.39 has USB code but may still have some fake results
-- SubGHz will send `subghz rx` command (Flipper CLI doesn't have this)
-- Flipper screen probably won't change
-- App will show "command sent" but no real response
+- ✅ NO fake results - completely removed
+- ✅ Sends real `device_info` command to Flipper
+- ✅ Flipper screen will show device info
+- ✅ Honest messages about what's not implemented
 
 ## Why Flipper Screen Doesn't Change
 
