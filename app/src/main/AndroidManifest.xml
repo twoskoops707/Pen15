@@ -161,6 +161,18 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".APIKeysActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".SettingsActivity" />
+
+        <activity
+            android:name=".OSINTScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
     </application>
 
 </manifest>
