@@ -8,9 +8,18 @@
 ## Current Status
 ✅ **Master Pentesting Suite - FULLY AUTOMATED**
 ✅ **Termux RUN_COMMAND execution (automatic command running)**
-✅ **Flipper Zero integration via USB-C serial**
+⚠️ **Flipper Zero USB integration - TESTING CLI APPROACH**
+❌ **Flipper companion app REMOVED - architecture was flawed**
 ✅ **AWOK Mini V3 ESP32 Marauder automation**
-🚀 **v1.0.12 - Complete rewrite with full hardware integration**
+🚀 **v1.0.92 - CRITICAL FIX: Now uses Flipper CLI instead of custom app**
+
+## CRITICAL DISCOVERY (2026-01-01)
+**Flipper Companion App can't work with USB!**
+- Custom apps can't listen on USB CDC (interface is in use by the app itself)
+- `FuriHalSerialIdUsb` doesn't exist in Flipper SDK
+- Solution: Use Flipper's built-in CLI via USB CDC instead
+- NO custom .fap app needed!
+- See: CRITICAL_ARCHITECTURE_FIX.md for details
 
 ## What Makes This Special
 🔥 **ZERO LEARNING CURVE** - One-click automated workflows
