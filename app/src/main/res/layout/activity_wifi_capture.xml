@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/dark_background">
+    android:background="@color/dark_bg">
 
     <!-- Header -->
     <LinearLayout
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="@drawable/gradient_header"
+        android:background="@color/electric_blue"
         android:gravity="center_vertical">
 
         <ImageView
@@ -58,7 +58,7 @@
             android:text="▶ START CAPTURE + CRACK"
             android:textSize="16sp"
             android:enabled="false"
-            app:backgroundTint="@color/neon_green"
+            app:backgroundTint="@color/status_connected"
             app:cornerRadius="12dp"
             android:layout_marginBottom="8dp" />
 
@@ -79,7 +79,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="16dp"
-        app:cardBackgroundColor="@color/card_background"
+        app:cardBackgroundColor="@color/surface_bg"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp">
 
