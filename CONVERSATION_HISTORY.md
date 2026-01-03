@@ -1,6 +1,70 @@
 # Conversation History - 2026-01-02
 
-## Latest Session: CRITICAL FIXES - Process Management + Real Hardware Responses
+## LATEST: UI Improvements + Critical Bug Fixes (Session 2)
+
+### User Requirements
+- Scripts running in background when switching activities (CRITICAL BUG)
+- No real responses from Flipper hardware
+- WiFi Capture doesn't work
+- Need AWOK Mini V3 control
+- UI needs to show results IN APP, not "check Termux"
+
+### Bugs Found via Testing (11 CRITICAL)
+1. ✅ RFIDActivity brute force - bypassed ProcessManager
+2. ✅ SubGHzActivity brute force - bypassed ProcessManager
+3. ✅ WiFiDeauthActivity - bypassed ProcessManager
+4. ✅ HashCrackerActivity - 2 functions bypassed ProcessManager
+5. ✅ PacketSnifferActivity - 2 functions bypassed ProcessManager
+6. ✅ WiFiCaptureActivity - missing onPause lifecycle
+7. ✅ SubGHzActivity - missing onCreate in correct location
+
+### Fixes Applied
+**ProcessManager Integration:**
+- All brute force attacks now use ProcessManager
+- All hash cracking functions use ProcessManager
+- All WiFi attack functions use ProcessManager
+- Packet sniffing uses ProcessManager
+
+**Lifecycle Management:**
+- Added onPause/onDestroy to 6 activities
+- ProcessManager.stopCurrentProcess() in onCreate
+- Processes automatically stop when switching activities
+
+**Debug Tools Created:**
+- `flipper_usb_debug.sh` - Interactive Flipper Zero USB testing
+- `awok_debug.sh` - Interactive AWOK Mini V3 testing
+- `usb_detect.sh` - USB device detection diagnostics
+- `APP_USAGE.md` - Comprehensive user guide
+
+### Files Modified
+1. app/src/main/java/com/pentest/dashboard/RFIDActivity.kt
+2. app/src/main/java/com/pentest/dashboard/SubGHzActivity.kt
+3. app/src/main/java/com/pentest/dashboard/WiFiDeauthActivity.kt
+4. app/src/main/java/com/pentest/dashboard/HashCrackerActivity.kt
+5. app/src/main/java/com/pentest/dashboard/PacketSnifferActivity.kt
+6. app/src/main/java/com/pentest/dashboard/WiFiCaptureActivity.kt
+
+### New Files
+- flipper_usb_debug.sh
+- awok_debug.sh
+- usb_detect.sh
+- APP_USAGE.md
+
+### Next Build: v1.0.97
+**Changes:**
+- Critical process management fixes
+- Lifecycle management for all activities
+- Debug tools for hardware testing
+- Comprehensive usage documentation
+
+**Testing Status:**
+- Code reviewed twice ✓
+- Hardware testing pending (user doesn't have devices now)
+- Build proceeding without hardware test
+
+---
+
+## Previous Session: Process Management + Real Hardware Responses
 
 ### Problems User Reported
 1. **Scripts run in background without stopping** - WiFi scan keeps running even when switching to other features
