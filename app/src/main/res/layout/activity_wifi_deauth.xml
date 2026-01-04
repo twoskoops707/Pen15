@@ -131,6 +131,18 @@
                 android:textColor="@color/white"
                 android:fontFamily="monospace"
                 android:enabled="false"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Stop Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⏹ STOP ATTACK"
+                android:backgroundTint="@color/status_disconnected"
+                android:textColor="@color/white"
+                android:fontFamily="monospace"
+                android:enabled="false"
                 android:layout_marginBottom="16dp" />
 
             <!-- Log Output -->
