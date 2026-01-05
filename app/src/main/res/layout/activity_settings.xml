@@ -117,6 +117,24 @@
             android:text="INSTALL TERMUX (F-DROID)"
             android:textColor="@color/text_white"
             app:backgroundTint="@color/surface_bg"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCheckTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CHECK INSTALLED TOOLS"
+            android:textColor="@color/terminal_black"
+            app:backgroundTint="@color/terminal_cyan"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInstallTools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INSTALL PENTEST TOOLS"
+            android:textColor="@color/terminal_black"
+            app:backgroundTint="@color/terminal_green"
             android:layout_marginBottom="24dp" />
 
         <!-- Actions -->
