@@ -6,55 +6,130 @@
     android:layout_height="match_parent"
     android:background="@color/black_bg">
 
-    <!-- Connection Status Bar -->
+    <!-- TOP: Status Bar with Connection Info -->
     <LinearLayout
-        android:id="@+id/connectionBar"
+        android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:background="@color/dark_bg"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1A1A1A"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <View
-            android:id="@+id/statusIndicator"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:background="@drawable/status_dot"
-            android:backgroundTint="@color/status_disconnected"/>
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="0dp"
+        <!-- Connection Status Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="DISCONNECTED"
-            android:textColor="@color/text_gray"
-            android:textSize="12sp"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.1"
-            android:layout_marginStart="12dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/btnSettings"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_manage"
-            android:tint="@color/text_gray"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"/>
+            <View
+                android:id="@+id/statusIndicator"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/status_dot"
+                android:backgroundTint="@color/status_disconnected"/>
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="DISCONNECTED"
+                android:textColor="#FF6B6B"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
+                android:layout_marginStart="12dp"/>
+
+            <ImageView
+                android:id="@+id/btnSettings"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_manage"
+                android:tint="#AAAAAA"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"/>
+
+        </LinearLayout>
+
+        <!-- Current Operation Display -->
+        <TextView
+            android:id="@+id/currentOperation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ready to connect"
+            android:textColor="#CCCCCC"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:layout_marginTop="4dp"
+            android:visibility="visible"/>
 
     </LinearLayout>
 
-    <!-- Main Functions Grid -->
+    <!-- MIDDLE: Real-time Information Display Panel -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/infoPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="12dp"
+        app:cardBackgroundColor="#0D0D0D"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintTop_toBottomOf="@id/statusBar"
+        app:layout_constraintBottom_toTopOf="@id/functionsContainer"
+        app:layout_constraintHeight_percent="0.25">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Info Panel Title -->
+                <TextView
+                    android:id="@+id/infoPanelTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DEVICE SCANNER"
+                    android:textColor="#00D4FF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:paddingBottom="8dp"/>
+
+                <!-- Real-time Info Display -->
+                <TextView
+                    android:id="@+id/infoDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Waiting for scan...\n\nConnect Flipper Zero via:\n• USB-C cable (Recommended)\n• Bluetooth (Pair first in Android settings)"
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:lineSpacingExtra="2dp"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
+
+    <!-- MIDDLE-BOTTOM: Flipper Tools Grid -->
     <ScrollView
         android:id="@+id/functionsContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/connectionBar"
+        app:layout_constraintTop_toBottomOf="@id/infoPanel"
         app:layout_constraintBottom_toTopOf="@id/actionBar">
 
         <GridLayout
@@ -62,56 +137,50 @@
             android:layout_height="wrap_content"
             android:columnCount="2"
             android:rowCount="4"
-            android:padding="12dp"
+            android:padding="8dp"
             android:alignmentMode="alignBounds">
 
             <!-- Sub-GHz -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardSubGHz"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="0"
                 android:layout_column="0"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_subghz"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#FF6B35"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="SUB-GHZ"
-                        android:textColor="@color/func_subghz"
-                        android:textSize="14sp"
+                        android:textColor="#FF6B35"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="300-928 MHz"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:text="315/433/868/915 MHz"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_subghz"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -120,49 +189,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardRFID"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="0"
                 android:layout_column="1"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_rfid"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#4ECDC4"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="RFID"
-                        android:textColor="@color/func_rfid"
-                        android:textSize="14sp"
+                        android:textColor="#4ECDC4"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="125 kHz"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_rfid"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -171,49 +234,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardNFC"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="1"
                 android:layout_column="0"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_nfc"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#9D4EDD"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="NFC"
-                        android:textColor="@color/func_nfc"
-                        android:textSize="14sp"
+                        android:textColor="#9D4EDD"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="13.56 MHz"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_nfc"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -222,49 +279,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardInfrared"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="1"
                 android:layout_column="1"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_ir"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#F72585"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="INFRARED"
-                        android:textColor="@color/func_ir"
-                        android:textSize="14sp"
+                        android:textColor="#F72585"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Universal Remote"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:text="Universal"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_ir"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -273,49 +324,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardGPIO"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="2"
                 android:layout_column="0"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_gpio"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#06FFA5"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="GPIO"
-                        android:textColor="@color/func_gpio"
-                        android:textSize="14sp"
+                        android:textColor="#06FFA5"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Hardware I/O"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_gpio"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -324,49 +369,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBadUSB"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="2"
                 android:layout_column="1"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_badusb"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#FFBE0B"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BAD USB"
-                        android:textColor="@color/func_badusb"
-                        android:textSize="14sp"
+                        android:textColor="#FFBE0B"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="HID Emulation"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_badusb"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -375,49 +414,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardIButton"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="3"
                 android:layout_column="0"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_ibutton"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#00B4D8"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="iBUTTON"
-                        android:textColor="@color/func_ibutton"
-                        android:textSize="14sp"
+                        android:textColor="#00B4D8"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="1-Wire Keys"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_ibutton"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -426,49 +459,43 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBluetooth"
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="110dp"
                 android:layout_row="3"
                 android:layout_column="1"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                app:cardBackgroundColor="@color/surface_bg"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/func_ble"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#1A1A1A"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#3A86FF"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BLUETOOTH"
-                        android:textColor="@color/func_ble"
-                        android:textSize="14sp"
+                        android:textColor="#3A86FF"
+                        android:textSize="13sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.15"/>
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.1"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BLE Scanner"
-                        android:textColor="@color/text_dim"
-                        android:textSize="11sp"
+                        android:textColor="#999999"
+                        android:textSize="10sp"
                         android:fontFamily="monospace"
                         android:layout_marginTop="4dp"/>
-
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="2dp"
-                        android:background="@color/func_ble"
-                        android:layout_marginTop="12dp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -477,13 +504,13 @@
 
     </ScrollView>
 
-    <!-- Bottom Action Bar -->
+    <!-- BOTTOM: Action Bar -->
     <LinearLayout
         android:id="@+id/actionBar"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="64dp"
         android:orientation="horizontal"
-        android:background="@color/dark_bg"
+        android:background="#1A1A1A"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
@@ -492,25 +519,25 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConnect"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
-            android:text="CONNECT"
-            android:textSize="13sp"
+            android:text="SCAN &amp; CONNECT"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:letterSpacing="0.1"
-            app:cornerRadius="4dp"
-            android:backgroundTint="@color/electric_blue"
-            android:textColor="@color/black_bg"
+            android:letterSpacing="0.05"
+            app:cornerRadius="6dp"
+            android:backgroundTint="#00D4FF"
+            android:textColor="#000000"
             android:layout_marginEnd="8dp"/>
 
         <ImageView
             android:id="@+id/btnArchive"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:src="@android:drawable/ic_menu_save"
-            android:tint="@color/text_gray"
+            android:tint="#AAAAAA"
             android:background="@drawable/action_button_bg"
-            android:padding="12dp"/>
+            android:padding="10dp"/>
 
     </LinearLayout>
 
