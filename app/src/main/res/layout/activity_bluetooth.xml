@@ -134,24 +134,48 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DEVICE LIST"
+                android:text="SCANNED DEVICES"
                 android:textColor="@color/text_gray"
                 android:textSize="11sp"
                 android:letterSpacing="0.15"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="12dp"/>
 
-            <TextView
-                android:id="@+id/bleDevices"
+            <ListView
+                android:id="@+id/bleDeviceList"
                 android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:background="@color/surface_bg"
+                android:divider="@color/dark_bg"
+                android:dividerHeight="1dp"
+                android:padding="8dp"/>
+
+            <!-- Log Output -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="200dp"
-                android:text="Press START BLE SCAN to discover devices..."
-                android:textColor="@color/text_dim"
-                android:textSize="12sp"
-                android:fontFamily="monospace"
-                android:padding="16dp"
-                android:background="@color/surface_bg"/>
+                android:text="SCAN LOG"
+                android:textColor="@color/text_gray"
+                android:textSize="11sp"
+                android:letterSpacing="0.15"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@color/terminal_black">
+
+                <TextView
+                    android:id="@+id/bleDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ready to scan..."
+                    android:textColor="@color/terminal_green"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:padding="12dp"/>
+            </ScrollView>
 
         </LinearLayout>
 
