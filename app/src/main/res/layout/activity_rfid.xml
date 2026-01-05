@@ -6,189 +6,240 @@
     android:layout_height="match_parent"
     android:background="@color/black_bg">
 
+    <!-- Header -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:orientation="horizontal"
         android:background="@color/dark_bg"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="@color/text_white"
+            android:tint="@color/neon_cyan"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"/>
+            android:padding="2dp"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="RFID"
+            android:text="[RFID 125kHz]"
             android:textColor="@color/func_rfid"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.1"
-            android:layout_marginStart="16dp"/>
+            android:fontFamily="monospace"
+            android:letterSpacing="0.05"
+            android:layout_marginStart="12dp"/>
 
         <TextView
+            android:id="@+id/cardStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="125 kHz"
+            android:text="IDLE"
             android:textColor="@color/text_dim"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:fontFamily="monospace"/>
 
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/cardInfoScroll"
+    <!-- CARD DATA DISPLAY AT TOP -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/outputCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="@color/surface_bg"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="2dp"
         app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintHeight_percent="0.4">
+
+        <ScrollView
+            android:id="@+id/cardInfoScroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[CARD ID]"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="9sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/cardId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="WAITING..."
+                    android:textColor="@color/func_rfid"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[CARD INFO]"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="9sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/cardInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="$ ./rfid_reader --init\n\n[READY] Place card near Flipper...\n\nProtocol: EM4100/HID\nFrequency: 125 kHz\n\n> Press READ to scan"
+                    android:textColor="@color/neon_green"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:lineSpacingExtra="2dp"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Controls Below -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/outputCard"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="12dp">
 
-            <!-- Card Status -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CARD DETECTED"
+                android:text="[OPERATIONS]"
                 android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"/>
-
-            <TextView
-                android:id="@+id/cardStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="WAITING..."
-                android:textColor="@color/text_dim"
-                android:textSize="24sp"
-                android:textStyle="bold"
+                android:textSize="9sp"
                 android:fontFamily="monospace"
-                android:layout_marginTop="8dp"
+                android:letterSpacing="0.1"
                 android:layout_marginBottom="8dp"/>
 
-            <TextView
-                android:id="@+id/cardId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/func_rfid"
-                android:textSize="14sp"
-                android:fontFamily="monospace"
-                android:layout_marginBottom="32dp"/>
-
-            <!-- Actions -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReadCard"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="READ CARD"
-                android:textSize="14sp"
+                android:layout_height="44dp"
+                android:text="[READ CARD]"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.1"
-                app:cornerRadius="4dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
+                app:cornerRadius="2dp"
                 android:backgroundTint="@color/func_rfid"
                 android:textColor="@color/black_bg"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveCard"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="SAVE TO ARCHIVE"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
+                android:layout_height="44dp"
+                android:text="[SAVE CARD]"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
                 app:strokeColor="@color/func_rfid"
+                app:strokeWidth="1dp"
                 android:textColor="@color/func_rfid"
-                android:enabled="false"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEmulateCard"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="EMULATE CARD"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
+                android:layout_height="44dp"
+                android:text="[EMULATE]"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
                 app:strokeColor="@color/func_rfid"
+                app:strokeWidth="1dp"
                 android:textColor="@color/func_rfid"
-                android:enabled="false"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRollingCode"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="ROLLING CODE RECORDER"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
+                android:layout_height="44dp"
+                android:text="[ROLLING CODE]"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
                 app:strokeColor="@color/func_rfid"
+                app:strokeWidth="1dp"
                 android:textColor="@color/func_rfid"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnBruteFob"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="BRUTE FOB OPENER"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_rfid"
-                android:textColor="@color/func_rfid"
-                android:layout_marginBottom="12dp"/>
+                android:layout_height="44dp"
+                android:text="[BRUTE FOB]"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
+                app:strokeColor="@color/neon_red"
+                app:strokeWidth="1dp"
+                android:textColor="@color/neon_red"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="[STOP]"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.05"
+                app:cornerRadius="2dp"
+                android:backgroundTint="@color/status_disconnected"
+                android:textColor="@color/black_bg"
+                android:layout_marginBottom="8dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSavedCards"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="SAVED CARDS"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/text_gray"
-                android:textColor="@color/text_gray"/>
-
-            <!-- Card Info -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CARD INFORMATION"
-                android:textColor="@color/text_gray"
+                android:layout_height="44dp"
+                android:text="[SAVED CARDS]"
                 android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/cardInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="120dp"
-                android:text="Place RFID card near Flipper Zero antenna..."
-                android:textColor="@color/text_dim"
-                android:textSize="12sp"
                 android:fontFamily="monospace"
-                android:padding="16dp"
-                android:background="@color/surface_bg"/>
+                android:letterSpacing="0.05"
+                app:strokeColor="@color/text_dim"
+                app:strokeWidth="1dp"
+                android:textColor="@color/text_gray"
+                android:layout_marginBottom="16dp"/>
 
         </LinearLayout>
 

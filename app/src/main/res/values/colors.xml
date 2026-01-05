@@ -1,57 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Professional Tool Color Scheme -->
+    <!-- NEON TERMINAL HACKER COLOR SCHEME -->
 
-    <!-- Base Colors -->
+    <!-- Base Colors - Deep Black Matrix Background -->
     <color name="black_bg">#000000</color>
-    <color name="dark_bg">#0D0D0D</color>
-    <color name="surface_bg">#1A1A1A</color>
-    <color name="elevated_bg">#242424</color>
+    <color name="dark_bg">#050505</color>
+    <color name="surface_bg">#0A0A0A</color>
+    <color name="elevated_bg">#101010</color>
 
-    <!-- Accent -->
-    <color name="electric_blue">#00D9FF</color>
-    <color name="electric_blue_dim">#0088AA</color>
+    <!-- Neon Primary Colors - Muted for low-profile -->
+    <color name="neon_green">#00CC33</color>
+    <color name="neon_cyan">#00CCCC</color>
+    <color name="neon_magenta">#CC00CC</color>
+    <color name="neon_yellow">#CCCC00</color>
+    <color name="neon_red">#CC0044</color>
+    <color name="neon_blue">#0088CC</color>
+    <color name="neon_purple">#8800CC</color>
+    <color name="neon_orange">#CC7700</color>
 
-    <!-- Text -->
-    <color name="text_white">#FFFFFF</color>
-    <color name="text_gray">#999999</color>
-    <color name="text_dim">#666666</color>
+    <!-- Neon Glow Effects (Semi-transparent for layering) -->
+    <color name="glow_green">#4000FF41</color>
+    <color name="glow_cyan">#4000FFFF</color>
+    <color name="glow_magenta">#40FF00FF</color>
+    <color name="glow_red">#40FF0055</color>
 
-    <!-- Status -->
-    <color name="status_connected">#00FF88</color>
-    <color name="status_disconnected">#FF4444</color>
-    <color name="status_scanning">#FFAA00</color>
+    <!-- Legacy Mappings -->
+    <color name="electric_blue">@color/neon_cyan</color>
+    <color name="electric_blue_dim">@color/neon_blue</color>
 
-    <!-- Function Colors (subtle, professional) -->
-    <color name="func_subghz">#4A90E2</color>
-    <color name="func_rfid">#7ED321</color>
-    <color name="func_nfc">#F5A623</color>
-    <color name="func_infrared">#D0021B</color>
-    <color name="func_ir">@color/func_infrared</color>
-    <color name="func_gpio">#BD10E0</color>
-    <color name="func_badusb">#F8E71C</color>
-    <color name="func_ibutton">#50E3C2</color>
-    <color name="func_bluetooth">#B8E986</color>
-    <color name="func_ble">@color/func_bluetooth</color>
+    <!-- Text Colors - Subtle Neon -->
+    <color name="text_white">#CCCCCC</color>
+    <color name="text_gray">#00AA33</color>
+    <color name="text_dim">#007722</color>
 
-    <!-- Terminal Colors for Pentesting Tools -->
+    <!-- Status Colors - Vivid -->
+    <color name="status_connected">@color/neon_green</color>
+    <color name="status_disconnected">@color/neon_red</color>
+    <color name="status_scanning">@color/neon_yellow</color>
+
+    <!-- Function Colors - Neon Spectrum -->
+    <color name="func_subghz">@color/neon_cyan</color>
+    <color name="func_rfid">@color/neon_green</color>
+    <color name="func_nfc">@color/neon_magenta</color>
+    <color name="func_infrared">@color/neon_red</color>
+    <color name="func_ir">@color/neon_red</color>
+    <color name="func_gpio">@color/neon_purple</color>
+    <color name="func_badusb">@color/neon_yellow</color>
+    <color name="func_ibutton">@color/neon_blue</color>
+    <color name="func_bluetooth">@color/neon_orange</color>
+    <color name="func_ble">@color/neon_orange</color>
+
+    <!-- Terminal Colors -->
     <color name="terminal_black">#000000</color>
-    <color name="terminal_dark_gray">#1A1A1A</color>
-    <color name="terminal_gray">#666666</color>
-    <color name="terminal_green">#00FF00</color>
-    <color name="terminal_red">#FF0000</color>
-    <color name="terminal_yellow">#FFFF00</color>
-    <color name="terminal_cyan">#00FFFF</color>
+    <color name="terminal_dark_gray">#0A0A0A</color>
+    <color name="terminal_gray">#00AA33</color>
+    <color name="terminal_green">@color/neon_green</color>
+    <color name="terminal_red">@color/neon_red</color>
+    <color name="terminal_yellow">@color/neon_yellow</color>
+    <color name="terminal_cyan">@color/neon_cyan</color>
 
-    <!-- Legacy -->
-    <color name="primary">@color/electric_blue</color>
-    <color name="primary_dark">@color/electric_blue_dim</color>
-    <color name="accent">@color/electric_blue</color>
+    <!-- Legacy Compatibility -->
+    <color name="primary">@color/neon_green</color>
+    <color name="primary_dark">#00AA33</color>
+    <color name="accent">@color/neon_cyan</color>
     <color name="background">@color/black_bg</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="card_background">@color/surface_bg</color>
     <color name="ic_launcher_background">@color/black_bg</color>
-    <color name="error">@color/status_disconnected</color>
-    <color name="success">@color/status_connected</color>
+    <color name="error">@color/neon_red</color>
+    <color name="success">@color/neon_green</color>
 </resources>

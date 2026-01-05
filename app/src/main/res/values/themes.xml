@@ -1,24 +1,42 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- TERMINAL HACKER THEME - Dark & Low Profile -->
     <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Backgrounds - Pure Black -->
         <item name="android:windowBackground">@color/black_bg</item>
         <item name="android:colorBackground">@color/dark_bg</item>
         <item name="colorSurface">@color/surface_bg</item>
         <item name="colorSurfaceVariant">@color/elevated_bg</item>
 
-        <item name="colorPrimary">@color/electric_blue</item>
-        <item name="colorPrimaryVariant">@color/electric_blue_dim</item>
+        <!-- Primary - Neon Green Matrix Style -->
+        <item name="colorPrimary">@color/neon_green</item>
+        <item name="colorPrimaryVariant">#007722</item>
         <item name="colorOnPrimary">@color/black_bg</item>
 
-        <item name="colorSecondary">@color/electric_blue</item>
+        <!-- Secondary - Neon Cyan Accents -->
+        <item name="colorSecondary">@color/neon_cyan</item>
         <item name="colorOnSecondary">@color/black_bg</item>
 
-        <item name="colorError">@color/status_disconnected</item>
+        <!-- Error - Neon Red -->
+        <item name="colorError">@color/neon_red</item>
 
+        <!-- Text - Subtle Green Tint -->
         <item name="android:textColorPrimary">@color/text_white</item>
         <item name="android:textColorSecondary">@color/text_gray</item>
 
+        <!-- System Bars - Black -->
         <item name="android:statusBarColor">@color/black_bg</item>
         <item name="android:navigationBarColor">@color/black_bg</item>
         <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Typography - Monospace for Terminal Feel -->
+        <item name="android:fontFamily">monospace</item>
+    </style>
+
+    <!-- Tab Text Style for Terminal Tabs -->
+    <style name="TabTextStyle">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 </resources>
