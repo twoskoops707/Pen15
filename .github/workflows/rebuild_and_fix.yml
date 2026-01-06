@@ -1,0 +1,41 @@
+name: Emergency Build & Release
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Since gradlew is literally missing from your repo, we install Gradle on the server
+      - name: Install Gradle & Generate Wrapper
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gradle
+          gradle wrapper
+
+      - name: Build APK
+        # We use 'sh' to bypass the permission errors you were getting
+        run: sh gradlew assembleDebug --stacktrace
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          # This finds the APK wherever the compiler put it
+          files: "**/*.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
