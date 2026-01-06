@@ -1,0 +1,52 @@
+name: Final Kotlin Build
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Locate or Create Gradle Wrapper
+        run: |
+          # 1. Search for gradlew
+          WRAPPER_PATH=$(find . -name "gradlew" | head -n 1)
+          
+          if [ -z "$WRAPPER_PATH" ]; then
+            echo "Gradlew missing! Generating a fresh wrapper..."
+            gradle wrapper
+            WRAPPER_PATH="./gradlew"
+          fi
+          
+          # 2. Fix permissions and Windows line endings
+          sed -i 's/\r$//' "$WRAPPER_PATH"
+          chmod +x "$WRAPPER_PATH"
+          
+          # 3. Export the folder path for the build step
+          echo "GRADLE_DIR=$(dirname "$WRAPPER_PATH")" >> $GITHUB_ENV
+          echo "Building from directory: $(dirname "$WRAPPER_PATH")"
+
+      - name: Build with Gradle
+        run: |
+          cd ${{ env.GRADLE_DIR }}
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          # This wildcard finds the APK regardless of the folder name
+          files: "**/*.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
