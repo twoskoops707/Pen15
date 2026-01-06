@@ -1,4 +1,4 @@
-name: Build and Release APK
+name: Build and Release APK (Path Fixed)
 
 on:
   push:
@@ -21,29 +21,28 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      # This step finds gradlew and makes it executable wherever it is
+      - name: Grant permissions
+        run: find . -name "gradlew" -exec chmod +x {} +
 
-      # DEBUG STEP: We run assembleDebug because it doesn't require signing keys
-      # This prevents the build from crashing if you haven't set up secrets yet.
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      # This builds the APK by finding the right directory automatically
+      - name: Build with Gradle
+        run: |
+          GRADLE_PATH=$(find . -name "gradlew" | head -n 1)
+          GRADLE_DIR=$(dirname "$GRADLE_PATH")
+          cd "$GRADLE_DIR"
+          ./gradlew assembleDebug
 
-      # FIX: This step finds the APK and renames it so the Release step knows exactly where it is
       - name: Prepare APK for Release
         run: |
           mkdir -p release-artifacts
           find . -name "*.apk" -exec cp {} release-artifacts/Build-Output.apk \;
 
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: Build ${{ github.run_number }}
-          draft: false
-          prerelease: false
-          # Pointing exactly to our renamed file
           files: release-artifacts/Build-Output.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
