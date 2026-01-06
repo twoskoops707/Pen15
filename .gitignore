@@ -111,3 +111,7 @@ lint-results*.html
 
 # Android Profiling
 *.hprof
+
+# Build logs
+build_output.log
+*.log
