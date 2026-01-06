@@ -1,0 +1,49 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # DEBUG STEP: We run assembleDebug because it doesn't require signing keys
+      # This prevents the build from crashing if you haven't set up secrets yet.
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # FIX: This step finds the APK and renames it so the Release step knows exactly where it is
+      - name: Prepare APK for Release
+        run: |
+          mkdir -p release-artifacts
+          find . -name "*.apk" -exec cp {} release-artifacts/Build-Output.apk \;
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          draft: false
+          prerelease: false
+          # Pointing exactly to our renamed file
+          files: release-artifacts/Build-Output.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
