@@ -1,419 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0a0e14">
+    android:orientation="vertical"
+    android:background="@color/terminal_black">
 
-    <!-- Tactical Header with Status Bar -->
-    <com.google.android.material.appbar.AppBarLayout
+    <!-- Header -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_terminal_header"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141920"
-            android:paddingBottom="2dp">
+            android:layout_weight="1"
+            android:text="WIFI DEAUTH"
+            android:textColor="@color/terminal_red"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
 
-            <!-- Top Status Bar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:id="@+id/btnBack"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_back"
-                    android:tint="#ff9500"
-                    android:contentDescription="Back" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="DEAUTH PROTOCOL"
-                        android:textColor="#ff9500"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
-
-                    <TextView
-                        android:id="@+id/txtStatusIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="◉ STANDBY"
-                        android:textColor="#666d7a"
-                        android:textSize="11sp"
-                        android:fontFamily="monospace"
-                        android:layout_marginTop="2dp" />
-                </LinearLayout>
-
-                <!-- Connection Status -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="#1f2430"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
-
-                    <View
-                        android:id="@+id/connectionStatusDot"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/status_dot_disconnected" />
-
-                    <TextView
-                        android:id="@+id/txtConnectionStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="OFFLINE"
-                        android:textColor="#666d7a"
-                        android:textSize="10sp"
-                        android:fontFamily="monospace"
-                        android:layout_marginStart="6dp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Warning Strip -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#ff9500" />
-        </LinearLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Main Content -->
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:fillViewport="true">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <!-- Control Panel -->
-            <LinearLayout
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#141920"
-                android:padding="16dp">
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▸ SCAN CONTROL"
-                    android:textColor="#ff9500"
-                    android:textSize="12sp"
-                    android:fontFamily="monospace"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1"
-                    android:layout_marginBottom="12dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnScan"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="INITIATE NETWORK SCAN"
-                    android:textColor="#0a0e14"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.05"
-                    app:cornerRadius="2dp"
-                    app:backgroundTint="#ff9500"
-                    app:strokeWidth="0dp"
-                    app:iconGravity="textStart"
-                    app:icon="@android:drawable/ic_menu_search"
-                    app:iconTint="#0a0e14" />
-            </LinearLayout>
-
-            <!-- Network Grid -->
-            <LinearLayout
+            <!-- Scan Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnScan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#141920"
-                android:layout_marginTop="16dp"
-                android:padding="16dp">
+                android:text="SCAN NETWORKS"
+                android:backgroundTint="@color/terminal_green"
+                android:textColor="@color/terminal_black"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Network List -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@color/terminal_dark_gray"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="▸ DETECTED TARGETS"
-                        android:textColor="#ff9500"
-                        android:textSize="12sp"
-                        android:fontFamily="monospace"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1" />
-
-                    <TextView
-                        android:id="@+id/txtNetworkCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="#666d7a"
-                        android:textSize="12sp"
-                        android:fontFamily="monospace"
-                        android:background="#1f2430"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:paddingTop="4dp"
-                        android:paddingBottom="4dp" />
-                </LinearLayout>
-
-                <!-- Network List Container -->
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#0a0e14"
-                    android:padding="2dp">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/networkRecyclerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="240dp"
-                        android:scrollbars="vertical"
-                        android:visibility="gone" />
-
-                    <!-- Empty State -->
-                    <LinearLayout
-                        android:id="@+id/emptyStateContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="240dp"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="32dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="[ ]"
-                            android:textColor="#2a3240"
-                            android:textSize="48sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="NO TARGETS ACQUIRED"
-                            android:textColor="#4a5160"
-                            android:textSize="11sp"
-                            android:fontFamily="monospace"
-                            android:letterSpacing="0.1" />
-                    </LinearLayout>
-                </FrameLayout>
-            </LinearLayout>
-
-            <!-- Attack Controls -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#141920"
-                android:layout_marginTop="16dp"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▸ ATTACK EXECUTION"
-                    android:textColor="#ff9500"
-                    android:textSize="12sp"
-                    android:fontFamily="monospace"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Attack Metrics -->
-                <LinearLayout
-                    android:id="@+id/attackMetricsPanel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="#0a0e14"
-                    android:padding="12dp"
-                    android:layout_marginBottom="12dp"
-                    android:visibility="gone">
+                    android:padding="16dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:text="NETWORKS"
+                        android:textColor="@color/terminal_green"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="TARGET"
-                            android:textColor="#666d7a"
-                            android:textSize="10sp"
-                            android:fontFamily="monospace" />
-
-                        <TextView
-                            android:id="@+id/txtAttackTarget"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--"
-                            android:textColor="#ff9500"
-                            android:textSize="10sp"
-                            android:fontFamily="monospace" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <ListView
+                        android:id="@+id/networkList"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="STATUS"
-                            android:textColor="#666d7a"
-                            android:textSize="10sp"
-                            android:fontFamily="monospace" />
-
-                        <TextView
-                            android:id="@+id/txtAttackStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="STANDBY"
-                            android:textColor="#30d158"
-                            android:textSize="10sp"
-                            android:fontFamily="monospace" />
-                    </LinearLayout>
-
-                    <!-- Progress Bar -->
-                    <ProgressBar
-                        android:id="@+id/attackProgressBar"
-                        style="@android:style/Widget.ProgressBar.Horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="4dp"
-                        android:layout_marginTop="8dp"
-                        android:indeterminate="true"
-                        android:indeterminateTint="#ff9500"
-                        android:visibility="gone" />
+                        android:layout_height="200dp"
+                        android:background="@color/terminal_black"
+                        android:divider="@color/terminal_green"
+                        android:dividerHeight="1dp" />
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <!-- Action Buttons Grid -->
-                <GridLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="2"
-                    android:rowCount="1"
-                    android:alignmentMode="alignBounds">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDeauth"
-                        android:layout_width="0dp"
-                        android:layout_height="56dp"
-                        android:layout_columnWeight="1"
-                        android:layout_marginEnd="8dp"
-                        android:text="EXECUTE"
-                        android:textColor="#ffffff"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:enabled="false"
-                        app:cornerRadius="2dp"
-                        app:backgroundTint="#ff3b30"
-                        app:strokeWidth="0dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStop"
-                        android:layout_width="0dp"
-                        android:layout_height="56dp"
-                        android:layout_columnWeight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="TERMINATE"
-                        android:textColor="#0a0e14"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:enabled="false"
-                        app:cornerRadius="2dp"
-                        app:backgroundTint="#666d7a"
-                        app:strokeWidth="0dp" />
-                </GridLayout>
-            </LinearLayout>
-
-            <!-- Terminal Log -->
-            <LinearLayout
+            <!-- Deauth Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeauth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#141920"
-                android:layout_marginTop="16dp"
-                android:padding="16dp">
+                android:text="START ATTACK"
+                android:backgroundTint="@color/terminal_red"
+                android:textColor="@color/white"
+                android:fontFamily="monospace"
+                android:enabled="false"
+                android:layout_marginBottom="8dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="▸ SYSTEM LOG"
-                    android:textColor="#ff9500"
-                    android:textSize="12sp"
-                    android:fontFamily="monospace"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1"
-                    android:layout_marginBottom="12dp" />
+            <!-- Stop Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="STOP ATTACK"
+                android:backgroundTint="@color/status_disconnected"
+                android:textColor="@color/white"
+                android:fontFamily="monospace"
+                android:enabled="false"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Log Output -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/terminal_black"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp">
 
                 <ScrollView
                     android:id="@+id/logScroll"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="#0a0e14"
-                    android:padding="12dp"
-                    android:scrollbars="vertical">
+                    android:layout_height="300dp"
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#30d158"
-                        android:textSize="11sp"
+                        android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
-                        android:lineSpacingExtra="2dp"
-                        android:text="SYSTEM INITIALIZED\nAWAITING COMMANDS..." />
+                        android:textSize="12sp" />
                 </ScrollView>
-            </LinearLayout>
-
-            <!-- Bottom Padding -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="16dp" />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </ScrollView>
+</LinearLayout>
