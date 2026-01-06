@@ -1,178 +1,444 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black_bg">
 
-    <LinearLayout
+    <!-- Scanline overlay effect -->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:background="@drawable/scanline_overlay"
+        android:alpha="0.05"/>
 
-        <!-- Header -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_back"
-                android:tint="@color/text_white"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView
-                android:layout_width="0dp"
+            <!-- Terminal Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Settings"
-                android:textColor="@color/text_white"
-                android:textSize="24sp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/dark_bg"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:tint="@color/neon_cyan"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="[SYSTEM.CONFIG]"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15"
+                    android:layout_marginStart="12dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="v1.0"
+                    android:textColor="@color/text_dim"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"/>
+            </LinearLayout>
+
+            <!-- ASCII Divider -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="╔════════════════════════════════════╗"
+                android:textColor="@color/neon_green"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:alpha="0.3"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- CONNECTION SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/section_arrow" android:drawablePadding="8dp" android:text=" CONNECTION"
+                android:textColor="@color/neon_green"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:layout_marginStart="16dp" />
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#0A0A0A"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/neon_border">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchAutoConnect"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="auto_connect_enabled"
+                        android:textColor="@color/text_white"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        app:thumbTint="@color/neon_cyan"
+                        app:trackTint="@color/surface_bg"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/neon_green"
+                        android:alpha="0.1"
+                        android:layout_marginVertical="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBluetoothSettings"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$ open bluetooth_config"
+                        android:textColor="@color/neon_cyan"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="0dp"
+                        android:textAllCaps="false"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- SYSTEM SETTINGS SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/section_arrow" android:drawablePadding="8dp" android:text=" SYSTEM"
+                android:textColor="@color/neon_green"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#0A0A0A"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/neon_border">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchVerboseLogging"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="debug_mode=true"
+                        android:textColor="@color/text_white"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        app:thumbTint="@color/neon_cyan"
+                        app:trackTint="@color/surface_bg"/>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchKeepScreenOn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="screen_lock_disabled"
+                        android:textColor="@color/text_white"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        app:thumbTint="@color/neon_cyan"
+                        app:trackTint="@color/surface_bg"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- TERMUX INTEGRATION SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/section_arrow" android:drawablePadding="8dp" android:text=" TERMUX"
+                android:textColor="@color/neon_green"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#0A0A0A"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/neon_border">
+
+                    <!-- Tool Status Indicator -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <View
+                            android:id="@+id/termuxStatusDot"
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/status_dot"
+                            android:backgroundTint="@color/status_disconnected"/>
+
+                        <TextView
+                            android:id="@+id/termuxStatusText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="tools_status: unknown"
+                            android:textColor="@color/text_dim"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInstallTermux"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$ apt-get install termux"
+                        android:textColor="@color/neon_cyan"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="0dp"
+                        android:textAllCaps="false"
+                        android:layout_marginBottom="4dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCheckTools"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="[SCAN TOOLS]"
+                        android:textColor="@color/black_bg"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.15"
+                        app:cornerRadius="0dp"
+                        app:backgroundTint="@color/neon_cyan"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInstallTools"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="[INSTALL ALL]"
+                        android:textColor="@color/black_bg"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.15"
+                        app:cornerRadius="0dp"
+                        app:backgroundTint="@color/neon_green"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- MAINTENANCE SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/section_arrow" android:drawablePadding="8dp" android:text=" MAINTENANCE"
+                android:textColor="@color/neon_green"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#0A0A0A"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/neon_border">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearCache"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$ rm -rf /cache/*"
+                        android:textColor="@color/neon_red"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="0dp"
+                        android:textAllCaps="false"
+                        android:layout_marginBottom="4dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAbout"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$ cat /proc/version"
+                        android:textColor="@color/text_dim"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="0dp"
+                        android:textAllCaps="false"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ASCII Footer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="╚════════════════════════════════════╝"
+                android:textColor="@color/neon_green"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:alpha="0.3"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
 
-        <!-- Connection Settings -->
-        <TextView
+    </ScrollView>
+
+    <!-- Progress Dialog Container (initially hidden) -->
+    <FrameLayout
+        android:id="@+id/progressContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:visibility="gone"
+        android:clickable="true">
+
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CONNECTION"
-            android:textColor="@color/electric_blue"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:layout_gravity="center"
+            android:layout_margin="24dp"
+            app:cardBackgroundColor="@color/dark_bg"
+            app:cardElevation="8dp"
+            app:cardCornerRadius="0dp">
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchAutoConnect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Auto-connect on launch"
-            android:textColor="@color/text_white"
-            android:layout_marginBottom="16dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/neon_border">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBluetoothSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OPEN BLUETOOTH SETTINGS"
-            android:textColor="@color/text_white"
-            app:backgroundTint="@color/surface_bg"
-            android:layout_marginBottom="24dp" />
+                <TextView
+                    android:id="@+id/progressTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="[EXECUTING]"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15"
+                    android:layout_marginBottom="12dp"/>
 
-        <!-- App Settings -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="APP SETTINGS"
-            android:textColor="@color/electric_blue"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/black_bg"
+                    android:padding="8dp">
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchShowTutorial"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Show tutorial on launch"
-            android:textColor="@color/text_white"
-            android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:id="@+id/progressOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="$ initializing...\n"
+                        android:textColor="@color/neon_green"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace"
+                        android:lineSpacingExtra="2dp"/>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchVerboseLogging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Verbose logging (debug)"
-            android:textColor="@color/text_white"
-            android:layout_marginBottom="8dp" />
+                </ScrollView>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchKeepScreenOn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Keep screen on during scans"
-            android:textColor="@color/text_white"
-            android:layout_marginBottom="24dp" />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:indeterminate="true"
+                    android:progressTint="@color/neon_cyan"/>
 
-        <!-- Termux Integration -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TERMUX INTEGRATION"
-            android:textColor="@color/electric_blue"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCloseProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="[CLOSE]"
+                    android:textColor="@color/black_bg"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    app:cornerRadius="0dp"
+                    app:backgroundTint="@color/neon_red"
+                    android:enabled="false"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnInstallTermux"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="INSTALL TERMUX (F-DROID)"
-            android:textColor="@color/text_white"
-            app:backgroundTint="@color/surface_bg"
-            android:layout_marginBottom="8dp" />
+            </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCheckTools"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CHECK INSTALLED TOOLS"
-            android:textColor="@color/terminal_black"
-            app:backgroundTint="@color/terminal_cyan"
-            android:layout_marginBottom="8dp" />
+        </androidx.cardview.widget.CardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnInstallTools"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="INSTALL PENTEST TOOLS"
-            android:textColor="@color/terminal_black"
-            app:backgroundTint="@color/terminal_green"
-            android:layout_marginBottom="24dp" />
+    </FrameLayout>
 
-        <!-- Actions -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ACTIONS"
-            android:textColor="@color/electric_blue"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnResetTutorial"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RESET TUTORIAL"
-            android:textColor="@color/text_white"
-            app:backgroundTint="@color/surface_bg"
-            android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClearCache"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CLEAR CACHE"
-            android:textColor="@color/text_white"
-            app:backgroundTint="@color/surface_bg"
-            android:layout_marginBottom="24dp" />
-
-        <!-- About -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAbout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ABOUT"
-            android:textColor="@color/text_white"
-            app:backgroundTint="@color/electric_blue" />
-
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>
