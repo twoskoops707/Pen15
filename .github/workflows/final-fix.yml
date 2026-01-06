@@ -1,0 +1,56 @@
+name: Final Build Fix
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Diagnostic - List All Files
+        # This helps us see exactly where gradlew is hiding
+        run: find . -maxdepth 3 -not -path '*/.*'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Locate and Fix Gradlew
+        run: |
+          # Find the gradlew file anywhere in the project
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "ERROR: gradlew not found in the repo. Generating one..."
+            gradle wrapper
+            GRADLEW_PATH="./gradlew"
+          fi
+          
+          # Fix Windows line endings and make it executable
+          sed -i 's/\r$//' "$GRADLEW_PATH"
+          chmod +x "$GRADLEW_PATH"
+          
+          # Save the directory path for the next step
+          echo "GRADLE_DIR=$(dirname "$GRADLEW_PATH")" >> $GITHUB_ENV
+          echo "Found gradlew at: $GRADLEW_PATH"
+
+      - name: Build APK
+        run: |
+          cd ${{ env.GRADLE_DIR }}
+          ./gradlew assembleDebug
+
+      - name: Upload to Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          # Finds the APK no matter where the build output put it
+          files: "**/*.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
