@@ -1,0 +1,40 @@
+name: Manual Gradle Setup and Build
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Since gradlew is missing from your repo, we install gradle on the runner
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # This generates the missing 'gradlew' file so the build can proceed
+      - name: Generate Wrapper
+        run: gradle wrapper
+
+      - name: Build APK
+        # We use 'sh gradlew' to ensure it runs even if permissions are weird
+        run: sh gradlew assembleDebug --stacktrace
+
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
