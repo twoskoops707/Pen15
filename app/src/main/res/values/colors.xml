@@ -7,7 +7,7 @@
     <color name="dark_bg">#050505</color>
     <color name="surface_bg">#0A0A0A</color>
     <color name="elevated_bg">#101010</color>
-    <color name="card_bg">#0F0F0F</color>
+    <!-- color name="card_bg">#0F0F0F</color -->
 
     <!-- Neon Primary Colors - Vivid & Aggressive -->
     <color name="neon_green">#00FF00</color>
@@ -92,7 +92,7 @@
     <color name="progress_background">@color/elevated_bg</color>
 
     <!-- ADDITIONAL BACKGROUNDS -->
-    <color name="card_bg">#0F0F0F</color>
+    <!-- color name="card_bg">#0F0F0F</color -->
     <color name="error">@color/neon_red</color>
     <color name="success">@color/neon_green</color>
 </resources>
