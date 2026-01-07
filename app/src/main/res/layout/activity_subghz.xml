@@ -1,274 +1,381 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- INTUITIVE FAB-BASED SUB-GHZ INTERFACE -->
+<!-- Primary: FAB (green=start, red=stop) | Secondary: Frequency selection -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_bg">
+    android:background="@drawable/grid_pattern">
 
-    <!-- Header -->
-    <LinearLayout
-        android:id="@+id/header"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:background="@color/dark_bg"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:tint="@color/neon_cyan"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="2dp"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="[SUB-GHZ]"
-            android:textColor="@color/func_subghz"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.05"
-            android:layout_marginStart="12dp"/>
-
-        <TextView
-            android:id="@+id/frequencyDisplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="433.920"
-            android:textColor="@color/func_subghz"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"/>
-
-    </LinearLayout>
-
-    <!-- OUTPUT DISPLAY AT TOP - 45% OF SCREEN -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/outputCard"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        app:cardBackgroundColor="@color/surface_bg"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="4dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintHeight_percent="0.45">
-
-        <ScrollView
-            android:id="@+id/logScroll"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp"
-            android:scrollbars="vertical">
-
-            <TextView
-                android:id="@+id/logOutput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="$ ./subghz_scanner --init\n\n[READY] Waiting for scan command...\n\nFrequency: 433.920 MHz\nMode: Idle\n\n> Press START to begin scanning"
-                android:textColor="@color/neon_green"
-                android:textSize="14sp"
-                android:fontFamily="monospace"
-                android:lineSpacingExtra="4dp"/>
-
-        </ScrollView>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Controls Below -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/outputCard"
-        app:layout_constraintBottom_toBottomOf="parent">
-
+        <!-- HEADER -->
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="#DD000000"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:elevation="8dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Frequency Presets -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#00FFFF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"/>
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="[FREQUENCY SELECT]"
-                android:textColor="@color/text_gray"
-                android:textSize="9sp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp"/>
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:rowCount="2"
-                android:layout_marginBottom="16dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn315"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:text="315"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    app:strokeColor="@color/func_subghz"
-                    app:strokeWidth="1dp"
-                    android:textColor="@color/func_subghz"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn433"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:text="433"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    app:strokeColor="@color/func_subghz"
-                    app:strokeWidth="1dp"
-                    android:textColor="@color/func_subghz"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn868"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:text="868"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    app:strokeColor="@color/func_subghz"
-                    app:strokeWidth="1dp"
-                    android:textColor="@color/func_subghz"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn390"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:text="390"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    app:strokeColor="@color/func_subghz"
-                    app:strokeWidth="1dp"
-                    android:textColor="@color/func_subghz"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn915"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="3dp"
-                    android:text="915"
-                    android:textSize="10sp"
-                    android:fontFamily="monospace"
-                    app:strokeColor="@color/func_subghz"
-                    app:strokeWidth="1dp"
-                    android:textColor="@color/func_subghz"/>
-
-            </GridLayout>
-
-            <!-- Action Buttons -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="[OPERATIONS]"
-                android:textColor="@color/text_gray"
-                android:textSize="9sp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnScan"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="[START SCAN]"
-                android:textSize="11sp"
+                android:layout_weight="1"
+                android:text="⬡ SUB-GHZ"
+                android:textColor="#FF0055"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                app:cornerRadius="2dp"
-                android:backgroundTint="@color/func_subghz"
-                android:textColor="@color/black_bg"
-                android:layout_marginBottom="8dp"/>
+                android:letterSpacing="0.1"
+                android:layout_marginStart="12dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnRead"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="[READ RAW]"
-                android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                app:strokeColor="@color/func_subghz"
-                app:strokeWidth="1dp"
-                android:textColor="@color/func_subghz"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBruteForce"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="[BRUTE FORCE]"
-                android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                app:strokeColor="@color/neon_red"
-                app:strokeWidth="1dp"
-                android:textColor="@color/neon_red"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStop"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="[STOP]"
-                android:textSize="11sp"
+            <TextView
+                android:id="@+id/frequencyDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="433.92"
+                android:textColor="#FFFF00"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                app:cornerRadius="2dp"
-                android:backgroundTint="@color/status_disconnected"
-                android:textColor="@color/black_bg"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSaved"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:text="[SAVED SIGNALS]"
-                android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:letterSpacing="0.05"
-                app:strokeColor="@color/text_dim"
-                app:strokeWidth="1dp"
-                android:textColor="@color/text_gray"
-                android:layout_marginBottom="16dp"/>
-
+                android:background="#22FFFF00"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"/>
         </LinearLayout>
 
-    </ScrollView>
+        <!-- FREQUENCY SELECTOR -->
+        <LinearLayout
+            android:id="@+id/frequencyBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#0A000000"
+            android:padding="8dp"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/header">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn315"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="315"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                app:strokeColor="#00FFFF"
+                android:textColor="#00FFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn390"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="390"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                app:strokeColor="#00FFFF"
+                android:textColor="#00FFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn433"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="433"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                app:backgroundTint="#00FFFF"
+                android:textColor="#000000"
+                android:layout_marginEnd="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn868"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="868"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                app:strokeColor="#00FFFF"
+                android:textColor="#00FFFF"
+                android:layout_marginEnd="4dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn915"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:text="915"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                app:strokeColor="#00FFFF"
+                android:textColor="#00FFFF"/>
+        </LinearLayout>
+
+        <!-- MAIN CONTENT AREA -->
+        <FrameLayout
+            android:id="@+id/contentArea"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/frequencyBar"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- IDLE STATE - Instructions -->
+            <LinearLayout
+                android:id="@+id/idleState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢"
+                    android:textColor="#00FFFF"
+                    android:textSize="72sp"
+                    android:alpha="0.4"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="READY TO SCAN"
+                    android:textColor="#00FFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="24dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="└─$ Select frequency and start scanning"
+                    android:textColor="#00AA33"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:alpha="0.8"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="↓"
+                    android:textColor="#00FF41"
+                    android:textSize="48sp"
+                    android:alpha="0.3"
+                    android:layout_marginTop="48dp"/>
+            </LinearLayout>
+
+            <!-- SCANNING STATE -->
+            <LinearLayout
+                android:id="@+id/scanningState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="#00FFFF"/>
+
+                <TextView
+                    android:id="@+id/scanningText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ SCANNING..."
+                    android:textColor="#00FFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15"
+                    android:layout_marginTop="32dp"/>
+
+                <TextView
+                    android:id="@+id/signalCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 SIGNALS DETECTED"
+                    android:textColor="#00FF41"
+                    android:textSize="16sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="└─$ Listening on 433.92 MHz..."
+                    android:textColor="#00AA33"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="24dp"
+                    android:alpha="0.7"/>
+            </LinearLayout>
+
+            <!-- RESULTS STATE -->
+            <LinearLayout
+                android:id="@+id/resultsState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <!-- Results Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="⬢ SIGNALS CAPTURED"
+                        android:textColor="#00FFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.12"/>
+
+                    <TextView
+                        android:id="@+id/resultsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textColor="#00FF41"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:background="#1A00FF41"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"/>
+                </LinearLayout>
+
+                <!-- Signals List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/signalsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/terminal_border"
+                    android:padding="8dp"/>
+
+                <!-- Available Actions -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ AVAILABLE ACTIONS"
+                    android:textColor="#00FFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Action Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSaveSignal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="⬢ SAVE"
+                            android:textColor="#000000"
+                            app:backgroundTint="#00FF41"
+                            android:fontFamily="monospace"
+                            android:textSize="11sp"
+                            android:layout_marginEnd="4dp"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnReplay"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="⬢ REPLAY"
+                            android:textColor="#FFFFFF"
+                            app:backgroundTint="#FF0055"
+                            android:fontFamily="monospace"
+                            android:textSize="11sp"
+                            android:layout_marginStart="4dp"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBruteForce"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⬢ BRUTE FORCE"
+                        android:textColor="#FFFF00"
+                        app:strokeColor="#FFFF00"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- PRIMARY CONTROL: FLOATING ACTION BUTTON -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="START SCAN"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:textSize="14sp"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconTint="#000000"
+        app:backgroundTint="#00FF41"
+        app:elevation="12dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

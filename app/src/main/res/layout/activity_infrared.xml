@@ -1,205 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- INTUITIVE FAB-BASED INFRARED INTERFACE -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_bg">
+    android:background="@drawable/grid_pattern">
 
-    <LinearLayout
-        android:id="@+id/header"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:background="@color/dark_bg"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:tint="@color/text_white"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="INFRARED"
-            android:textColor="@color/func_infrared"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.1"
-            android:layout_marginStart="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Universal Remote"
-            android:textColor="@color/text_dim"
-            android:textSize="12sp"
-            android:fontFamily="monospace"/>
-
-    </LinearLayout>
-
-    <!-- Progress Bar -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/header" />
-
-    <ScrollView
-        android:id="@+id/irOutputScroll"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/progressBar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="#DD000000"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:elevation="8dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Remote Type Selector -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#00FFFF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"/>
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="REMOTE LIBRARY"
-                android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="12dp"/>
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="3"
-                android:layout_marginBottom="32dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTV"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    android:text="TV"
-                    android:textSize="14sp"
-                    app:strokeColor="@color/func_infrared"
-                    android:textColor="@color/func_infrared"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAC"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    android:text="AIR CONDITIONER"
-                    android:textSize="14sp"
-                    app:strokeColor="@color/func_infrared"
-                    android:textColor="@color/func_infrared"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAudio"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    android:text="AUDIO SYSTEM"
-                    android:textSize="14sp"
-                    app:strokeColor="@color/func_infrared"
-                    android:textColor="@color/func_infrared"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnProjector"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    android:text="PROJECTOR"
-                    android:textSize="14sp"
-                    app:strokeColor="@color/func_infrared"
-                    android:textColor="@color/func_infrared"/>
-
-            </GridLayout>
-
-            <!-- Actions -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLearn"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="LEARN NEW REMOTE"
-                android:textSize="14sp"
+                android:layout_weight="1"
+                android:text="⬡ INFRARED"
+                android:textColor="#FF0055"
+                android:textSize="16sp"
                 android:textStyle="bold"
+                android:fontFamily="monospace"
                 android:letterSpacing="0.1"
-                app:cornerRadius="4dp"
-                android:backgroundTint="@color/func_infrared"
-                android:textColor="@color/black_bg"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginStart="12dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTest"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="TEST SIGNAL"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_infrared"
-                android:textColor="@color/func_infrared"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSavedRemotes"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="SAVED REMOTES"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/text_gray"
-                android:textColor="@color/text_gray"/>
-
-            <!-- Output Log -->
             <TextView
+                android:id="@+id/statusBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STATUS"
-                android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/irOutput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="120dp"
-                android:text="Select remote type or learn a new one..."
-                android:textColor="@color/text_dim"
-                android:textSize="12sp"
+                android:text="STANDBY"
+                android:textColor="#FFFF00"
+                android:textSize="10sp"
+                android:textStyle="bold"
                 android:fontFamily="monospace"
-                android:padding="16dp"
-                android:background="@color/surface_bg"/>
-
+                android:background="#22FFFF00"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"/>
         </LinearLayout>
 
-    </ScrollView>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#0A000000"
+            app:tabTextColor="#00AA33"
+            app:tabSelectedTextColor="#00FFFF"
+            app:tabIndicatorColor="#00FFFF"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed"
+            app:layout_constraintTop_toBottomOf="@id/header">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.tabs.TabItem
+                android:text="LEARN"/>
+            <com.google.android.material.tabs.TabItem
+                android:text="TRANSMIT"/>
+            <com.google.android.material.tabs.TabItem
+                android:text="LIBRARY"/>
+        </com.google.android.material.tabs.TabLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tabLayout"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:text="⬢"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#00FFFF"
+                    android:textSize="72sp"
+                    android:alpha="0.4"/>
+
+                <TextView
+                    android:text="READY TO LEARN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#00FFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="24dp"/>
+
+                <TextView
+                    android:text="└─$ Point remote at Flipper Zero IR receiver"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#00AA33"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:alpha="0.8"/>
+
+                <TextView
+                    android:text="↓"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#00FF41"
+                    android:textSize="48sp"
+                    android:alpha="0.3"
+                    android:layout_marginTop="48dp"/>
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="START LEARN"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:textSize="14sp"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconTint="#000000"
+        app:backgroundTint="#00FF41"
+        app:elevation="12dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
