@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hexagonal card with cyberpunk gradient -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer glow -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#4000FFFF"
+                android:centerColor="#2000FF41"
+                android:endColor="#40BB00FF"
+                android:type="linear"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+
+    <!-- Inner card with darker gradient -->
+    <item
+        android:top="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#1A0A0E14"
+                android:centerColor="#1A141920"
+                android:endColor="#1A1A1F2E"
+                android:type="linear"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+
+    <!-- Scan line overlay -->
+    <item
+        android:top="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:startColor="#0000FFFF"
+                android:centerColor="#1000FFFF"
+                android:endColor="#0000FFFF"
+                android:type="linear"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+</layer-list>
