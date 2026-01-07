@@ -1,139 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- INTUITIVE FAB-BASED BADUSB INTERFACE -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/terminal_black">
+    android:background="@drawable/grid_pattern">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/bg_terminal_header"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back"
-            android:contentDescription="Back" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="BAD USB PAYLOADS"
-            android:textColor="@color/terminal_red"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:fontFamily="monospace"
-            android:layout_marginStart="16dp" />
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="#DD000000"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:elevation="8dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#00FFFF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"/>
+
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/terminal_dark_gray"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                android:layout_weight="1"
+                android:text="⬡ BAD USB"
+                android:textColor="#FF0055"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginStart="12dp"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PAYLOAD LIBRARY"
-                        android:textColor="@color/terminal_green"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp" />
-
-                    <ListView
-                        android:id="@+id/payloadList"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/statusBadge"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/terminal_dark_gray"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExecute"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="EXECUTE PAYLOAD"
-                        android:backgroundTint="@color/terminal_red"
-                        android:textColor="@color/white"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCopyScript"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="COPY SCRIPT"
-                        android:backgroundTint="@color/terminal_yellow"
-                        android:textColor="@color/terminal_black"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/terminal_black"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/payloadDetails"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Select a payload to view details..."
-                        android:textColor="@color/terminal_green"
-                        android:fontFamily="monospace"
-                        android:textSize="12sp" />
-                </ScrollView>
-            </com.google.android.material.card.MaterialCardView>
+                android:text="ARMED"
+                android:textColor="#FF0055"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:background="#22FF0055"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"/>
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ PAYLOAD SCRIPTS"
+                    android:textColor="#00FFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="12dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/payloadsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:background="@drawable/terminal_border"
+                    android:padding="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ QUICK PAYLOADS"
+                    android:textColor="#00FFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRickRoll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ RICK ROLL"
+                    android:textColor="#000000"
+                    app:backgroundTint="#00FF41"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnWifiGrabber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ WIFI PASSWORD GRABBER"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="#FF0055"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCustomScript"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ LOAD CUSTOM SCRIPT"
+                    android:textColor="#00FFFF"
+                    app:strokeColor="#00FFFF"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="EXECUTE"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:textSize="14sp"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconTint="#FFFFFF"
+        app:backgroundTint="#FF0055"
+        app:elevation="12dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,219 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- INTUITIVE FAB-BASED GPIO/MARAUDER INTERFACE -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_bg">
+    android:background="@drawable/grid_pattern">
 
-    <LinearLayout
-        android:id="@+id/header"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:background="@color/dark_bg"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:tint="@color/text_white"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="GPIO / MARAUDER"
-            android:textColor="@color/func_gpio"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.1"
-            android:layout_marginStart="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ESP32 AWOK V3"
-            android:textColor="@color/text_dim"
-            android:textSize="12sp"
-            android:fontFamily="monospace"/>
-
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintBottom_toBottomOf="parent">
-
+        <!-- HEADER -->
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:background="#DD000000"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:elevation="8dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Marauder Tools -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#00FFFF"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"/>
+
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="MARAUDER TOOLS"
-                android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMarauder"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="WIFI MARAUDER"
-                android:textSize="14sp"
+                android:layout_weight="1"
+                android:text="⬡ GPIO / MARAUDER"
+                android:textColor="#FF0055"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.1"
-                app:cornerRadius="4dp"
-                android:backgroundTint="@color/func_gpio"
-                android:textColor="@color/black_bg"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDeauth"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="DEAUTH ATTACK"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEvilPortal"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="EVIL PORTAL"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnWifiScan"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="WIFI SCANNER"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBLESpam"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="BLE SPAM"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBeaconSpam"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="BEACON SPAM"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnProbeSniff"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="PROBE REQUEST SNIFF"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_gpio"
-                android:textColor="@color/func_gpio"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPacketCapture"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="PACKET CAPTURE → CRACK"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/electric_blue"
-                android:textColor="@color/electric_blue"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- GPIO Controls -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GPIO CONTROLS"
-                android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPinControl"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="PIN CONTROL"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/text_gray"
-                android:textColor="@color/text_gray"/>
-
-            <!-- Output Log -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ACTIVITY LOG"
-                android:textColor="@color/text_gray"
-                android:textSize="11sp"
-                android:letterSpacing="0.15"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="12dp"/>
-
-            <TextView
-                android:id="@+id/gpioOutput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="120dp"
-                android:text="Ready. Select a tool to begin..."
-                android:textColor="@color/text_dim"
-                android:textSize="12sp"
                 android:fontFamily="monospace"
-                android:padding="16dp"
-                android:background="@color/surface_bg"/>
+                android:letterSpacing="0.1"
+                android:layout_marginStart="12dp"/>
 
+            <TextView
+                android:id="@+id/statusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="READY"
+                android:textColor="#00FF41"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:background="#2200FF41"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"/>
         </LinearLayout>
 
-    </ScrollView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ MARAUDER TOOLS"
+                    android:textColor="#00FFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="12dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMarauder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ WIFI MARAUDER"
+                    android:textColor="#000000"
+                    app:backgroundTint="#00FF41"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeauth"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ DEAUTH ATTACK"
+                    android:textColor="#FF0055"
+                    app:strokeColor="#FF0055"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEvilPortal"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ EVIL PORTAL"
+                    android:textColor="#FFFF00"
+                    app:strokeColor="#FFFF00"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnWifiScan"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="⬢ SCAN"
+                        android:textColor="#00FFFF"
+                        app:strokeColor="#00FFFF"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBLESpam"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="⬢ BLE"
+                        android:textColor="#00FFFF"
+                        app:strokeColor="#00FFFF"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:layout_marginStart="4dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ GPIO CONTROLS"
+                    android:textColor="#00FFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPinControl"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ PIN CONTROL"
+                    android:textColor="#00FFFF"
+                    app:strokeColor="#00FFFF"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ ACTIVITY LOG"
+                    android:textColor="#00FFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/gpioOutput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="120dp"
+                    android:text="$ Ready. Select a tool to begin..."
+                    android:textColor="#00AA33"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:padding="16dp"
+                    android:background="@drawable/terminal_border"/>
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:text="EXECUTE"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:textSize="14sp"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconTint="#000000"
+        app:backgroundTint="#00FF41"
+        app:elevation="12dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
