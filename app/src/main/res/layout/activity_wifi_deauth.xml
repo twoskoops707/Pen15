@@ -1,152 +1,356 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- SWIPE-TO-CONTROL WIFI DEAUTH INTERFACE -->
+<!-- Swipe UP = Start Scan | Swipe DOWN = Stop -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/terminal_black">
+    android:background="@drawable/grid_pattern">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <LinearLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/bg_terminal_header"
+        android:layout_height="56dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:background="#DD000000"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical"
+        android:elevation="8dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back"
-            android:contentDescription="Back" />
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:tint="#00FFFF"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="WIFI DEAUTH"
-            android:textColor="@color/terminal_red"
-            android:textSize="18sp"
+            android:text="⬡ WIFI DEAUTH ATTACK"
+            android:textColor="#FF0055"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
-            android:layout_marginStart="16dp" />
+            android:letterSpacing="0.1"
+            android:layout_marginStart="12dp"/>
+
+        <TextView
+            android:id="@+id/statusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="STANDBY"
+            android:textColor="#FFFF00"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:background="#22FFFF00"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"/>
     </LinearLayout>
 
-    <ScrollView
+    <!-- TAB LAYOUT -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="48dp"
+        android:background="#0A000000"
+        app:tabTextColor="#00AA33"
+        app:tabSelectedTextColor="#00FFFF"
+        app:tabIndicatorColor="#00FFFF"
+        app:tabIndicatorHeight="3dp"
+        app:tabMode="fixed"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SCAN"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ATTACK"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RESULTS"/>
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- SWIPE GESTURE AREA -->
+    <FrameLayout
+        android:id="@+id/swipeArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toTopOf="@id/resultsPanel">
+
+        <!-- Swipe Instructions -->
+        <LinearLayout
+            android:id="@+id/swipeInstructions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp">
+
+            <!-- Swipe UP Icon -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="▲"
+                android:textColor="#00FF41"
+                android:textSize="64sp"
+                android:alpha="0.6"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SWIPE UP TO START SCAN"
+                android:textColor="#00FFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="└─$ Scanning for WiFi access points..."
+                android:textColor="#00AA33"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="8dp"
+                android:alpha="0.7"/>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="100dp"
+                android:layout_height="2dp"
+                android:background="#22FFFFFF"
+                android:layout_marginTop="48dp"
+                android:layout_marginBottom="48dp"/>
+
+            <!-- Swipe DOWN Icon -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="▼"
+                android:textColor="#FF0055"
+                android:textSize="64sp"
+                android:alpha="0.6"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SWIPE DOWN TO STOP"
+                android:textColor="#FF0055"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="└─$ Results will appear below"
+                android:textColor="#00AA33"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="8dp"
+                android:alpha="0.7"/>
+        </LinearLayout>
+
+        <!-- Scanning Progress (shown during scan) -->
+        <LinearLayout
+            android:id="@+id/scanningProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:indeterminate="true"
+                android:indeterminateTint="#00FFFF"/>
+
+            <TextView
+                android:id="@+id/scanningText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⬢ SCANNING..."
+                android:textColor="#00FFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.15"
+                android:layout_marginTop="24dp"/>
+
+            <TextView
+                android:id="@+id/networkCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 NETWORKS FOUND"
+                android:textColor="#00FF41"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="└─$ Swipe down to stop and view results"
+                android:textColor="#00AA33"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="32dp"
+                android:alpha="0.8"/>
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- RESULTS PANEL (slides up when stopped) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/resultsPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent="0.5"
+        app:cardBackgroundColor="#DD0A0A0A"
+        app:cardElevation="16dp"
+        app:cardCornerRadius="16dp"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <!-- Progress Bar -->
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
+            <!-- Results Header -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:visibility="gone"
-                android:layout_marginBottom="16dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="12dp">
 
-            <!-- Scan Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnScan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SCAN NETWORKS"
-                android:backgroundTint="@color/terminal_green"
-                android:textColor="@color/terminal_black"
-                android:fontFamily="monospace"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="⬢ SCAN RESULTS"
+                    android:textColor="#00FFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12"/>
+
+                <TextView
+                    android:id="@+id/resultsCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 APs FOUND"
+                    android:textColor="#00FF41"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:background="#1A00FF41"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"/>
+            </LinearLayout>
 
             <!-- Network List -->
-            <com.google.android.material.card.MaterialCardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/networkList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/terminal_border"
+                android:padding="8dp"/>
+
+            <!-- Follow-up Actions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⬢ AVAILABLE ACTIONS"
+                android:textColor="#00FFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Action Chips -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/actionChips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/terminal_dark_gray"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                app:singleSelection="false">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSelectTarget"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="⬢ SELECT TARGET AP"
+                    android:textColor="#FFFFFF"
+                    app:chipBackgroundColor="#00FFFF"
+                    app:chipStrokeColor="#00FFFF"
+                    android:fontFamily="monospace"
+                    android:textSize="10sp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NETWORKS"
-                        android:textColor="@color/terminal_green"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDeauth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ START DEAUTH"
+                    android:textColor="#FFFFFF"
+                    app:chipBackgroundColor="#FF0055"
+                    app:chipStrokeColor="#FF0055"
+                    android:fontFamily="monospace"
+                    android:textSize="10sp"/>
 
-                    <ListView
-                        android:id="@+id/networkList"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:background="@color/terminal_black"
-                        android:divider="@color/terminal_green"
-                        android:dividerHeight="1dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCapture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ CAPTURE HANDSHAKE"
+                    android:textColor="#000000"
+                    app:chipBackgroundColor="#00FF41"
+                    app:chipStrokeColor="#00FF41"
+                    android:fontFamily="monospace"
+                    android:textSize="10sp"/>
 
-            <!-- Deauth Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDeauth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="START ATTACK"
-                android:backgroundTint="@color/terminal_red"
-                android:textColor="@color/white"
-                android:fontFamily="monospace"
-                android:enabled="false"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Stop Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="STOP ATTACK"
-                android:backgroundTint="@color/status_disconnected"
-                android:textColor="@color/white"
-                android:fontFamily="monospace"
-                android:enabled="false"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Log Output -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/terminal_black"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <ScrollView
-                    android:id="@+id/logScroll"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/logOutput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/terminal_green"
-                        android:fontFamily="monospace"
-                        android:textSize="12sp" />
-                </ScrollView>
-            </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipRescan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⬢ RESCAN"
+                    android:textColor="#FFFFFF"
+                    app:chipBackgroundColor="#0A141920"
+                    app:chipStrokeColor="#00FFFF"
+                    app:chipStrokeWidth="1dp"
+                    android:fontFamily="monospace"
+                    android:textSize="10sp"/>
+            </com.google.android.material.chip.ChipGroup>
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
