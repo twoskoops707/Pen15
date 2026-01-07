@@ -36,6 +36,7 @@
     <color name="text_gray">#888888</color>
     <color name="text_dim">#00AA33</color>
     <color name="text_muted">#666666</color>
+    <color name="dark_grey">#333333</color>
 
     <!-- Status Colors - Vivid & Clear -->
     <color name="status_connected">@color/neon_green</color>
