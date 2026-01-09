@@ -115,3 +115,4 @@ lint-results*.html
 # Build logs
 build_output.log
 *.log
+.env
