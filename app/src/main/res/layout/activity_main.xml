@@ -70,7 +70,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_manage"
-            android:tint="#808080"
+            app:tint="#808080"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"/>
     </LinearLayout>

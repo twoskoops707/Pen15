@@ -30,7 +30,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_menu_revert"
-                android:tint="#00FFFF"
+                app:tint="#00FFFF"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"/>
 

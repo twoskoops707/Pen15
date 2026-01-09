@@ -37,7 +37,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_menu_revert"
-                    android:tint="@color/neon_cyan"
+                    app:tint="@color/neon_cyan"
                     android:clickable="true"
                     android:focusable="true"
                     android:background="?attr/selectableItemBackgroundBorderless"/>
