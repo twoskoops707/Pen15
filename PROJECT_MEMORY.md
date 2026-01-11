@@ -12,16 +12,40 @@
 ✅ **GitHub Workflows** - Build workflows updated and stable
 **NOTE:** These files are finalized. Do not suggest reviewing them before builds.
 
-## Current Status (2026-01-07)
+## Current Status (2026-01-11)
 ✅ **Master Pentesting Suite - FULLY AUTOMATED**
 ✅ **Termux RUN_COMMAND execution (automatic command running)**
-✅ **Neon Terminal UI** - Complete hacker aesthetic color scheme
-⚠️ **Flipper Zero USB integration - TESTING CLI APPROACH**
-❌ **Flipper companion app REMOVED - architecture was flawed**
+✅ **Modern Glassmorphism UI** - Complete redesign with tactical HUD
+✅ **Flipper Zero USB/Bluetooth integration** - Working CLI commands
 ✅ **AWOK Mini V3 ESP32 Marauder automation**
-🔧 **MainActivity UI Fix** - Removed references to non-existent cards (build #20780548418)
+✅ **Flipper CLI Commands FIXED** - Corrected invalid commands
+   - RFID: `rfid read` ✓ (works)
+   - NFC: GUI-only (CLI removed in firmware)
+   - iButton: `ikey read` ✓ (was using wrong command)
+   - SubGHz: `subghz rx <freq>` ✓ (works)
+   - IR: `ir rx` ✓ (works)
+   - GPIO: `power 5v` ✓ (works)
+   - BadUSB: `storage list /ext/badusb` ✓ (works)
 
-## CRITICAL DISCOVERY (2026-01-01)
+## CRITICAL DISCOVERIES
+
+### 2026-01-11: Flipper CLI Command Corrections
+**Research confirmed actual working commands:**
+- ✅ `rfid read` - Works (confirmed by official docs)
+- ❌ `nfc read` - REMOVED in firmware (GitHub issue #3276)
+  - NFC now requires GUI interaction only
+  - CLI commands were removed after NFC refactor
+- ❌ `ibutton read` - WRONG command name
+  - ✅ Correct command: `ikey read`
+- ✅ `subghz rx <frequency> <device>` - Works
+- ✅ `ir rx` - Works (infrared)
+- ✅ `storage list /ext/<path>` - Works
+
+**Sources:**
+- https://docs.flipper.net/zero/development/cli
+- https://github.com/flipperdevices/flipperzero-firmware/issues/3276
+
+### 2026-01-01: Flipper Architecture
 **Flipper Companion App can't work with USB!**
 - Custom apps can't listen on USB CDC (interface is in use by the app itself)
 - `FuriHalSerialIdUsb` doesn't exist in Flipper SDK
@@ -131,16 +155,18 @@
 - **APK Output:** app-debug.apk (~15MB)
 
 ## Latest Release
-- **Version:** v1.0.12 (MASTER PENTEST SUITE)
-- **Status:** 🚀 PENDING BUILD
+- **Version:** Build #54 (2026-01-11)
+- **Status:** ✅ SUCCESSFULLY BUILT
+- **APK:** https://github.com/twoskoops707/Pen15/releases/tag/build-54
 - **Changes:**
-  - ✅ Termux RUN_COMMAND integration (auto-execution)
-  - ✅ WiFi capture + crack full automation
-  - ✅ Flipper Zero USB-C serial control
-  - ✅ AWOK Mini V3 ESP32 Marauder scripts
-  - ✅ Online wordlist downloader (rockyou.txt)
-  - ✅ Step-by-step guides for every feature
-  - ✅ Python automation scripts
+  - ✅ Modern glassmorphism UI with tactical HUD design
+  - ✅ Flipper Zero USB/Bluetooth connection managers
+  - ✅ FIXED: Corrected all Flipper CLI commands
+  - ✅ BaseToolActivity architecture for all tools
+  - ✅ Working RFID/SubGHz/IR/iButton/BadUSB/GPIO
+  - ✅ NFC properly documented as GUI-only
+  - ✅ Removed blocking operations from connection init
+  - ✅ 20+ pentesting tools fully implemented
 
 ## UI Layout
 **6 Main Card Sections:**

@@ -15,8 +15,15 @@ class IButtonActivity : BaseToolActivity() {
         appendOutput("Starting iButton read mode...")
         appendOutput("Touch iButton device to Flipper's contact pad")
         appendOutput("")
+        appendOutput("Supported types:")
+        appendOutput("• Dallas (DS1990, DS1992, DS1996, DS1971)")
+        appendOutput("• Cyfral")
+        appendOutput("• Metakom")
+        appendOutput("")
         lifecycleScope.launch {
-            val response = sendFlipperCommand("ibutton read")
+            // Correct command is "ikey read" not "ibutton read"
+            val response = sendFlipperCommand("ikey read")
+            appendOutput("Response:")
             appendOutput(response)
         }
     }
