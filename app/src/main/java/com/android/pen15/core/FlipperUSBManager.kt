@@ -85,6 +85,16 @@ class FlipperUSBManager(private val context: Context) {
             usbSerialPort = driver.ports[0]
             usbSerialPort?.open(connection)
             usbSerialPort?.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+
+            // Clear buffer and wait for prompt
+            Thread.sleep(500)
+            val buffer = ByteArray(2048)
+            try {
+                usbSerialPort?.read(buffer, 1000)
+            } catch (e: Exception) {
+                // Ignore timeout, just clearing buffer
+            }
+
             connected = true
             Log.i(TAG, "Connected to Flipper Zero via USB")
             true
@@ -98,17 +108,40 @@ class FlipperUSBManager(private val context: Context) {
         if (!connected || usbSerialPort == null) {
             return@withContext "Error: Not connected"
         }
-        
+
         try {
-            val data = "$command\r\n".toByteArray()
-            usbSerialPort?.write(data, 1000)
-            
-            Thread.sleep(200)
-            
-            val buffer = ByteArray(8192)
-            val numBytesRead = usbSerialPort?.read(buffer, 1000) ?: 0
-            
-            String(buffer, 0, numBytesRead)
+            // Send command with \r (carriage return only, NOT \r\n!)
+            val data = "$command\r".toByteArray()
+            usbSerialPort?.write(data, 2000)
+
+            // Wait for response - read until we see the prompt ">: "
+            val response = StringBuilder()
+            val buffer = ByteArray(1024)
+            var totalRead = 0
+            val startTime = System.currentTimeMillis()
+
+            while (System.currentTimeMillis() - startTime < 3000) {
+                try {
+                    val numBytesRead = usbSerialPort?.read(buffer, 500) ?: 0
+                    if (numBytesRead > 0) {
+                        val chunk = String(buffer, 0, numBytesRead)
+                        response.append(chunk)
+                        totalRead += numBytesRead
+
+                        // Stop reading if we see the prompt
+                        if (response.contains(">: ")) {
+                            break
+                        }
+                    } else {
+                        Thread.sleep(100)
+                    }
+                } catch (e: Exception) {
+                    break
+                }
+            }
+
+            // Remove the prompt from the response
+            response.toString().replace(">: ", "").trim()
         } catch (e: IOException) {
             Log.e(TAG, "Error sending command", e)
             "Error: ${e.message}"

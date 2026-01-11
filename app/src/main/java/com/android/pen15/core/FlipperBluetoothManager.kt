@@ -85,9 +85,21 @@ class FlipperBluetoothManager(private val context: Context) {
 
                 Log.d(TAG, "Connected to Flipper Zero via Bluetooth!")
 
-                // Send initial handshake
+                // Clear buffer and wait for prompt
                 Thread.sleep(500)
-                sendCommand("version")
+                val buffer = ByteArray(2048)
+                try {
+                    val available = inputStream?.available() ?: 0
+                    if (available > 0) {
+                        inputStream?.read(buffer, 0, minOf(available, buffer.size))
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, "Buffer clear: ${e.message}")
+                }
+
+                // Test connection with version command
+                val versionResponse = sendCommand("device_info")
+                Log.d(TAG, "Version: $versionResponse")
 
                 return true
             }
@@ -109,24 +121,38 @@ class FlipperBluetoothManager(private val context: Context) {
                 return "Error: Not connected"
             }
 
-            val commandBytes = "$command\r\n".toByteArray()
+            // Send command with \r (carriage return only, NOT \r\n!)
+            val commandBytes = "$command\r".toByteArray()
             outputStream?.write(commandBytes)
             outputStream?.flush()
 
-            // Wait for response
-            Thread.sleep(300)
-
+            // Wait for response - read until we see the prompt ">: "
+            val response = StringBuilder()
             val buffer = ByteArray(1024)
-            val bytesRead = inputStream?.available() ?: 0
+            val startTime = System.currentTimeMillis()
 
-            if (bytesRead > 0) {
-                inputStream?.read(buffer, 0, bytesRead)
-                val response = String(buffer, 0, bytesRead).trim()
-                Log.d(TAG, "Response: $response")
-                return response
+            while (System.currentTimeMillis() - startTime < 3000) {
+                val available = inputStream?.available() ?: 0
+                if (available > 0) {
+                    val bytesRead = inputStream?.read(buffer, 0, minOf(available, buffer.size)) ?: 0
+                    if (bytesRead > 0) {
+                        val chunk = String(buffer, 0, bytesRead)
+                        response.append(chunk)
+                        Log.d(TAG, "Read chunk: $chunk")
+
+                        // Stop reading if we see the prompt
+                        if (response.contains(">: ")) {
+                            break
+                        }
+                    }
+                } else {
+                    Thread.sleep(100)
+                }
             }
 
-            return "OK"
+            val result = response.toString().replace(">: ", "").trim()
+            Log.d(TAG, "Final response: $result")
+            return if (result.isEmpty()) "OK" else result
 
         } catch (e: IOException) {
             Log.e(TAG, "Command failed: ${e.message}")

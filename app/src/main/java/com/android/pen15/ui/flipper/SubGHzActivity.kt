@@ -55,16 +55,16 @@ class SubGHzActivity : BaseToolActivity() {
         lifecycleScope.launch {
             showProgress(true)
 
-            // Send Flipper command
-            val response = sendFlipperCommand("subghz rx $frequency")
+            // Send Flipper command (device 0 = internal CC1101 antenna)
+            val response = sendFlipperCommand("subghz rx $frequency 0")
             logMessage("Flipper response: $response")
 
-            if (response.contains("OK")) {
+            if (!response.contains("Error")) {
                 logMessage("✓ Scanning started successfully")
                 logMessage("Listening for signals...")
                 logMessage("Common uses: car keys, garage doors, remotes")
             } else {
-                logMessage("✗ Error starting scan")
+                logMessage("✗ Error starting scan: $response")
                 stopScan()
             }
 
