@@ -28,27 +28,47 @@ class SubGHzActivity : BaseToolActivity() {
 
         btnStartScan.setOnClickListener { startScan() }
         btnStopScan.setOnClickListener { stopScan() }
+
+        logMessage("Sub-GHz scanner ready")
+        logMessage("Select frequency and tap 'Start Scan'")
     }
 
     private fun startScan() {
         val frequency = when (frequencyChips.checkedChipId) {
-            R.id.chip315 -> 315000000
-            R.id.chip390 -> 390000000
-            R.id.chip433 -> 433920000
-            R.id.chip868 -> 868000000
-            R.id.chip915 -> 915000000
-            else -> 433920000
+            R.id.chip315 -> 315000000L
+            R.id.chip390 -> 390000000L
+            R.id.chip433 -> 433920000L
+            R.id.chip868 -> 868000000L
+            R.id.chip915 -> 915000000L
+            else -> 433920000L
         }
 
         scanning = true
         btnStartScan.isEnabled = false
         btnStopScan.isEnabled = true
 
-        appendOutput("Starting Sub-GHz scan at ${frequency / 1000000} MHz...")
+        clearOutput()
+        logMessage("Configuring Sub-GHz radio...")
+        logMessage("Frequency: ${frequency / 1000000} MHz")
+        logMessage("Mode: Receive (RX)")
 
         lifecycleScope.launch {
+            showProgress(true)
+
+            // Send Flipper command
             val response = sendFlipperCommand("subghz rx $frequency")
-            appendOutput(response)
+            logMessage("Flipper response: $response")
+
+            if (response.contains("OK")) {
+                logMessage("✓ Scanning started successfully")
+                logMessage("Listening for signals...")
+                logMessage("Common uses: car keys, garage doors, remotes")
+            } else {
+                logMessage("✗ Error starting scan")
+                stopScan()
+            }
+
+            showProgress(false)
         }
     }
 
@@ -57,11 +77,13 @@ class SubGHzActivity : BaseToolActivity() {
         btnStartScan.isEnabled = true
         btnStopScan.isEnabled = false
 
-        appendOutput("Stopping scan...")
+        logMessage("Stopping scan...")
 
         lifecycleScope.launch {
+            showProgress(true)
             val response = sendFlipperCommand("subghz stop")
-            appendOutput(response)
+            logMessage("Scan stopped")
+            showProgress(false)
         }
     }
 }
