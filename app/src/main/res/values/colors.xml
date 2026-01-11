@@ -1,99 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- NEON TERMINAL HACKER COLOR SCHEME -->
+    <!-- Glassmorphism Base Colors -->
+    <color name="glass_background">#0A0E1A</color>
+    <color name="glass_surface">#14192B</color>
+    <color name="glass_overlay">#1A1F33</color>
 
-    <!-- Base Colors - Deep Black Matrix Background -->
-    <color name="black_bg">#000000</color>
-    <color name="dark_bg">#050505</color>
-    <color name="surface_bg">#0A0A0A</color>
-    <color name="elevated_bg">#101010</color>
-    <!-- color name="card_bg">#0F0F0F</color -->
+    <!-- Glass Accent Colors -->
+    <color name="glass_primary">#6366F1</color>
+    <color name="glass_primary_variant">#818CF8</color>
+    <color name="glass_secondary">#8B5CF6</color>
+    <color name="glass_accent">#06B6D4</color>
 
-    <!-- Neon Primary Colors - Vivid & Aggressive -->
-    <color name="neon_green">#00FF00</color>
-    <color name="neon_cyan">#00FFFF</color>
-    <color name="neon_magenta">#FF00FF</color>
-    <color name="neon_yellow">#FFFF00</color>
-    <color name="neon_red">#FF0055</color>
-    <color name="neon_blue">#0088FF</color>
-    <color name="neon_purple">#BB00FF</color>
-    <color name="neon_orange">#FF7700</color>
+    <!-- Glass Effects -->
+    <color name="glass_blur_light">#33FFFFFF</color>
+    <color name="glass_blur_medium">#26FFFFFF</color>
+    <color name="glass_blur_dark">#1AFFFFFF</color>
 
-    <!-- Neon Glow Effects (Semi-transparent for layering) -->
-    <color name="glow_green">#4000FF41</color>
-    <color name="glow_cyan">#4000FFFF</color>
-    <color name="glow_magenta">#40FF00FF</color>
-    <color name="glow_red">#40FF0055</color>
+    <!-- Glass Borders -->
+    <color name="glass_border">#40FFFFFF</color>
+    <color name="glass_border_subtle">#20FFFFFF</color>
 
-    <!-- Legacy Mappings -->
-    <color name="electric_blue">@color/neon_cyan</color>
-    <color name="electric_blue_dim">@color/neon_blue</color>
-    <color name="card_bg">#0F0F0F</color>
+    <!-- Status Colors -->
+    <color name="glass_success">#10B981</color>
+    <color name="glass_warning">#F59E0B</color>
+    <color name="glass_error">#EF4444</color>
+    <color name="glass_info">#3B82F6</color>
 
-    <!-- Text Colors - Terminal Style -->
-    <color name="text_white">#FFFFFF</color>
-    <color name="text_light">#E0E0E0</color>
-    <color name="text_gray">#888888</color>
-    <color name="text_dim">#00AA33</color>
-    <color name="text_muted">#666666</color>
-    <color name="dark_grey">#333333</color>
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0AEC0</color>
+    <color name="text_tertiary">#64748B</color>
+    <color name="text_disabled">#475569</color>
 
-    <!-- Status Colors - Vivid & Clear -->
-    <color name="status_connected">@color/neon_green</color>
-    <color name="status_disconnected">@color/neon_red</color>
-    <color name="status_scanning">@color/neon_yellow</color>
-    <color name="status_warning">@color/neon_orange</color>
-    <color name="status_error">@color/neon_red</color>
-    <color name="status_success">@color/neon_green</color>
+    <!-- Connection Status -->
+    <color name="status_connected">#10B981</color>
+    <color name="status_connecting">#F59E0B</color>
+    <color name="status_disconnected">#64748B</color>
 
-    <!-- Function Colors - Neon Spectrum -->
-    <color name="func_subghz">@color/neon_cyan</color>
-    <color name="func_rfid">@color/neon_green</color>
-    <color name="func_nfc">@color/neon_magenta</color>
-    <color name="func_infrared">@color/neon_red</color>
-    <color name="func_ir">@color/neon_red</color>
-    <color name="func_gpio">@color/neon_purple</color>
-    <color name="func_badusb">@color/neon_yellow</color>
-    <color name="func_ibutton">@color/neon_blue</color>
-    <color name="func_bluetooth">@color/neon_orange</color>
-    <color name="func_ble">@color/neon_orange</color>
-    <color name="func_wifi">@color/neon_cyan</color>
-    <color name="func_network">@color/neon_green</color>
-    <color name="func_exploit">@color/neon_red</color>
+    <!-- Category Colors -->
+    <color name="category_flipper">#6366F1</color>
+    <color name="category_network">#06B6D4</color>
+    <color name="category_crypto">#8B5CF6</color>
+    <color name="category_utilities">#10B981</color>
 
-    <!-- Terminal Colors - Classic Terminal Palette -->
-    <color name="terminal_black">#000000</color>
-    <color name="terminal_dark_gray">#0A0A0A</color>
-    <color name="terminal_gray">#00AA33</color>
-    <color name="terminal_green">@color/neon_green</color>
-    <color name="terminal_red">@color/neon_red</color>
-    <color name="terminal_yellow">@color/neon_yellow</color>
-    <color name="terminal_cyan">@color/neon_cyan</color>
-    <color name="terminal_magenta">@color/neon_magenta</color>
-
-    <!-- Legacy Compatibility -->
-    <color name="primary">@color/neon_green</color>
-    <color name="primary_dark">#00AA33</color>
-    <color name="accent">@color/neon_cyan</color>
-    <color name="background">@color/black_bg</color>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="card_background">@color/surface_bg</color>
-    <color name="ic_launcher_background">#0A0A0A</color>
-
-    <!-- BUTTON COLORS -->
-    <color name="btn_primary">@color/neon_cyan</color>
-    <color name="btn_primary_dark">@color/neon_blue</color>
-    <color name="btn_danger">@color/neon_red</color>
-    <color name="btn_success">@color/neon_green</color>
-    <color name="btn_warning">@color/neon_yellow</color>
-
-    <!-- PROGRESS & LOADING -->
-    <color name="progress_bar">@color/neon_green</color>
-    <color name="progress_background">@color/elevated_bg</color>
-
-    <!-- ADDITIONAL BACKGROUNDS -->
-    <!-- color name="card_bg">#0F0F0F</color -->
-    <color name="error">@color/neon_red</color>
-    <color name="success">@color/neon_green</color>
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#6366F1</color>
+    <color name="gradient_middle">#8B5CF6</color>
+    <color name="gradient_end">#06B6D4</color>
 </resources>

@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace 'com.pentest.dashboard'
+    namespace 'com.android.pen15'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.pentest.dashboard"
+        applicationId "com.android.pen15"
         minSdk 30
         targetSdk 34
-        versionCode 11
-        versionName "1.0.11"
+        versionCode 20
+        versionName "2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,9 +44,13 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
 
     // Material Design
     implementation 'com.google.android.material:material:1.11.0'
+
+    // ViewPager2 for tab navigation
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'

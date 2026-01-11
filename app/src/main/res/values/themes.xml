@@ -1,42 +1,21 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- TERMINAL HACKER THEME - Dark & Low Profile -->
-    <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Backgrounds - Pure Black -->
-        <item name="android:windowBackground">@color/black_bg</item>
-        <item name="android:colorBackground">@color/dark_bg</item>
-        <item name="colorSurface">@color/surface_bg</item>
-        <item name="colorSurfaceVariant">@color/elevated_bg</item>
-
-        <!-- Primary - Neon Green Matrix Style -->
-        <item name="colorPrimary">@color/neon_green</item>
-        <item name="colorPrimaryVariant">#007722</item>
-        <item name="colorOnPrimary">@color/black_bg</item>
-
-        <!-- Secondary - Neon Cyan Accents -->
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="colorOnSecondary">@color/black_bg</item>
-
-        <!-- Error - Neon Red -->
-        <item name="colorError">@color/neon_red</item>
-
-        <!-- Text - Subtle Green Tint -->
-        <item name="android:textColorPrimary">@color/text_white</item>
-        <item name="android:textColorSecondary">@color/text_gray</item>
-
-        <!-- System Bars - Black -->
-        <item name="android:statusBarColor">@color/black_bg</item>
-        <item name="android:navigationBarColor">@color/black_bg</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Pen15" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/glass_primary</item>
+        <item name="colorPrimaryVariant">@color/glass_primary_variant</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorSecondary">@color/glass_secondary</item>
+        <item name="colorSecondaryVariant">@color/glass_secondary</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="android:colorBackground">@color/glass_background</item>
+        <item name="colorSurface">@color/glass_surface</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Typography - Monospace for Terminal Feel -->
-        <item name="android:fontFamily">monospace</item>
-    </style>
-
-    <!-- Tab Text Style for Terminal Tabs -->
-    <style name="TabTextStyle">
-        <item name="android:fontFamily">monospace</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0.1</item>
-        <item name="android:textAllCaps">true</item>
+        <item name="android:navigationBarColor">@color/glass_background</item>
+        <item name="android:windowBackground">@color/glass_background</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 </resources>

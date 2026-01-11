@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pentest.dashboard">
+    package="com.android.pen15">
 
     <!-- Required Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,7 +28,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PentestDashboard">
+        android:theme="@style/Theme.Pen15">
 
         <activity
             android:name=".MainActivity"
@@ -46,133 +46,6 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </activity>
-
-        <activity
-            android:name=".SubGHzActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".RFIDActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".NFCActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".InfraredActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".GPIOActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".BadUSBActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".IButtonActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".BluetoothActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ScriptBuilderActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".BadUSBActivity" />
-
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".WiFiDeauthActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".WiFiCaptureActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".NetworkScannerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ExploitDatabaseActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".PacketSnifferActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".HashCrackerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ESP32ManagerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".PayloadGeneratorActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".ARPPoisonerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".CheatSheetActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-
-        <activity
-            android:name=".CreditCardReaderActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
 
     </application>
 
