@@ -14,6 +14,7 @@ import com.android.pen15.core.ConnectionManager
 import com.android.pen15.ui.crypto.CryptoToolsFragment
 import com.android.pen15.ui.flipper.FlipperToolsFragment
 import com.android.pen15.ui.network.NetworkToolsFragment
+import kotlinx.coroutines.launch
 import com.android.pen15.ui.utilities.UtilitiesFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
