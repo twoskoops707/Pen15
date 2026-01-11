@@ -99,28 +99,31 @@
 
 **Manual Alternative:** All features accessible directly on Flipper Zero screen
 
-### 📶 AWOK Mini V3 ESP32 Marauder (USB-C Serial)
-**Automated Scripts Control via /dev/ttyUSB0:**
+### 📶 AWOK Mini V3 ESP32 Marauder (GPIO UART)
+**Connected to Flipper Zero via GPIO pins**
 
-1. **WiFi Wardriving with GPS**
-   - Scans WiFi networks with GPS coordinates logged
-   - Saves results: SSID, BSSID, Channel, Signal strength, GPS location
-   - Via Flipper screen OR Python automation
+**Correct Commands (confirmed 2026-01-11):**
 
-2. **Deauthentication Attack**
-   - Disconnects clients from target WiFi
-   - Forces WPA handshake for capture
-   - Marauder command: `attack -t deauth -s SSID`
+1. **WiFi Scanning**
+   - `scanap` - Scan for access points
+   - `list -a` - List scanned APs
+   - `stopscan` - Stop scanning
 
-3. **Evil Portal (Captive Portal)**
-   - Creates fake WiFi hotspot
-   - Captures credentials via fake login page
-   - Web interface: 192.168.4.1
+2. **Target Selection**
+   - `select -a 0` - Select AP by index
+   - `clearap` - Clear selection
 
-4. **BLE Device Scanner**
-   - Scans Bluetooth Low Energy devices
-   - Detects smartwatches, fitness trackers, car keys
-   - Saves results to file
+3. **WiFi Attacks**
+   - `attack -t deauth` - Deauth flood attack
+   - `attack -t beacon` - Beacon spam
+   - `attack -t probe` - Probe request spam
+
+4. **BLE Attacks**
+   - `btspamall` - BLE spam all
+   - `sniffbt` - Sniff Bluetooth
+
+**Connection:** AWOK Mini V3 → Flipper GPIO (UART) → USB to Android
+**Resources:** https://github.com/justcallmekoko/ESP32Marauder/wiki
 
 ## Devices Supported
 - **Phone:** Samsung Galaxy Note 10+ (Android 11+, non-rooted)
