@@ -45,6 +45,7 @@ abstract class BaseToolActivity : AppCompatActivity() {
             outputText = findViewById(R.id.outputText)
             progressBar = findViewById(R.id.progressBar)
             executeButton = findViewById(R.id.btnExecute)
+            setupToolButtons()
             logMessage("${getToolName()} - Ready")
         }
     }

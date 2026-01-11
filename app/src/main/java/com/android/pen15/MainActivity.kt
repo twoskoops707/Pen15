@@ -1,5 +1,6 @@
 package com.android.pen15
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.android.pen15.core.ConnectionManager
 import com.android.pen15.ui.crypto.CryptoToolsFragment
 import com.android.pen15.ui.flipper.FlipperToolsFragment
 import com.android.pen15.ui.network.NetworkToolsFragment
+import com.android.pen15.ui.utilities.SettingsActivity
 import kotlinx.coroutines.launch
 import com.android.pen15.ui.utilities.UtilitiesFragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -52,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         textConnectionStatus = findViewById(R.id.textConnectionStatus)
         
         findViewById<View>(R.id.btnSettings).setOnClickListener {
-            // TODO: Open settings
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
     
