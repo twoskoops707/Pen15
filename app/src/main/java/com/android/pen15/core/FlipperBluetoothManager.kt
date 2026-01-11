@@ -84,23 +84,6 @@ class FlipperBluetoothManager(private val context: Context) {
                 outputStream = bluetoothSocket?.outputStream
 
                 Log.d(TAG, "Connected to Flipper Zero via Bluetooth!")
-
-                // Clear buffer and wait for prompt
-                Thread.sleep(500)
-                val buffer = ByteArray(2048)
-                try {
-                    val available = inputStream?.available() ?: 0
-                    if (available > 0) {
-                        inputStream?.read(buffer, 0, minOf(available, buffer.size))
-                    }
-                } catch (e: Exception) {
-                    Log.d(TAG, "Buffer clear: ${e.message}")
-                }
-
-                // Test connection with version command
-                val versionResponse = sendCommand("device_info")
-                Log.d(TAG, "Version: $versionResponse")
-
                 return true
             }
 

@@ -86,15 +86,6 @@ class FlipperUSBManager(private val context: Context) {
             usbSerialPort?.open(connection)
             usbSerialPort?.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
 
-            // Clear buffer and wait for prompt
-            Thread.sleep(500)
-            val buffer = ByteArray(2048)
-            try {
-                usbSerialPort?.read(buffer, 1000)
-            } catch (e: Exception) {
-                // Ignore timeout, just clearing buffer
-            }
-
             connected = true
             Log.i(TAG, "Connected to Flipper Zero via USB")
             true
