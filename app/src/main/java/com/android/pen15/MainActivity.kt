@@ -87,24 +87,28 @@ class MainActivity : AppCompatActivity() {
         val textStatus = view.findViewById<TextView>(R.id.textStatus)
         
         btnUSB.setOnClickListener {
-            connectionManager.connectUSB(this) { success ->
-                runOnUiThread {
-                    updateConnectionStatus(success)
-                    if (success) {
-                        textStatus.text = "Connected via USB"
-                        dialog.dismiss()
+            lifecycleScope.launch {
+                connectionManager.connectUSB(this@MainActivity) { success ->
+                    runOnUiThread {
+                        updateConnectionStatus(success)
+                        if (success) {
+                            textStatus.text = "Connected via USB"
+                            dialog.dismiss()
+                        }
                     }
                 }
             }
         }
-        
+
         btnBluetooth.setOnClickListener {
-            connectionManager.connectBluetooth(this) { success ->
-                runOnUiThread {
-                    updateConnectionStatus(success)
-                    if (success) {
-                        textStatus.text = "Connected via Bluetooth"
-                        dialog.dismiss()
+            lifecycleScope.launch {
+                connectionManager.connectBluetooth(this@MainActivity) { success ->
+                    runOnUiThread {
+                        updateConnectionStatus(success)
+                        if (success) {
+                            textStatus.text = "Connected via Bluetooth"
+                            dialog.dismiss()
+                        }
                     }
                 }
             }
