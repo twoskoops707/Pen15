@@ -26,6 +26,10 @@ gradle-app.setting
 # Local configuration file (sdk path, etc)
 local.properties
 
+# Local Android SDK/bootstrap files (never commit)
+android-sdk/
+commandlinetools.zip
+
 # Android Studio
 *.iml
 .idea/
