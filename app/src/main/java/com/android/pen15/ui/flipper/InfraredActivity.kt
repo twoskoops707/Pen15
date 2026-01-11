@@ -10,9 +10,10 @@ class InfraredActivity : BaseToolActivity() {
     override fun getToolName() = "Infrared"
     override fun getLayoutResource() = R.layout.activity_generic_tool
     override fun onToolExecute() {
-        appendOutput("Executing Infrared...")
+        appendOutput("Starting infrared capture...")
+        appendOutput("Point remote at Flipper and press button")
         lifecycleScope.launch {
-            val response = sendFlipperCommand("infrared capture")
+            val response = sendFlipperCommand("ir rx")
             appendOutput(response)
         }
     }

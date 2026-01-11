@@ -10,7 +10,11 @@ class IButtonActivity : BaseToolActivity() {
     override fun getToolName() = "IButton"
     override fun getLayoutResource() = R.layout.activity_generic_tool
     override fun onToolExecute() {
-        appendOutput("Executing IButton...")
+        appendOutput("iButton Reader")
+        appendOutput("")
+        appendOutput("Starting iButton read mode...")
+        appendOutput("Touch iButton device to Flipper's contact pad")
+        appendOutput("")
         lifecycleScope.launch {
             val response = sendFlipperCommand("ibutton read")
             appendOutput(response)
