@@ -16,6 +16,7 @@ import com.android.pen15.ui.components.ToolCardView
 class UtilitiesFragment : Fragment() {
     
     private val utilities = listOf(
+        Tool("qr_scanner", "QR Scanner", "Scan QR codes and barcodes", ToolCategory.UTILITIES),
         Tool("script_builder", "Script Builder", "Create custom pentesting scripts", ToolCategory.UTILITIES),
         Tool("cheat_sheet", "Cheat Sheet", "Quick command reference", ToolCategory.UTILITIES),
         Tool("esp32", "ESP32 Manager", "Control AWOK Marauder device", ToolCategory.UTILITIES),
@@ -43,6 +44,7 @@ class UtilitiesFragment : Fragment() {
 
     private fun launchTool(toolId: String) {
         val className = when (toolId) {
+            "qr_scanner" -> "QRScannerActivity"
             "script_builder" -> "ScriptBuilderActivity"
             "cheat_sheet" -> "CheatSheetActivity"
             "esp32" -> "ESP32ManagerActivity"

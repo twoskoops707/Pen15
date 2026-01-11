@@ -47,4 +47,7 @@
     <color name="gradient_start">#6366F1</color>
     <color name="gradient_middle">#8B5CF6</color>
     <color name="gradient_end">#06B6D4</color>
+
+    <!-- Launcher Icon -->
+    <color name="ic_launcher_background">#14192B</color>
 </resources>
