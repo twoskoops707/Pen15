@@ -17,9 +17,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 abstract class BaseToolActivity : AppCompatActivity() {
-    
+
     protected lateinit var outputText: TextView
     protected lateinit var progressBar: ProgressBar
+    protected lateinit var executeButton: Button
     protected val connectionManager = ConnectionManager.getInstance()
     protected val processManager by lazy { ProcessManager(this) }
     private val outputBuilder = StringBuilder()
@@ -30,18 +31,20 @@ abstract class BaseToolActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         try {
             setContentView(getLayoutResource())
             outputText = findViewById(R.id.outputText)
             progressBar = findViewById(R.id.progressBar)
-            
+            executeButton = findViewById(R.id.btnExecute)
+
             setupToolButtons()
             logMessage("${getToolName()} initialized")
         } catch (e: Exception) {
             setContentView(R.layout.activity_generic_tool)
             outputText = findViewById(R.id.outputText)
             progressBar = findViewById(R.id.progressBar)
+            executeButton = findViewById(R.id.btnExecute)
             logMessage("${getToolName()} - Ready")
         }
     }
@@ -111,15 +114,33 @@ abstract class BaseToolActivity : AppCompatActivity() {
     protected fun executeCommandWithProgress(command: String, useTermux: Boolean = false) {
         lifecycleScope.launch {
             showProgress(true)
-            
+
             val result = if (useTermux) {
                 executeTermuxCommand(command)
             } else {
                 sendFlipperCommand(command)
             }
-            
+
             logMessage(result)
             showProgress(false)
         }
+    }
+
+    // Check if Flipper Zero is connected
+    protected suspend fun checkFlipperConnection(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Check if USB device exists
+                val result = processManager.executeCommand("ls /dev/ttyACM0", useTermux = false)
+                result.success
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    // Backward compatibility method
+    protected fun appendOutput(text: String) {
+        logMessage(text, includeTimestamp = false)
     }
 }
