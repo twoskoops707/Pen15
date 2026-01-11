@@ -36,10 +36,23 @@ class FlipperToolsFragment : Fragment() {
             val toolCard = ToolCardView(requireContext())
             toolCard.setTool(tool)
             toolCard.setOnClickListener {
-                // TODO: Launch tool activity
-                android.widget.Toast.makeText(requireContext(), "Opening ${tool.name}", android.widget.Toast.LENGTH_SHORT).show()
+                launchTool(tool.id)
             }
             toolsContainer.addView(toolCard)
         }
+    }
+
+    private fun launchTool(toolId: String) {
+        val intent = when (toolId) {
+            "subghz" -> android.content.Intent(requireContext(), SubGHzActivity::class.java)
+            "rfid" -> android.content.Intent(requireContext(), RFIDActivity::class.java)
+            "nfc" -> android.content.Intent(requireContext(), NFCActivity::class.java)
+            "infrared" -> android.content.Intent(requireContext(), InfraredActivity::class.java)
+            "gpio" -> android.content.Intent(requireContext(), GPIOActivity::class.java)
+            "badusb" -> android.content.Intent(requireContext(), BadUSBActivity::class.java)
+            "ibutton" -> android.content.Intent(requireContext(), IButtonActivity::class.java)
+            else -> return
+        }
+        startActivity(intent)
     }
 }

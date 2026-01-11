@@ -1,10 +1,12 @@
 package com.android.pen15.ui.network
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.pen15.R
 import com.android.pen15.domain.Tool
@@ -35,9 +37,28 @@ class NetworkToolsFragment : Fragment() {
             val toolCard = ToolCardView(requireContext())
             toolCard.setTool(tool)
             toolCard.setOnClickListener {
-                android.widget.Toast.makeText(requireContext(), "Opening ${tool.name}", android.widget.Toast.LENGTH_SHORT).show()
+                launchTool(tool.id)
             }
             toolsContainer.addView(toolCard)
+        }
+    }
+
+    private fun launchTool(toolId: String) {
+        val className = when (toolId) {
+            "wifi_deauth" -> "WiFiDeauthActivity"
+            "wifi_capture" -> "WiFiCaptureActivity"
+            "nmap" -> "NetworkScannerActivity"
+            "packet_sniffer" -> "PacketSnifferActivity"
+            "bluetooth" -> "BluetoothScannerActivity"
+            "arp_poison" -> "ARPPoisonerActivity"
+            else -> return
+        }
+
+        try {
+            val activityClass = Class.forName("com.android.pen15.ui.network.$className")
+            startActivity(Intent(requireContext(), activityClass))
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }

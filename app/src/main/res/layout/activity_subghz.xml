@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/glass_background">
+
+    <!-- Header -->
+    <TextView
+        android:id="@+id/headerText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sub-GHz Scanner"
+        android:textSize="24sp"
+        android:textColor="@color/text_primary"
+        android:fontFamily="sans-serif-medium"
+        android:padding="20dp"
+        android:background="@drawable/header_gradient"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Frequency Selection -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/frequencyCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/glass_card_bg"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/headerText">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Frequency"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary"
+                android:fontFamily="sans-serif-medium"/>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/frequencyChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip315"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="315 MHz"
+                    android:textColor="@color/text_primary"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip390"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="390 MHz"
+                    android:textColor="@color/text_primary"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip433"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="433.92 MHz"
+                    android:checked="true"
+                    android:textColor="@color/text_primary"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip868"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="868 MHz"
+                    android:textColor="@color/text_primary"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip915"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="915 MHz"
+                    android:textColor="@color/text_primary"/>
+            </com.google.android.material.chip.ChipGroup>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Control Buttons -->
+    <LinearLayout
+        android:id="@+id/controlButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/frequencyCard">
+
+        <Button
+            android:id="@+id/btnStartScan"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Start Scan"
+            android:background="@drawable/glass_button_primary_bg"
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btnStopScan"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Stop"
+            android:background="@drawable/glass_button_bg"
+            android:textColor="@color/text_primary"
+            android:enabled="false"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Output Monitor -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/controlButtons"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/outputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:background="@drawable/glass_card_bg"
+            android:padding="16dp"
+            android:text="Ready to scan..."/>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
