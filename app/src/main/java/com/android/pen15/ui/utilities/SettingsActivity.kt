@@ -30,8 +30,8 @@ class SettingsActivity : BaseToolActivity() {
         logMessage("")
 
         logMessage("--- App Information ---", includeTimestamp = false)
-        logMessage("App Version: 2.0.0", includeTimestamp = false)
-        logMessage("Build: 20", includeTimestamp = false)
+        logMessage("App Version: 2.1.0", includeTimestamp = false)
+        logMessage("Build: 21", includeTimestamp = false)
         logMessage("Package: com.android.pen15", includeTimestamp = false)
         logMessage("")
 
