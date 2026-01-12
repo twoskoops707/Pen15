@@ -126,15 +126,28 @@ class FlipperUSBManager(private val context: Context) {
                     } else {
                         Thread.sleep(100)
                     }
+                } catch (e: IOException) {
+                    Log.e(TAG, "USB read error during command execution", e)
+                    break
                 } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error during USB read: ${e.javaClass.simpleName}", e)
                     break
                 }
             }
 
-            // Remove the prompt from the response
-            response.toString().replace(">: ", "").trim()
+            // Check for timeout
+            val result = response.toString().replace(">: ", "").trim()
+            if (result.isEmpty() && System.currentTimeMillis() - startTime >= 3000) {
+                Log.w(TAG, "Command timed out after 3s: $command")
+                return@withContext "Error: Command timed out (no response from Flipper)"
+            }
+
+            result
         } catch (e: IOException) {
-            Log.e(TAG, "Error sending command", e)
+            Log.e(TAG, "IO error sending command '$command'", e)
+            "Error: USB communication failed - ${e.message}"
+        } catch (e: Exception) {
+            Log.e(TAG, "Unexpected error sending command '$command': ${e.javaClass.simpleName}", e)
             "Error: ${e.message}"
         }
     }

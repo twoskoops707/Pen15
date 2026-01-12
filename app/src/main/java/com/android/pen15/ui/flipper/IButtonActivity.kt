@@ -21,10 +21,18 @@ class IButtonActivity : BaseToolActivity() {
         appendOutput("• Metakom")
         appendOutput("")
         lifecycleScope.launch {
+            showProgress(true)
             // Correct command is "ikey read" not "ibutton read"
             val response = sendFlipperCommand("ikey read")
-            appendOutput("Response:")
-            appendOutput(response)
+            appendOutput("")
+            if (response.contains("Error")) {
+                appendOutput("✗ Failed to read iButton")
+                appendOutput(response)
+            } else {
+                appendOutput("Response:")
+                appendOutput(response)
+            }
+            showProgress(false)
         }
     }
 }
