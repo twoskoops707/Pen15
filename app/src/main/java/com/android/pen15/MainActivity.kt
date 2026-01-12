@@ -2,153 +2,61 @@ package com.android.pen15
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import com.android.pen15.core.ConnectionManager
-import com.android.pen15.ui.crypto.CryptoToolsFragment
-import com.android.pen15.ui.flipper.FlipperToolsFragment
-import com.android.pen15.ui.network.NetworkToolsFragment
-import com.android.pen15.ui.utilities.SettingsActivity
-import kotlinx.coroutines.launch
-import com.android.pen15.ui.utilities.UtilitiesFragment
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
-    
-    private lateinit var viewPager: ViewPager2
-    private lateinit var tabLayout: TabLayout
-    private lateinit var connectionBadge: View
-    private lateinit var connectionStatusDot: View
-    private lateinit var textConnectionStatus: TextView
-    
-    private val connectionManager = ConnectionManager.getInstance()
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
-        initViews()
-        setupViewPager()
-        setupConnectionBadge()
-        
-        // Show connection modal on first launch
-        if (savedInstanceState == null) {
-            showConnectionModal()
+
+        try {
+            setupButtons()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
-    
-    private fun initViews() {
-        viewPager = findViewById(R.id.viewPager)
-        tabLayout = findViewById(R.id.tabLayout)
-        connectionBadge = findViewById(R.id.connectionBadge)
-        connectionStatusDot = findViewById(R.id.connectionStatusDot)
-        textConnectionStatus = findViewById(R.id.textConnectionStatus)
-        
-        findViewById<View>(R.id.btnSettings).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-    }
-    
-    private fun setupViewPager() {
-        val adapter = ToolsPagerAdapter(this)
-        viewPager.adapter = adapter
-        
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "🔧 Flipper"
-                1 -> "🌐 Network"
-                2 -> "🔐 Crypto"
-                3 -> "⚙️ Utils"
-                else -> ""
-            }
-        }.attach()
-    }
-    
-    private fun setupConnectionBadge() {
-        connectionBadge.setOnClickListener {
-            showConnectionModal()
-        }
-        updateConnectionStatus(connectionManager.isConnected())
-    }
-    
-    private fun showConnectionModal() {
-        val dialog = BottomSheetDialog(this, R.style.Theme_Pen15)
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_connection, null)
-        
-        val btnUSB = view.findViewById<Button>(R.id.btnConnectUSB)
-        val btnBluetooth = view.findViewById<Button>(R.id.btnConnectBluetooth)
-        val btnOffline = view.findViewById<Button>(R.id.btnContinueOffline)
-        val statusIndicator = view.findViewById<View>(R.id.statusIndicator)
-        val textStatus = view.findViewById<TextView>(R.id.textStatus)
-        
-        btnUSB.setOnClickListener {
-            lifecycleScope.launch {
-                connectionManager.connectUSB(this@MainActivity) { success ->
-                    runOnUiThread {
-                        updateConnectionStatus(success)
-                        if (success) {
-                            textStatus.text = "Connected via USB"
-                            dialog.dismiss()
-                        }
-                    }
-                }
-            }
+
+    private fun setupButtons() {
+        // Flipper Tools
+        findViewById<Button>(R.id.btnRFID)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.RFIDActivity::class.java))
         }
 
-        btnBluetooth.setOnClickListener {
-            lifecycleScope.launch {
-                connectionManager.connectBluetooth(this@MainActivity) { success ->
-                    runOnUiThread {
-                        updateConnectionStatus(success)
-                        if (success) {
-                            textStatus.text = "Connected via Bluetooth"
-                            dialog.dismiss()
-                        }
-                    }
-                }
-            }
+        findViewById<Button>(R.id.btnNFC)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.NFCActivity::class.java))
         }
-        
-        btnOffline.setOnClickListener {
-            dialog.dismiss()
+
+        findViewById<Button>(R.id.btnSubGHz)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.SubGHzActivity::class.java))
         }
-        
-        dialog.setContentView(view)
-        dialog.show()
-    }
-    
-    private fun updateConnectionStatus(connected: Boolean) {
-        if (connected) {
-            textConnectionStatus.text = "Connected"
-            textConnectionStatus.setTextColor(getColor(R.color.status_connected))
-            connectionStatusDot.setBackgroundResource(R.drawable.status_indicator)
-        } else {
-            textConnectionStatus.text = "Disconnected"
-            textConnectionStatus.setTextColor(getColor(R.color.status_disconnected))
-            connectionStatusDot.setBackgroundResource(R.drawable.status_indicator)
+
+        findViewById<Button>(R.id.btnInfrared)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.InfraredActivity::class.java))
         }
-    }
-    
-    private class ToolsPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
-        override fun getItemCount(): Int = 4
-        
-        override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> FlipperToolsFragment()
-                1 -> NetworkToolsFragment()
-                2 -> CryptoToolsFragment()
-                3 -> UtilitiesFragment()
-                else -> FlipperToolsFragment()
-            }
+
+        findViewById<Button>(R.id.btnIButton)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.IButtonActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnGPIO)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.GPIOActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnBadUSB)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.flipper.BadUSBActivity::class.java))
+        }
+
+        // ESP32
+        findViewById<Button>(R.id.btnESP32)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.utilities.ESP32ManagerActivity::class.java))
+        }
+
+        // Settings
+        findViewById<Button>(R.id.btnSettings)?.setOnClickListener {
+            startActivity(Intent(this, com.android.pen15.ui.utilities.SettingsActivity::class.java))
         }
     }
 }
