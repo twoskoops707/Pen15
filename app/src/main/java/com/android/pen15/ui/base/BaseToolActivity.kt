@@ -21,32 +21,50 @@ abstract class BaseToolActivity : AppCompatActivity() {
     protected lateinit var outputText: TextView
     protected lateinit var progressBar: ProgressBar
     protected lateinit var executeButton: Button
-    protected val connectionManager = ConnectionManager.getInstance()
-    protected val processManager by lazy { ProcessManager(this) }
+    protected lateinit var connectionManager: ConnectionManager
+    protected lateinit var processManager: ProcessManager
     private val outputBuilder = StringBuilder()
-    
+
     abstract fun getToolName(): String
     abstract fun getLayoutResource(): Int
     abstract fun onToolExecute()
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         try {
+            Log.d("BaseToolActivity", "Initializing ${getToolName()}")
+
+            // Initialize managers safely
+            connectionManager = ConnectionManager.getInstance()
+            processManager = ProcessManager(this)
+
+            // Set layout
             setContentView(getLayoutResource())
+
+            // Find views
             outputText = findViewById(R.id.outputText)
             progressBar = findViewById(R.id.progressBar)
             executeButton = findViewById(R.id.btnExecute)
 
             setupToolButtons()
             logMessage("${getToolName()} initialized")
+            Log.d("BaseToolActivity", "${getToolName()} created successfully")
         } catch (e: Exception) {
-            setContentView(R.layout.activity_generic_tool)
-            outputText = findViewById(R.id.outputText)
-            progressBar = findViewById(R.id.progressBar)
-            executeButton = findViewById(R.id.btnExecute)
-            setupToolButtons()
-            logMessage("${getToolName()} - Ready")
+            Log.e("BaseToolActivity", "Error initializing ${getToolName()}", e)
+            try {
+                setContentView(R.layout.activity_generic_tool)
+                outputText = findViewById(R.id.outputText)
+                progressBar = findViewById(R.id.progressBar)
+                executeButton = findViewById(R.id.btnExecute)
+                connectionManager = ConnectionManager.getInstance()
+                processManager = ProcessManager(this)
+                setupToolButtons()
+                logMessage("${getToolName()} - Ready (fallback mode)")
+            } catch (e2: Exception) {
+                Log.e("BaseToolActivity", "Fatal error in ${getToolName()}", e2)
+                finish()
+            }
         }
     }
     
