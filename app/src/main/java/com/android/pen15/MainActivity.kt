@@ -22,7 +22,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        // Flipper Tools
+        // Connection Test - TEMPORARY FOR DEBUGGING
+        findViewById<Button>(R.id.btnRFID)?.setOnClickListener {
+            launchActivity("Connection Test", ConnectionTestActivity::class.java)
+        }
+
+        /*
+        // Flipper Tools - DISABLED UNTIL CONNECTION WORKS
         findViewById<Button>(R.id.btnRFID)?.setOnClickListener {
             launchActivity("RFID", com.android.pen15.ui.flipper.RFIDActivity::class.java)
         }
@@ -60,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSettings)?.setOnClickListener {
             launchActivity("Settings", com.android.pen15.ui.utilities.SettingsActivity::class.java)
         }
+        */
     }
 
     private fun launchActivity(name: String, activityClass: Class<*>) {

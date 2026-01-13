@@ -50,6 +50,9 @@
                 android:resource="@xml/device_filter" />
         </activity>
 
+        <!-- Connection Test -->
+        <activity android:name=".ConnectionTestActivity" android:exported="false" android:screenOrientation="portrait" />
+
         <!-- Flipper Zero Tools -->
         <activity android:name=".ui.flipper.SubGHzActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.flipper.RFIDActivity" android:exported="false" android:screenOrientation="portrait" />
