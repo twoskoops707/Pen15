@@ -211,6 +211,12 @@ class MainActivity : AppCompatActivity() {
                         UsbSerialPort.STOPBITS_1,
                         UsbSerialPort.PARITY_NONE
                     )
+                    // CRITICAL: DTR must be true for STM32 CDC devices (Flipper Zero)
+                    usbSerialPort?.dtr = true
+                    usbSerialPort?.rts = true
+
+                    // Small delay to let device initialize
+                    Thread.sleep(100)
 
                     isConnected = true
                     "SUCCESS: Connected to Flipper Zero!"
