@@ -12,13 +12,20 @@
 ✅ **GitHub Workflows** - Build workflows updated and stable
 **NOTE:** These files are finalized. Do not suggest reviewing them before builds.
 
-## Current Status (2026-01-11)
+## Current Status (2026-01-16)
+✅ **Build #64 - ALL BUTTONS WORKING**
 ✅ **Master Pentesting Suite - FULLY AUTOMATED**
 ✅ **Termux RUN_COMMAND execution (automatic command running)**
 ✅ **Modern Glassmorphism UI** - Complete redesign with tactical HUD
 ✅ **Flipper Zero USB/Bluetooth integration** - Working CLI commands
 ✅ **AWOK Mini V3 ESP32 Marauder automation**
 ✅ **Flipper CLI Commands FIXED** - Corrected invalid commands
+
+### 2026-01-16 FIX: MainActivity buttons restored
+All buttons were commented out during debugging. Fixed:
+- RFID, NFC, SubGHz, Infrared, iButton, GPIO, BadUSB all work
+- ESP32 Manager works
+- Settings works
    - RFID: `rfid read` ✓ (works)
    - NFC: GUI-only (CLI removed in firmware)
    - iButton: `ikey read` ✓ (was using wrong command)

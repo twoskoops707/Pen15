@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Flipper Zero USB Device -->
+    <!-- Flipper Zero USB Device (STM32 CDC) -->
+    <!-- VID: 0x0483 (1155 decimal) = STMicroelectronics -->
+    <!-- PID: 0x5740 (22336 decimal) = Virtual COM Port -->
     <usb-device vendor-id="1155" product-id="22336" />
 </resources>

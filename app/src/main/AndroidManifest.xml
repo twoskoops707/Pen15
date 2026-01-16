@@ -2,25 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.pen15">
 
-    <!-- Required Permissions -->
+    <!-- USB Host for Flipper Zero -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
+
+    <!-- Network -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Bluetooth -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
-    <!-- USB Host permissions for USB-C connection -->
-    <uses-feature android:name="android.hardware.usb.host" />
-    <uses-permission android:name="android.permission.USB_PERMISSION" />
-
-    <!-- Termux RUN_COMMAND Permission - Required for automatic command execution -->
+    <!-- Termux -->
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
-
-    <!-- Queries declaration for Termux package visibility -->
     <queries>
         <package android:name="com.termux" />
     </queries>
@@ -36,12 +33,12 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- USB device attachment detection -->
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
@@ -49,40 +46,6 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </activity>
-
-        <!-- Connection Test -->
-        <activity android:name=".ConnectionTestActivity" android:exported="false" android:screenOrientation="portrait" />
-
-        <!-- Flipper Zero Tools -->
-        <activity android:name=".ui.flipper.SubGHzActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.RFIDActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.NFCActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.InfraredActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.GPIOActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.BadUSBActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.flipper.IButtonActivity" android:exported="false" android:screenOrientation="portrait" />
-
-        <!-- Network Tools -->
-        <activity android:name=".ui.network.WiFiDeauthActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.network.WiFiCaptureActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.network.NetworkScannerActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.network.PacketSnifferActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.network.BluetoothScannerActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.network.ARPPoisonerActivity" android:exported="false" android:screenOrientation="portrait" />
-
-        <!-- Crypto & Exploit Tools -->
-        <activity android:name=".ui.crypto.HashCrackerActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.crypto.AircrackActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.crypto.PayloadGeneratorActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.crypto.ExploitDatabaseActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.crypto.CreditCardReaderActivity" android:exported="false" android:screenOrientation="portrait" />
-
-        <!-- Utilities -->
-        <activity android:name=".ui.utilities.ScriptBuilderActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.utilities.QRScannerActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.utilities.CheatSheetActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.utilities.ESP32ManagerActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.utilities.SettingsActivity" android:exported="false" android:screenOrientation="portrait" />
 
     </application>
 
