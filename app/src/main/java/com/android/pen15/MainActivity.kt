@@ -289,8 +289,8 @@ class MainActivity : AppCompatActivity() {
                     val clearBuf = ByteArray(1024)
                     try { port.read(clearBuf, 100) } catch (e: Exception) {}
 
-                    // Send command with carriage return
-                    val data = "$command\r".toByteArray()
+                    // Send command with CRLF (required for CLI)
+                    val data = "$command\r\n".toByteArray()
                     port.write(data, 1000)
 
                     // Read response
