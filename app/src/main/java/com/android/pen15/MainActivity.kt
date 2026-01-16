@@ -22,13 +22,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        // Connection Test - TEMPORARY FOR DEBUGGING
-        findViewById<Button>(R.id.btnRFID)?.setOnClickListener {
-            launchActivity("Connection Test", ConnectionTestActivity::class.java)
-        }
-
-        /*
-        // Flipper Tools - DISABLED UNTIL CONNECTION WORKS
+        // Flipper Zero Tools
         findViewById<Button>(R.id.btnRFID)?.setOnClickListener {
             launchActivity("RFID", com.android.pen15.ui.flipper.RFIDActivity::class.java)
         }
@@ -46,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnIButton)?.setOnClickListener {
-            launchActivity("IButton", com.android.pen15.ui.flipper.IButtonActivity::class.java)
+            launchActivity("iButton", com.android.pen15.ui.flipper.IButtonActivity::class.java)
         }
 
         findViewById<Button>(R.id.btnGPIO)?.setOnClickListener {
@@ -57,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             launchActivity("BadUSB", com.android.pen15.ui.flipper.BadUSBActivity::class.java)
         }
 
-        // ESP32
+        // ESP32 Marauder
         findViewById<Button>(R.id.btnESP32)?.setOnClickListener {
             launchActivity("ESP32", com.android.pen15.ui.utilities.ESP32ManagerActivity::class.java)
         }
@@ -66,16 +60,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSettings)?.setOnClickListener {
             launchActivity("Settings", com.android.pen15.ui.utilities.SettingsActivity::class.java)
         }
-        */
     }
 
     private fun launchActivity(name: String, activityClass: Class<*>) {
         try {
-            Log.d(TAG, "Attempting to launch $name activity")
-            Toast.makeText(this, "Opening $name...", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "Launching $name activity")
             val intent = Intent(this, activityClass)
             startActivity(intent)
-            Log.d(TAG, "Successfully launched $name activity")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to launch $name activity", e)
             Toast.makeText(this, "Failed to open $name: ${e.message}", Toast.LENGTH_LONG).show()
