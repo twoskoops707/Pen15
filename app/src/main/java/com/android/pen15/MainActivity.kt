@@ -5,7 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.usb.UsbConstants
 import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbDeviceConnection
+import android.hardware.usb.UsbEndpoint
+import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
 import android.os.Bundle
@@ -17,14 +21,9 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
-import com.hoho.android.usbserial.driver.ProbeTable
-import com.hoho.android.usbserial.driver.UsbSerialPort
-import com.hoho.android.usbserial.driver.UsbSerialProber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,15 +44,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSubGHz: Button
     private lateinit var btnTest: Button
 
-    private var usbSerialPort: UsbSerialPort? = null
+    // Raw USB connection
+    private var usbConnection: UsbDeviceConnection? = null
+    private var controlInterface: UsbInterface? = null
+    private var dataInterface: UsbInterface? = null
+    private var endpointIn: UsbEndpoint? = null
+    private var endpointOut: UsbEndpoint? = null
     private var isConnected = false
-
-    // Custom prober that explicitly recognizes Flipper Zero
-    private val flipperProber: UsbSerialProber by lazy {
-        val table = ProbeTable()
-        table.addProduct(FLIPPER_VID, FLIPPER_PID, CdcAcmSerialDriver::class.java)
-        UsbSerialProber(table)
-    }
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -71,7 +68,7 @@ class MainActivity : AppCompatActivity() {
                             log("USB permission GRANTED")
                             device?.let { connectToDevice(it) }
                         } else {
-                            log("ERROR: USB permission DENIED by user")
+                            log("ERROR: USB permission DENIED")
                         }
                     }
                 }
@@ -112,9 +109,9 @@ class MainActivity : AppCompatActivity() {
         btnConnect.setOnClickListener { connectFlipper() }
         btnRFID.setOnClickListener { sendCommand("rfid read") }
         btnSubGHz.setOnClickListener { sendCommand("subghz rx 433920000") }
-        btnTest.setOnClickListener { sendCommand("?") }  // Simple help command
+        btnTest.setOnClickListener { sendCommand("?") }
 
-        log("=== PEN15 v66 ===")
+        log("=== PEN15 v71 (RAW USB) ===")
         log("")
         log("Connect Flipper via USB-C")
         log("Then tap CONNECT")
@@ -128,66 +125,47 @@ class MainActivity : AppCompatActivity() {
 
     private fun connectFlipper() {
         log("")
-        log("--- CONNECTING ---")
+        log("--- SCANNING USB ---")
 
         val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         val deviceList = usbManager.deviceList
 
-        log("USB devices: ${deviceList.size}")
+        log("Found ${deviceList.size} USB device(s)")
 
         if (deviceList.isEmpty()) {
             log("ERROR: No USB devices!")
-            log("Is Flipper connected via USB-C?")
+            log("Connect Flipper via USB-C")
             return
         }
 
-        // Find Flipper Zero
         var flipperDevice: UsbDevice? = null
 
         for ((name, device) in deviceList) {
             val vid = device.vendorId
             val pid = device.productId
-            log("  $name: VID=$vid PID=$pid")
+            log("  $name")
+            log("    VID=0x${vid.toString(16)} PID=0x${pid.toString(16)}")
+            log("    Interfaces: ${device.interfaceCount}")
 
             if (vid == FLIPPER_VID && pid == FLIPPER_PID) {
                 flipperDevice = device
-                log("  ^ FLIPPER ZERO FOUND!")
-            }
-        }
-
-        // Also try the default prober
-        if (flipperDevice == null) {
-            log("Trying default prober...")
-            val defaultDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager)
-            if (defaultDrivers.isNotEmpty()) {
-                flipperDevice = defaultDrivers[0].device
-                log("Found via default prober: VID=${flipperDevice.vendorId}")
-            }
-        }
-
-        // Try custom Flipper prober
-        if (flipperDevice == null) {
-            log("Trying Flipper prober...")
-            val flipperDrivers = flipperProber.findAllDrivers(usbManager)
-            if (flipperDrivers.isNotEmpty()) {
-                flipperDevice = flipperDrivers[0].device
-                log("Found via Flipper prober")
+                log("    >>> FLIPPER ZERO <<<")
             }
         }
 
         if (flipperDevice == null) {
             log("")
             log("ERROR: Flipper not found!")
-            log("Expected: VID=1155 PID=22336")
+            log("Expected VID=0x0483 PID=0x5740")
             return
         }
 
         // Request permission
         if (usbManager.hasPermission(flipperDevice)) {
-            log("Already have permission")
+            log("Permission OK")
             connectToDevice(flipperDevice)
         } else {
-            log("Requesting USB permission...")
+            log("Requesting permission...")
             val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_MUTABLE
             } else {
@@ -203,79 +181,148 @@ class MainActivity : AppCompatActivity() {
     private fun connectToDevice(device: UsbDevice) {
         lifecycleScope.launch {
             showProgress(true)
-            log("Opening connection...")
+            log("")
+            log("--- CONNECTING (RAW USB) ---")
 
             val result = withContext(Dispatchers.IO) {
                 try {
                     val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-                    // Try custom prober first, then default
-                    var driver = flipperProber.probeDevice(device)
-                    if (driver == null) {
-                        driver = UsbSerialProber.getDefaultProber().probeDevice(device)
+                    // Find BOTH CDC interfaces
+                    var ctrlIface: UsbInterface? = null
+                    var dataIface: UsbInterface? = null
+                    var inEp: UsbEndpoint? = null
+                    var outEp: UsbEndpoint? = null
+
+                    log("Scanning ${device.interfaceCount} interfaces...")
+
+                    for (i in 0 until device.interfaceCount) {
+                        val iface = device.getInterface(i)
+                        log("  Interface $i: class=${iface.interfaceClass} subclass=${iface.interfaceSubclass}")
+
+                        // CDC Control class = 0x02
+                        if (iface.interfaceClass == UsbConstants.USB_CLASS_COMM) {
+                            ctrlIface = iface
+                            log("    ^ CDC Control")
+                        }
+
+                        // CDC Data class = 0x0A (10)
+                        if (iface.interfaceClass == UsbConstants.USB_CLASS_CDC_DATA ||
+                            iface.interfaceClass == 0x0A) {
+
+                            for (j in 0 until iface.endpointCount) {
+                                val ep = iface.getEndpoint(j)
+                                val dir = if (ep.direction == UsbConstants.USB_DIR_IN) "IN" else "OUT"
+                                log("    EP$j: ${dir} addr=0x${ep.address.toString(16)} type=${ep.type}")
+
+                                if (ep.type == UsbConstants.USB_ENDPOINT_XFER_BULK) {
+                                    if (ep.direction == UsbConstants.USB_DIR_IN) {
+                                        inEp = ep
+                                    } else {
+                                        outEp = ep
+                                    }
+                                }
+                            }
+
+                            if (inEp != null && outEp != null) {
+                                dataIface = iface
+                                log("    ^ CDC Data")
+                            }
+                        }
                     }
 
-                    // Direct instantiation as fallback
-                    if (driver == null) {
-                        driver = CdcAcmSerialDriver(device)
+                    if (dataIface == null || inEp == null || outEp == null) {
+                        return@withContext "ERROR: CDC Data interface not found"
                     }
 
+                    log("IN endpoint: 0x${inEp.address.toString(16)}")
+                    log("OUT endpoint: 0x${outEp.address.toString(16)}")
+
+                    // Open connection
                     val connection = usbManager.openDevice(device)
                     if (connection == null) {
-                        return@withContext "ERROR: openDevice returned null"
+                        return@withContext "ERROR: openDevice failed"
                     }
 
-                    val port = driver.ports[0]
-                    port.open(connection)
+                    // MUST claim Control interface FIRST (if present)
+                    if (ctrlIface != null) {
+                        if (!connection.claimInterface(ctrlIface, true)) {
+                            log("WARN: Control interface claim failed")
+                        } else {
+                            log("Control interface claimed")
+                        }
+                    }
 
-                    // Set parameters - standard 115200 8N1
-                    port.setParameters(
-                        115200,
-                        8,
-                        UsbSerialPort.STOPBITS_1,
-                        UsbSerialPort.PARITY_NONE
+                    // Claim Data interface
+                    if (!connection.claimInterface(dataIface, true)) {
+                        connection.close()
+                        return@withContext "ERROR: Data interface claim failed"
+                    }
+                    log("Data interface claimed")
+
+                    // Set line coding (115200, 8N1)
+                    val lineCoding = byteArrayOf(
+                        0x00, 0xC2.toByte(), 0x01, 0x00,  // 115200 baud
+                        0x00,  // 1 stop bit
+                        0x00,  // no parity
+                        0x08   // 8 data bits
                     )
 
-                    usbSerialPort = port
+                    val lcResult = connection.controlTransfer(
+                        0x21, 0x20, 0, 0, lineCoding, lineCoding.size, 1000
+                    )
+                    log("SET_LINE_CODING: $lcResult")
+
+                    // Set control line state (DTR=0, RTS=0)
+                    val clsResult = connection.controlTransfer(
+                        0x21, 0x22, 0x00, 0, null, 0, 1000
+                    )
+                    log("SET_CONTROL_LINE_STATE: $clsResult")
+
+                    // Store connection
+                    usbConnection = connection
+                    controlInterface = ctrlIface
+                    dataInterface = dataIface
+                    endpointIn = inEp
+                    endpointOut = outEp
                     isConnected = true
 
                     // Wait for connection to stabilize
                     Thread.sleep(300)
 
-                    // Drain any pending data from Flipper's buffer
-                    val drainBuf = ByteArray(4096)
-                    try {
-                        var drained = 0
-                        for (i in 0..5) {
-                            val n = port.read(drainBuf, 100)
-                            if (n > 0) drained += n else break
-                        }
-                        if (drained > 0) {
-                            Log.d(TAG, "Drained $drained bytes from buffer")
-                        }
-                    } catch (e: Exception) {
-                        // Ignore drain errors
+                    // Try a simple bulk write test
+                    val testBuf = "\r".toByteArray()
+                    val testResult = connection.bulkTransfer(outEp, testBuf, testBuf.size, 1000)
+                    log("Test write: $testResult")
+
+                    if (testResult < 0) {
+                        // Try releasing and reclaiming
+                        log("Reclaiming interfaces...")
+                        connection.releaseInterface(dataIface)
+                        ctrlIface?.let { connection.releaseInterface(it) }
+                        Thread.sleep(100)
+                        ctrlIface?.let { connection.claimInterface(it, true) }
+                        connection.claimInterface(dataIface, true)
+                        Thread.sleep(100)
+
+                        val retry = connection.bulkTransfer(outEp, testBuf, testBuf.size, 1000)
+                        log("Retry write: $retry")
                     }
 
-                    // Send a simple newline to sync with CLI
-                    try {
-                        port.write("\r\n".toByteArray(), 500)
-                        Thread.sleep(200)
-                        // Read any prompt response
-                        try { port.read(drainBuf, 200) } catch (e: Exception) {}
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Sync write: ${e.message}")
+                    // Drain pending data
+                    val drainBuf = ByteArray(512)
+                    var drained = 0
+                    for (i in 0..5) {
+                        val n = connection.bulkTransfer(inEp, drainBuf, drainBuf.size, 100)
+                        if (n > 0) drained += n else break
                     }
+                    if (drained > 0) log("Drained $drained bytes")
 
                     "SUCCESS: Connected!"
-                } catch (e: IOException) {
-                    isConnected = false
-                    usbSerialPort = null
-                    "ERROR (IO): ${e.message}"
                 } catch (e: Exception) {
+                    Log.e(TAG, "Connection error", e)
                     isConnected = false
-                    usbSerialPort = null
-                    "ERROR: ${e.javaClass.simpleName}: ${e.message}"
+                    "ERROR: ${e.message}"
                 }
             }
 
@@ -292,7 +339,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendCommand(command: String) {
-        if (!isConnected || usbSerialPort == null) {
+        if (!isConnected) {
             log("Not connected!")
             return
         }
@@ -305,87 +352,77 @@ class MainActivity : AppCompatActivity() {
 
             val response = withContext(Dispatchers.IO) {
                 try {
-                    val port = usbSerialPort ?: return@withContext "ERROR: port is null"
+                    val conn = usbConnection ?: return@withContext "ERROR: no connection"
+                    val epIn = endpointIn ?: return@withContext "ERROR: no IN endpoint"
+                    val epOut = endpointOut ?: return@withContext "ERROR: no OUT endpoint"
 
-                    // Clear any pending data first
-                    val clearBuf = ByteArray(2048)
-                    try {
-                        for (i in 0..3) {
-                            val n = port.read(clearBuf, 50)
-                            if (n <= 0) break
-                        }
-                    } catch (e: Exception) {}
+                    // Clear pending data
+                    val clearBuf = ByteArray(512)
+                    for (i in 0..2) {
+                        val n = conn.bulkTransfer(epIn, clearBuf, clearBuf.size, 50)
+                        if (n <= 0) break
+                    }
 
-                    // Send command with CRLF (required for Flipper CLI)
-                    val data = "$command\r\n".toByteArray()
-                    val written = port.write(data, 2000)
+                    // Send command with CRLF
+                    val cmdData = "$command\r\n".toByteArray()
+                    val written = conn.bulkTransfer(epOut, cmdData, cmdData.size, 2000)
                     Log.d(TAG, "Wrote $written bytes")
 
-                    // Small delay for Flipper to process
+                    if (written < 0) {
+                        return@withContext "ERROR: Write failed ($written)"
+                    }
+
                     Thread.sleep(100)
 
-                    // Read response with longer timeout
+                    // Read response
                     val response = StringBuilder()
-                    val buffer = ByteArray(2048)
+                    val buffer = ByteArray(512)
                     val startTime = System.currentTimeMillis()
                     var totalBytes = 0
-                    var noDataCount = 0
+                    var emptyReads = 0
 
                     while (System.currentTimeMillis() - startTime < 3000) {
-                        try {
-                            val len = port.read(buffer, 300)
-                            if (len > 0) {
-                                val chunk = String(buffer, 0, len)
-                                response.append(chunk)
-                                totalBytes += len
-                                noDataCount = 0
-                                Log.d(TAG, "Read $len bytes: ${chunk.take(50)}")
+                        val len = conn.bulkTransfer(epIn, buffer, buffer.size, 300)
 
-                                // Check for CLI prompt (indicates command complete)
-                                val text = response.toString()
-                                if (text.contains(">:") || text.endsWith(">: ") ||
-                                    text.contains("\r\n>:")) {
-                                    break
-                                }
-                            } else {
-                                noDataCount++
-                                if (noDataCount > 5 && totalBytes > 0) {
-                                    // Got data but no more coming
-                                    break
-                                }
+                        if (len > 0) {
+                            val chunk = String(buffer, 0, len)
+                            response.append(chunk)
+                            totalBytes += len
+                            emptyReads = 0
+                            Log.d(TAG, "Read $len: ${chunk.take(30)}")
+
+                            // Check for prompt
+                            if (response.contains(">:")) {
+                                break
                             }
-                        } catch (e: IOException) {
-                            Log.d(TAG, "Read exception: ${e.message}")
-                            if (totalBytes > 0) break
+                        } else {
+                            emptyReads++
+                            if (emptyReads > 5 && totalBytes > 0) break
                         }
+
                         Thread.sleep(30)
                     }
 
-                    // Clean up response
+                    // Clean response
                     var result = response.toString()
+                    val lines = result.lines().toMutableList()
 
-                    // Remove command echo (first line usually)
-                    val lines = result.split("\r\n", "\n").toMutableList()
+                    // Remove echo line
                     if (lines.isNotEmpty() && lines[0].contains(command)) {
                         lines.removeAt(0)
                     }
 
                     result = lines.joinToString("\n")
-                        .replace(Regex(">:\\s*$"), "")  // Remove trailing prompt
-                        .replace(Regex("^\\s*>:\\s*"), "") // Remove leading prompt
+                        .replace(Regex(">:\\s*$"), "")
                         .trim()
 
                     if (result.isEmpty()) {
-                        if (totalBytes == 0) {
-                            "(no response - check connection)"
-                        } else {
-                            "(command sent, $totalBytes bytes received)"
-                        }
+                        "(received $totalBytes bytes)"
                     } else {
                         result
                     }
                 } catch (e: Exception) {
-                    Log.e(TAG, "sendCommand error", e)
+                    Log.e(TAG, "Command error", e)
                     "ERROR: ${e.message}"
                 }
             }
@@ -397,9 +434,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun disconnect() {
         try {
-            usbSerialPort?.close()
+            dataInterface?.let { usbConnection?.releaseInterface(it) }
+            controlInterface?.let { usbConnection?.releaseInterface(it) }
+            usbConnection?.close()
         } catch (e: Exception) {}
-        usbSerialPort = null
+        usbConnection = null
+        controlInterface = null
+        dataInterface = null
+        endpointIn = null
+        endpointOut = null
         isConnected = false
         runOnUiThread { updateButtonStates() }
     }
