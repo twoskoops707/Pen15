@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity() {
                     val port = driver.ports[0]
                     port.open(connection)
 
-                    // Set parameters - NO DTR/RTS initially (can cause reset!)
+                    // Set parameters - standard 115200 8N1
                     port.setParameters(
                         115200,
                         8,
@@ -239,14 +239,42 @@ class MainActivity : AppCompatActivity() {
                     usbSerialPort = port
                     isConnected = true
 
-                    // NO DTR - it causes Flipper to reset!
-                    // Just wait for connection to stabilize
-                    Thread.sleep(100)
+                    // Wait for connection to stabilize
+                    Thread.sleep(300)
+
+                    // Drain any pending data from Flipper's buffer
+                    val drainBuf = ByteArray(4096)
+                    try {
+                        var drained = 0
+                        for (i in 0..5) {
+                            val n = port.read(drainBuf, 100)
+                            if (n > 0) drained += n else break
+                        }
+                        if (drained > 0) {
+                            Log.d(TAG, "Drained $drained bytes from buffer")
+                        }
+                    } catch (e: Exception) {
+                        // Ignore drain errors
+                    }
+
+                    // Send a simple newline to sync with CLI
+                    try {
+                        port.write("\r\n".toByteArray(), 500)
+                        Thread.sleep(200)
+                        // Read any prompt response
+                        try { port.read(drainBuf, 200) } catch (e: Exception) {}
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Sync write: ${e.message}")
+                    }
 
                     "SUCCESS: Connected!"
                 } catch (e: IOException) {
+                    isConnected = false
+                    usbSerialPort = null
                     "ERROR (IO): ${e.message}"
                 } catch (e: Exception) {
+                    isConnected = false
+                    usbSerialPort = null
                     "ERROR: ${e.javaClass.simpleName}: ${e.message}"
                 }
             }
@@ -279,51 +307,85 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val port = usbSerialPort ?: return@withContext "ERROR: port is null"
 
-                    // Clear any pending data
-                    val clearBuf = ByteArray(1024)
-                    try { port.read(clearBuf, 100) } catch (e: Exception) {}
+                    // Clear any pending data first
+                    val clearBuf = ByteArray(2048)
+                    try {
+                        for (i in 0..3) {
+                            val n = port.read(clearBuf, 50)
+                            if (n <= 0) break
+                        }
+                    } catch (e: Exception) {}
 
-                    // Send command with CRLF (required for CLI)
+                    // Send command with CRLF (required for Flipper CLI)
                     val data = "$command\r\n".toByteArray()
-                    port.write(data, 1000)
+                    val written = port.write(data, 2000)
+                    Log.d(TAG, "Wrote $written bytes")
 
-                    // Read response
+                    // Small delay for Flipper to process
+                    Thread.sleep(100)
+
+                    // Read response with longer timeout
                     val response = StringBuilder()
-                    val buffer = ByteArray(1024)
+                    val buffer = ByteArray(2048)
                     val startTime = System.currentTimeMillis()
                     var totalBytes = 0
+                    var noDataCount = 0
 
-                    while (System.currentTimeMillis() - startTime < 2000) {
+                    while (System.currentTimeMillis() - startTime < 3000) {
                         try {
-                            val len = port.read(buffer, 200)
+                            val len = port.read(buffer, 300)
                             if (len > 0) {
                                 val chunk = String(buffer, 0, len)
                                 response.append(chunk)
                                 totalBytes += len
+                                noDataCount = 0
+                                Log.d(TAG, "Read $len bytes: ${chunk.take(50)}")
 
-                                // Check for prompt
-                                if (response.contains(">:") || response.contains(">: ")) {
+                                // Check for CLI prompt (indicates command complete)
+                                val text = response.toString()
+                                if (text.contains(">:") || text.endsWith(">: ") ||
+                                    text.contains("\r\n>:")) {
+                                    break
+                                }
+                            } else {
+                                noDataCount++
+                                if (noDataCount > 5 && totalBytes > 0) {
+                                    // Got data but no more coming
                                     break
                                 }
                             }
                         } catch (e: IOException) {
-                            break
+                            Log.d(TAG, "Read exception: ${e.message}")
+                            if (totalBytes > 0) break
                         }
-                        Thread.sleep(50)
+                        Thread.sleep(30)
                     }
 
-                    val result = response.toString()
-                        .replace(Regex("^.*$command"), "")  // Remove echo
-                        .replace(">:", "")
-                        .replace(">: ", "")
+                    // Clean up response
+                    var result = response.toString()
+
+                    // Remove command echo (first line usually)
+                    val lines = result.split("\r\n", "\n").toMutableList()
+                    if (lines.isNotEmpty() && lines[0].contains(command)) {
+                        lines.removeAt(0)
+                    }
+
+                    result = lines.joinToString("\n")
+                        .replace(Regex(">:\\s*$"), "")  // Remove trailing prompt
+                        .replace(Regex("^\\s*>:\\s*"), "") // Remove leading prompt
                         .trim()
 
                     if (result.isEmpty()) {
-                        "(no response - read $totalBytes bytes)"
+                        if (totalBytes == 0) {
+                            "(no response - check connection)"
+                        } else {
+                            "(command sent, $totalBytes bytes received)"
+                        }
                     } else {
                         result
                     }
                 } catch (e: Exception) {
+                    Log.e(TAG, "sendCommand error", e)
                     "ERROR: ${e.message}"
                 }
             }
