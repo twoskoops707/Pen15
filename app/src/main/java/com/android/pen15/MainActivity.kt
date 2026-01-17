@@ -239,15 +239,9 @@ class MainActivity : AppCompatActivity() {
                     usbSerialPort = port
                     isConnected = true
 
-                    // Enable DTR for data flow (required for STM32 CDC)
-                    try {
-                        port.dtr = true
-                    } catch (e: Exception) {
-                        // Some drivers don't support DTR
-                    }
-
-                    // Small delay to stabilize
-                    Thread.sleep(300)
+                    // NO DTR - it causes Flipper to reset!
+                    // Just wait for connection to stabilize
+                    Thread.sleep(100)
 
                     "SUCCESS: Connected!"
                 } catch (e: IOException) {
