@@ -221,9 +221,9 @@ class MainActivity : AppCompatActivity() {
                     var r = conn.controlTransfer(0x21, 0x20, 0, 0, lineCoding, 7, 1000)
                     log("SET_LINE_CODING: $r")
 
-                    // SET_CONTROL_LINE_STATE with DTR=1, RTS=1
-                    r = conn.controlTransfer(0x21, 0x22, 0x03, 0, null, 0, 1000)
-                    log("SET_CONTROL (DTR+RTS): $r")
+                    // SET_CONTROL_LINE_STATE - NO DTR/RTS (causes timeouts!)
+                    r = conn.controlTransfer(0x21, 0x22, 0x00, 0, null, 0, 1000)
+                    log("SET_CONTROL (no DTR): $r")
 
                     // Store
                     usbConnection = conn
