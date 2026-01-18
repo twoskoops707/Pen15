@@ -24,12 +24,15 @@
         </shape>
     </item>
     <!-- Top accent glow -->
-    <item android:bottom="85%">
+    <item>
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"
                 android:startColor="#1500FFFF"
-                android:endColor="#00000000"/>
+                android:centerColor="#0800FFFF"
+                android:endColor="#00000000"
+                android:type="linear"/>
+            <size android:height="100dp"/>
         </shape>
     </item>
 </layer-list>

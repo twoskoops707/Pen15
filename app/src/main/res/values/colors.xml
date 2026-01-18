@@ -74,10 +74,14 @@
     <color name="glass_surface">#14141C</color>
     <color name="glass_overlay">#1C1C26</color>
     <color name="glass_blur_light">#20FFFFFF</color>
+    <color name="glass_blur_medium">#15FFFFFF</color>
+    <color name="glass_blur_dark">#10FFFFFF</color>
     <color name="glass_border">#30FFFFFF</color>
+    <color name="glass_border_subtle">#18FFFFFF</color>
     <color name="glass_primary">#00FFFF</color>
     <color name="glass_primary_variant">#00AAAA</color>
     <color name="glass_secondary">#00FF41</color>
+    <color name="glass_success">#00FF41</color>
 
     <!-- Gradient Anchors -->
     <color name="gradient_start">#00FFFF</color>
