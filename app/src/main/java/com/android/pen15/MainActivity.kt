@@ -11,6 +11,7 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
+import android.hardware.usb.UsbRequest
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -24,16 +25,15 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.nio.ByteBuffer
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "Pen15"
         private const val ACTION_USB_PERMISSION = "com.android.pen15.USB_PERMISSION"
-
-        // Flipper Zero USB IDs
-        private const val FLIPPER_VID = 0x0483  // STMicroelectronics
-        private const val FLIPPER_PID = 0x5740  // Virtual COM Port
+        private const val FLIPPER_VID = 0x0483
+        private const val FLIPPER_PID = 0x5740
     }
 
     private lateinit var outputText: TextView
@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSubGHz: Button
     private lateinit var btnTest: Button
 
-    // Raw USB connection
     private var usbConnection: UsbDeviceConnection? = null
     private var controlInterface: UsbInterface? = null
     private var dataInterface: UsbInterface? = null
@@ -63,20 +62,16 @@ class MainActivity : AppCompatActivity() {
                             @Suppress("DEPRECATION")
                             intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
                         }
-
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                            log("USB permission GRANTED")
+                            log("Permission GRANTED")
                             device?.let { connectToDevice(it) }
                         } else {
-                            log("ERROR: USB permission DENIED")
+                            log("Permission DENIED")
                         }
                     }
                 }
-                UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
-                    log("USB device attached")
-                }
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                    log("USB device detached")
+                    log("Device detached")
                     disconnect()
                 }
             }
@@ -97,7 +92,6 @@ class MainActivity : AppCompatActivity() {
 
         val filter = IntentFilter().apply {
             addAction(ACTION_USB_PERMISSION)
-            addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -106,15 +100,15 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(usbReceiver, filter)
         }
 
-        btnConnect.setOnClickListener { connectFlipper() }
+        btnConnect.setOnClickListener { findAndConnect() }
         btnRFID.setOnClickListener { sendCommand("rfid read") }
         btnSubGHz.setOnClickListener { sendCommand("subghz rx 433920000") }
         btnTest.setOnClickListener { sendCommand("?") }
 
-        log("=== PEN15 v71 (RAW USB) ===")
+        log("=== PEN15 v72 ===")
+        log("Using UsbRequest API")
         log("")
-        log("Connect Flipper via USB-C")
-        log("Then tap CONNECT")
+        log("Connect Flipper, tap CONNECT")
     }
 
     override fun onDestroy() {
@@ -123,58 +117,39 @@ class MainActivity : AppCompatActivity() {
         disconnect()
     }
 
-    private fun connectFlipper() {
+    private fun findAndConnect() {
         log("")
-        log("--- SCANNING USB ---")
+        log("--- SCANNING ---")
 
         val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         val deviceList = usbManager.deviceList
 
-        log("Found ${deviceList.size} USB device(s)")
-
         if (deviceList.isEmpty()) {
-            log("ERROR: No USB devices!")
-            log("Connect Flipper via USB-C")
+            log("No USB devices found!")
             return
         }
 
-        var flipperDevice: UsbDevice? = null
-
-        for ((name, device) in deviceList) {
-            val vid = device.vendorId
-            val pid = device.productId
-            log("  $name")
-            log("    VID=0x${vid.toString(16)} PID=0x${pid.toString(16)}")
-            log("    Interfaces: ${device.interfaceCount}")
-
-            if (vid == FLIPPER_VID && pid == FLIPPER_PID) {
-                flipperDevice = device
-                log("    >>> FLIPPER ZERO <<<")
+        var flipper: UsbDevice? = null
+        for ((_, device) in deviceList) {
+            log("Device: VID=0x${device.vendorId.toString(16)} PID=0x${device.productId.toString(16)}")
+            if (device.vendorId == FLIPPER_VID && device.productId == FLIPPER_PID) {
+                flipper = device
+                log("  ^ FLIPPER ZERO")
             }
         }
 
-        if (flipperDevice == null) {
-            log("")
-            log("ERROR: Flipper not found!")
-            log("Expected VID=0x0483 PID=0x5740")
+        if (flipper == null) {
+            log("Flipper not found!")
             return
         }
 
-        // Request permission
-        if (usbManager.hasPermission(flipperDevice)) {
-            log("Permission OK")
-            connectToDevice(flipperDevice)
+        if (usbManager.hasPermission(flipper)) {
+            connectToDevice(flipper)
         } else {
             log("Requesting permission...")
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_MUTABLE
-            } else {
-                0
-            }
-            val permissionIntent = PendingIntent.getBroadcast(
-                this, 0, Intent(ACTION_USB_PERMISSION), flags
-            )
-            usbManager.requestPermission(flipperDevice, permissionIntent)
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+            val pi = PendingIntent.getBroadcast(this, 0, Intent(ACTION_USB_PERMISSION), flags)
+            usbManager.requestPermission(flipper, pi)
         }
     }
 
@@ -182,244 +157,212 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             showProgress(true)
             log("")
-            log("--- CONNECTING (RAW USB) ---")
+            log("--- CONNECTING ---")
 
             val result = withContext(Dispatchers.IO) {
                 try {
                     val usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-                    // Find BOTH CDC interfaces
+                    // Find interfaces
                     var ctrlIface: UsbInterface? = null
                     var dataIface: UsbInterface? = null
                     var inEp: UsbEndpoint? = null
                     var outEp: UsbEndpoint? = null
 
-                    log("Scanning ${device.interfaceCount} interfaces...")
-
                     for (i in 0 until device.interfaceCount) {
                         val iface = device.getInterface(i)
-                        log("  Interface $i: class=${iface.interfaceClass} subclass=${iface.interfaceSubclass}")
+                        log("Interface $i: class=${iface.interfaceClass}")
 
-                        // CDC Control class = 0x02
                         if (iface.interfaceClass == UsbConstants.USB_CLASS_COMM) {
                             ctrlIface = iface
-                            log("    ^ CDC Control")
                         }
-
-                        // CDC Data class = 0x0A (10)
-                        if (iface.interfaceClass == UsbConstants.USB_CLASS_CDC_DATA ||
-                            iface.interfaceClass == 0x0A) {
-
+                        if (iface.interfaceClass == UsbConstants.USB_CLASS_CDC_DATA) {
+                            dataIface = iface
                             for (j in 0 until iface.endpointCount) {
                                 val ep = iface.getEndpoint(j)
-                                val dir = if (ep.direction == UsbConstants.USB_DIR_IN) "IN" else "OUT"
-                                log("    EP$j: ${dir} addr=0x${ep.address.toString(16)} type=${ep.type}")
-
                                 if (ep.type == UsbConstants.USB_ENDPOINT_XFER_BULK) {
-                                    if (ep.direction == UsbConstants.USB_DIR_IN) {
-                                        inEp = ep
-                                    } else {
-                                        outEp = ep
-                                    }
+                                    if (ep.direction == UsbConstants.USB_DIR_IN) inEp = ep
+                                    else outEp = ep
                                 }
-                            }
-
-                            if (inEp != null && outEp != null) {
-                                dataIface = iface
-                                log("    ^ CDC Data")
                             }
                         }
                     }
 
                     if (dataIface == null || inEp == null || outEp == null) {
-                        return@withContext "ERROR: CDC Data interface not found"
+                        return@withContext "ERROR: CDC interface not found"
                     }
 
-                    log("IN endpoint: 0x${inEp.address.toString(16)}")
-                    log("OUT endpoint: 0x${outEp.address.toString(16)}")
+                    log("OUT: 0x${outEp.address.toString(16)}, IN: 0x${inEp.address.toString(16)}")
 
-                    // Open connection
-                    val connection = usbManager.openDevice(device)
-                    if (connection == null) {
-                        return@withContext "ERROR: openDevice failed"
+                    // Open device
+                    val conn = usbManager.openDevice(device)
+                        ?: return@withContext "ERROR: Cannot open device"
+
+                    // Claim interfaces
+                    ctrlIface?.let {
+                        if (conn.claimInterface(it, true)) log("Control claimed")
+                        else log("Control claim FAILED")
                     }
-
-                    // MUST claim Control interface FIRST (if present)
-                    if (ctrlIface != null) {
-                        if (!connection.claimInterface(ctrlIface, true)) {
-                            log("WARN: Control interface claim failed")
-                        } else {
-                            log("Control interface claimed")
-                        }
+                    if (!conn.claimInterface(dataIface, true)) {
+                        conn.close()
+                        return@withContext "ERROR: Cannot claim data interface"
                     }
+                    log("Data claimed")
 
-                    // Claim Data interface
-                    if (!connection.claimInterface(dataIface, true)) {
-                        connection.close()
-                        return@withContext "ERROR: Data interface claim failed"
-                    }
-                    log("Data interface claimed")
-
-                    // Set line coding (115200, 8N1)
+                    // SET_LINE_CODING (115200 8N1)
                     val lineCoding = byteArrayOf(
-                        0x00, 0xC2.toByte(), 0x01, 0x00,  // 115200 baud
-                        0x00,  // 1 stop bit
-                        0x00,  // no parity
-                        0x08   // 8 data bits
+                        0x00, 0xC2.toByte(), 0x01, 0x00,  // 115200
+                        0x00, 0x00, 0x08
                     )
+                    var r = conn.controlTransfer(0x21, 0x20, 0, 0, lineCoding, 7, 1000)
+                    log("SET_LINE_CODING: $r")
 
-                    val lcResult = connection.controlTransfer(
-                        0x21, 0x20, 0, 0, lineCoding, lineCoding.size, 1000
-                    )
-                    log("SET_LINE_CODING: $lcResult")
+                    // SET_CONTROL_LINE_STATE with DTR=1, RTS=1
+                    r = conn.controlTransfer(0x21, 0x22, 0x03, 0, null, 0, 1000)
+                    log("SET_CONTROL (DTR+RTS): $r")
 
-                    // Set control line state (DTR=0, RTS=0)
-                    val clsResult = connection.controlTransfer(
-                        0x21, 0x22, 0x00, 0, null, 0, 1000
-                    )
-                    log("SET_CONTROL_LINE_STATE: $clsResult")
-
-                    // Store connection
-                    usbConnection = connection
+                    // Store
+                    usbConnection = conn
                     controlInterface = ctrlIface
                     dataInterface = dataIface
                     endpointIn = inEp
                     endpointOut = outEp
-                    isConnected = true
 
-                    // Wait for connection to stabilize
-                    Thread.sleep(300)
+                    Thread.sleep(500)
 
-                    // Try a simple bulk write test
-                    val testBuf = "\r".toByteArray()
-                    val testResult = connection.bulkTransfer(outEp, testBuf, testBuf.size, 1000)
-                    log("Test write: $testResult")
+                    // Test with UsbRequest
+                    log("Testing UsbRequest write...")
+                    val testData = "\r\n".toByteArray()
+                    val buffer = ByteBuffer.allocate(64)
+                    buffer.put(testData)
 
-                    if (testResult < 0) {
-                        // Try releasing and reclaiming
-                        log("Reclaiming interfaces...")
-                        connection.releaseInterface(dataIface)
-                        ctrlIface?.let { connection.releaseInterface(it) }
-                        Thread.sleep(100)
-                        ctrlIface?.let { connection.claimInterface(it, true) }
-                        connection.claimInterface(dataIface, true)
-                        Thread.sleep(100)
-
-                        val retry = connection.bulkTransfer(outEp, testBuf, testBuf.size, 1000)
-                        log("Retry write: $retry")
+                    val request = UsbRequest()
+                    if (!request.initialize(conn, outEp)) {
+                        return@withContext "ERROR: UsbRequest init failed"
                     }
 
-                    // Drain pending data
+                    buffer.rewind()
+                    if (!request.queue(buffer, testData.size)) {
+                        request.close()
+                        return@withContext "ERROR: UsbRequest queue failed"
+                    }
+
+                    val completed = conn.requestWait()
+                    if (completed == null) {
+                        request.close()
+                        return@withContext "ERROR: UsbRequest timeout"
+                    }
+                    request.close()
+                    log("UsbRequest write OK!")
+
+                    // Drain
+                    Thread.sleep(200)
                     val drainBuf = ByteArray(512)
                     var drained = 0
-                    for (i in 0..5) {
-                        val n = connection.bulkTransfer(inEp, drainBuf, drainBuf.size, 100)
+                    for (i in 0..3) {
+                        val n = conn.bulkTransfer(inEp, drainBuf, 512, 100)
                         if (n > 0) drained += n else break
                     }
                     if (drained > 0) log("Drained $drained bytes")
 
-                    "SUCCESS: Connected!"
+                    isConnected = true
+                    "SUCCESS!"
                 } catch (e: Exception) {
-                    Log.e(TAG, "Connection error", e)
-                    isConnected = false
+                    Log.e(TAG, "Connect error", e)
                     "ERROR: ${e.message}"
                 }
             }
 
             log(result)
-
             if (isConnected) {
                 log("")
-                log("Ready! Try TEST button")
-                updateButtonStates()
+                log("Ready! Tap TEST")
+                updateUI()
             }
-
             showProgress(false)
         }
     }
 
-    private fun sendCommand(command: String) {
+    private fun sendCommand(cmd: String) {
         if (!isConnected) {
             log("Not connected!")
             return
         }
 
         log("")
-        log("> $command")
+        log("> $cmd")
 
         lifecycleScope.launch {
             showProgress(true)
 
             val response = withContext(Dispatchers.IO) {
                 try {
-                    val conn = usbConnection ?: return@withContext "ERROR: no connection"
-                    val epIn = endpointIn ?: return@withContext "ERROR: no IN endpoint"
-                    val epOut = endpointOut ?: return@withContext "ERROR: no OUT endpoint"
+                    val conn = usbConnection ?: return@withContext "No connection"
+                    val epOut = endpointOut ?: return@withContext "No OUT endpoint"
+                    val epIn = endpointIn ?: return@withContext "No IN endpoint"
 
-                    // Clear pending data
+                    // Clear buffer
                     val clearBuf = ByteArray(512)
                     for (i in 0..2) {
-                        val n = conn.bulkTransfer(epIn, clearBuf, clearBuf.size, 50)
+                        val n = conn.bulkTransfer(epIn, clearBuf, 512, 50)
                         if (n <= 0) break
                     }
 
-                    // Send command with CRLF
-                    val cmdData = "$command\r\n".toByteArray()
-                    val written = conn.bulkTransfer(epOut, cmdData, cmdData.size, 2000)
-                    Log.d(TAG, "Wrote $written bytes")
+                    // Send using UsbRequest
+                    val cmdBytes = "$cmd\r\n".toByteArray()
+                    val outBuffer = ByteBuffer.allocate(cmdBytes.size)
+                    outBuffer.put(cmdBytes)
+                    outBuffer.rewind()
 
-                    if (written < 0) {
-                        return@withContext "ERROR: Write failed ($written)"
+                    val outRequest = UsbRequest()
+                    if (!outRequest.initialize(conn, epOut)) {
+                        return@withContext "Write init failed"
                     }
 
+                    if (!outRequest.queue(outBuffer, cmdBytes.size)) {
+                        outRequest.close()
+                        return@withContext "Write queue failed"
+                    }
+
+                    val writeResult = conn.requestWait()
+                    outRequest.close()
+
+                    if (writeResult == null) {
+                        return@withContext "Write timeout"
+                    }
+
+                    log("Sent ${cmdBytes.size} bytes")
                     Thread.sleep(100)
 
-                    // Read response
+                    // Read response using bulk transfer
                     val response = StringBuilder()
-                    val buffer = ByteArray(512)
+                    val readBuf = ByteArray(512)
                     val startTime = System.currentTimeMillis()
-                    var totalBytes = 0
-                    var emptyReads = 0
+                    var totalRead = 0
 
                     while (System.currentTimeMillis() - startTime < 3000) {
-                        val len = conn.bulkTransfer(epIn, buffer, buffer.size, 300)
-
-                        if (len > 0) {
-                            val chunk = String(buffer, 0, len)
-                            response.append(chunk)
-                            totalBytes += len
-                            emptyReads = 0
-                            Log.d(TAG, "Read $len: ${chunk.take(30)}")
-
-                            // Check for prompt
-                            if (response.contains(">:")) {
-                                break
-                            }
-                        } else {
-                            emptyReads++
-                            if (emptyReads > 5 && totalBytes > 0) break
+                        val n = conn.bulkTransfer(epIn, readBuf, 512, 300)
+                        if (n > 0) {
+                            response.append(String(readBuf, 0, n))
+                            totalRead += n
+                            if (response.contains(">:")) break
+                        } else if (totalRead > 0) {
+                            break
                         }
-
-                        Thread.sleep(30)
+                        Thread.sleep(50)
                     }
 
-                    // Clean response
-                    var result = response.toString()
-                    val lines = result.lines().toMutableList()
-
-                    // Remove echo line
-                    if (lines.isNotEmpty() && lines[0].contains(command)) {
-                        lines.removeAt(0)
-                    }
-
-                    result = lines.joinToString("\n")
-                        .replace(Regex(">:\\s*$"), "")
-                        .trim()
-
-                    if (result.isEmpty()) {
-                        "(received $totalBytes bytes)"
+                    if (response.isEmpty()) {
+                        "(no response, read $totalRead bytes)"
                     } else {
-                        result
+                        // Clean up
+                        response.toString()
+                            .lines()
+                            .filterNot { it.contains(cmd) }
+                            .joinToString("\n")
+                            .replace(Regex(">:\\s*$"), "")
+                            .trim()
+                            .ifEmpty { "(empty response)" }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Command error", e)
@@ -444,10 +387,10 @@ class MainActivity : AppCompatActivity() {
         endpointIn = null
         endpointOut = null
         isConnected = false
-        runOnUiThread { updateButtonStates() }
+        runOnUiThread { updateUI() }
     }
 
-    private fun updateButtonStates() {
+    private fun updateUI() {
         btnConnect.text = if (isConnected) "CONNECTED" else "CONNECT"
         btnConnect.isEnabled = !isConnected
         btnRFID.isEnabled = isConnected
@@ -455,17 +398,15 @@ class MainActivity : AppCompatActivity() {
         btnTest.isEnabled = isConnected
     }
 
-    private fun log(message: String) {
+    private fun log(msg: String) {
         runOnUiThread {
-            outputText.append("$message\n")
+            outputText.append("$msg\n")
             scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
         }
-        Log.d(TAG, message)
+        Log.d(TAG, msg)
     }
 
     private fun showProgress(show: Boolean) {
-        runOnUiThread {
-            progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        }
+        runOnUiThread { progressBar.visibility = if (show) View.VISIBLE else View.GONE }
     }
 }
