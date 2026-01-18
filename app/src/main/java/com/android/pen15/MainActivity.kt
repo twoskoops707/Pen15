@@ -11,9 +11,10 @@ import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbEndpoint
 import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
-import android.hardware.usb.UsbRequest
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -25,7 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         private const val ACTION_USB_PERMISSION = "com.android.pen15.USB_PERMISSION"
         private const val FLIPPER_VID = 0x0483
         private const val FLIPPER_PID = 0x5740
+        private const val KEEP_ALIVE_INTERVAL_MS = 2000L
     }
 
     private lateinit var outputText: TextView
@@ -51,7 +53,18 @@ class MainActivity : AppCompatActivity() {
     private var dataInterface: UsbInterface? = null
     private var endpointIn: UsbEndpoint? = null
     private var endpointOut: UsbEndpoint? = null
-    private var isConnected = false
+    private val isConnected = AtomicBoolean(false)
+
+    // Keep-alive handler
+    private val keepAliveHandler = Handler(Looper.getMainLooper())
+    private val keepAliveRunnable = object : Runnable {
+        override fun run() {
+            if (isConnected.get()) {
+                performKeepAlive()
+                keepAliveHandler.postDelayed(this, KEEP_ALIVE_INTERVAL_MS)
+            }
+        }
+    }
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -109,14 +122,15 @@ class MainActivity : AppCompatActivity() {
         btnSubGHz.setOnClickListener { sendCommand("subghz rx 433920000") }
         btnTest.setOnClickListener { sendCommand("?") }
 
-        log("=== PEN15 v72 ===")
-        log("Using UsbRequest API")
+        log("=== PEN15 v73 ===")
+        log("With keep-alive & stability fixes")
         log("")
         log("Connect Flipper, tap CONNECT")
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        keepAliveHandler.removeCallbacks(keepAliveRunnable)
         try { unregisterReceiver(usbReceiver) } catch (e: Exception) {}
         disconnect()
     }
@@ -202,11 +216,13 @@ class MainActivity : AppCompatActivity() {
                     val conn = usbManager.openDevice(device)
                         ?: return@withContext "ERROR: Cannot open device"
 
-                    // Claim interfaces
+                    // Claim control interface first
                     ctrlIface?.let {
                         if (conn.claimInterface(it, true)) log("Control claimed")
                         else log("Control claim FAILED")
                     }
+
+                    // Then claim data interface
                     if (!conn.claimInterface(dataIface, true)) {
                         conn.close()
                         return@withContext "ERROR: Cannot claim data interface"
@@ -221,55 +237,48 @@ class MainActivity : AppCompatActivity() {
                     var r = conn.controlTransfer(0x21, 0x20, 0, 0, lineCoding, 7, 1000)
                     log("SET_LINE_CODING: $r")
 
-                    // SET_CONTROL_LINE_STATE - NO DTR/RTS (causes timeouts!)
+                    // SET_CONTROL_LINE_STATE - NO DTR/RTS (prevents timeouts!)
                     r = conn.controlTransfer(0x21, 0x22, 0x00, 0, null, 0, 1000)
                     log("SET_CONTROL (no DTR): $r")
 
-                    // Store
+                    // Store references
                     usbConnection = conn
                     controlInterface = ctrlIface
                     dataInterface = dataIface
                     endpointIn = inEp
                     endpointOut = outEp
 
-                    Thread.sleep(500)
+                    Thread.sleep(300)
 
-                    // Test with UsbRequest
-                    log("Testing UsbRequest write...")
-                    val testData = "\r\n".toByteArray()
-                    val buffer = ByteBuffer.allocate(64)
-                    buffer.put(testData)
-
-                    val request = UsbRequest()
-                    if (!request.initialize(conn, outEp)) {
-                        return@withContext "ERROR: UsbRequest init failed"
-                    }
-
-                    buffer.rewind()
-                    if (!request.queue(buffer, testData.size)) {
-                        request.close()
-                        return@withContext "ERROR: UsbRequest queue failed"
-                    }
-
-                    val completed = conn.requestWait()
-                    if (completed == null) {
-                        request.close()
-                        return@withContext "ERROR: UsbRequest timeout"
-                    }
-                    request.close()
-                    log("UsbRequest write OK!")
-
-                    // Drain
-                    Thread.sleep(200)
+                    // Initial drain of any pending data
                     val drainBuf = ByteArray(512)
                     var drained = 0
-                    for (i in 0..3) {
+                    for (i in 0..5) {
                         val n = conn.bulkTransfer(inEp, drainBuf, 512, 100)
                         if (n > 0) drained += n else break
                     }
-                    if (drained > 0) log("Drained $drained bytes")
+                    if (drained > 0) log("Initial drain: $drained bytes")
 
-                    isConnected = true
+                    // Send initial newline to wake up CLI
+                    val initData = "\r\n".toByteArray()
+                    val writeResult = conn.bulkTransfer(outEp, initData, initData.size, 1000)
+                    if (writeResult < 0) {
+                        conn.close()
+                        return@withContext "ERROR: Initial write failed ($writeResult)"
+                    }
+                    log("Initial write: $writeResult bytes")
+
+                    Thread.sleep(200)
+
+                    // Drain response
+                    drained = 0
+                    for (i in 0..5) {
+                        val n = conn.bulkTransfer(inEp, drainBuf, 512, 100)
+                        if (n > 0) drained += n else break
+                    }
+                    if (drained > 0) log("Response drain: $drained bytes")
+
+                    isConnected.set(true)
                     "SUCCESS!"
                 } catch (e: Exception) {
                     Log.e(TAG, "Connect error", e)
@@ -278,17 +287,46 @@ class MainActivity : AppCompatActivity() {
             }
 
             log(result)
-            if (isConnected) {
+            if (isConnected.get()) {
                 log("")
-                log("Ready! Tap TEST")
+                log("Ready! Keep-alive active.")
+                log("Tap TEST to verify")
                 updateUI()
+                // Start keep-alive
+                keepAliveHandler.postDelayed(keepAliveRunnable, KEEP_ALIVE_INTERVAL_MS)
             }
             showProgress(false)
         }
     }
 
+    private fun performKeepAlive() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val conn = usbConnection ?: return@launch
+                val epIn = endpointIn ?: return@launch
+
+                // Just read any pending data - this keeps the connection active
+                val buf = ByteArray(64)
+                val n = conn.bulkTransfer(epIn, buf, 64, 50)
+                if (n > 0) {
+                    Log.d(TAG, "Keep-alive read: $n bytes")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Keep-alive error", e)
+                // Connection might be dead
+                if (isConnected.get()) {
+                    isConnected.set(false)
+                    runOnUiThread {
+                        log("Connection lost!")
+                        disconnect()
+                    }
+                }
+            }
+        }
+    }
+
     private fun sendCommand(cmd: String) {
-        if (!isConnected) {
+        if (!isConnected.get()) {
             log("Not connected!")
             return
         }
@@ -305,66 +343,73 @@ class MainActivity : AppCompatActivity() {
                     val epOut = endpointOut ?: return@withContext "No OUT endpoint"
                     val epIn = endpointIn ?: return@withContext "No IN endpoint"
 
-                    // Clear buffer
+                    // Clear any pending data first
                     val clearBuf = ByteArray(512)
-                    for (i in 0..2) {
+                    for (i in 0..3) {
                         val n = conn.bulkTransfer(epIn, clearBuf, 512, 50)
                         if (n <= 0) break
                     }
 
-                    // Send using UsbRequest
-                    val cmdBytes = "$cmd\r\n".toByteArray()
-                    val outBuffer = ByteBuffer.allocate(cmdBytes.size)
-                    outBuffer.put(cmdBytes)
-                    outBuffer.rewind()
+                    // Send command with CR termination (Flipper expects \r)
+                    val cmdBytes = "$cmd\r".toByteArray()
+                    val writeResult = conn.bulkTransfer(epOut, cmdBytes, cmdBytes.size, 2000)
 
-                    val outRequest = UsbRequest()
-                    if (!outRequest.initialize(conn, epOut)) {
-                        return@withContext "Write init failed"
-                    }
-
-                    if (!outRequest.queue(outBuffer, cmdBytes.size)) {
-                        outRequest.close()
-                        return@withContext "Write queue failed"
-                    }
-
-                    val writeResult = conn.requestWait()
-                    outRequest.close()
-
-                    if (writeResult == null) {
-                        return@withContext "Write timeout"
+                    if (writeResult < 0) {
+                        // Try to recover
+                        log("Write failed ($writeResult), retrying...")
+                        Thread.sleep(100)
+                        val retryResult = conn.bulkTransfer(epOut, cmdBytes, cmdBytes.size, 2000)
+                        if (retryResult < 0) {
+                            return@withContext "Write failed: $retryResult"
+                        }
                     }
 
                     log("Sent ${cmdBytes.size} bytes")
                     Thread.sleep(100)
 
-                    // Read response using bulk transfer
+                    // Read response
                     val response = StringBuilder()
                     val readBuf = ByteArray(512)
                     val startTime = System.currentTimeMillis()
                     var totalRead = 0
+                    var noDataCount = 0
 
-                    while (System.currentTimeMillis() - startTime < 3000) {
-                        val n = conn.bulkTransfer(epIn, readBuf, 512, 300)
+                    while (System.currentTimeMillis() - startTime < 5000) {
+                        val n = conn.bulkTransfer(epIn, readBuf, 512, 200)
                         if (n > 0) {
-                            response.append(String(readBuf, 0, n))
+                            val chunk = String(readBuf, 0, n)
+                            response.append(chunk)
                             totalRead += n
-                            if (response.contains(">:")) break
-                        } else if (totalRead > 0) {
-                            break
+                            noDataCount = 0
+
+                            // Check for prompt indicating command complete
+                            if (response.contains(">:") || response.contains("\r\n>")) {
+                                break
+                            }
+                        } else {
+                            noDataCount++
+                            // If we've read some data and now getting nothing, probably done
+                            if (totalRead > 0 && noDataCount >= 3) {
+                                break
+                            }
                         }
-                        Thread.sleep(50)
+                        Thread.sleep(30)
                     }
 
+                    log("Read $totalRead bytes")
+
                     if (response.isEmpty()) {
-                        "(no response, read $totalRead bytes)"
+                        "(no response)"
                     } else {
-                        // Clean up
+                        // Clean up response
                         response.toString()
+                            .replace("\r\n", "\n")
+                            .replace("\r", "\n")
                             .lines()
-                            .filterNot { it.contains(cmd) }
+                            .filterNot { it.trim() == cmd || it.trim().isEmpty() }
                             .joinToString("\n")
                             .replace(Regex(">:\\s*$"), "")
+                            .replace(Regex("^\\s*>:\\s*"), "")
                             .trim()
                             .ifEmpty { "(empty response)" }
                     }
@@ -380,29 +425,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun disconnect() {
+        keepAliveHandler.removeCallbacks(keepAliveRunnable)
+        isConnected.set(false)
         try {
             dataInterface?.let { usbConnection?.releaseInterface(it) }
             controlInterface?.let { usbConnection?.releaseInterface(it) }
             usbConnection?.close()
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            Log.e(TAG, "Disconnect error", e)
+        }
         usbConnection = null
         controlInterface = null
         dataInterface = null
         endpointIn = null
         endpointOut = null
-        isConnected = false
         runOnUiThread { updateUI() }
     }
 
     private fun updateUI() {
-        btnConnect.text = if (isConnected) "CONNECTED" else "CONNECT"
-        btnConnect.isEnabled = !isConnected
-        btnRFID.isEnabled = isConnected
-        btnSubGHz.isEnabled = isConnected
-        btnTest.isEnabled = isConnected
+        val connected = isConnected.get()
+        btnConnect.text = if (connected) "CONNECTED" else "CONNECT"
+        btnConnect.isEnabled = !connected
+        btnRFID.isEnabled = connected
+        btnSubGHz.isEnabled = connected
+        btnTest.isEnabled = connected
 
         // Update status indicator
-        if (isConnected) {
+        if (connected) {
             statusDot.setBackgroundResource(R.drawable.indicator_status_connected)
             statusText.text = "ONLINE"
             statusText.setTextColor(resources.getColor(R.color.status_connected, null))
