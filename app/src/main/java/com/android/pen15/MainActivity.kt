@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnRFID: Button
     private lateinit var btnSubGHz: Button
     private lateinit var btnTest: Button
+    private lateinit var statusDot: View
+    private lateinit var statusText: TextView
 
     private var usbConnection: UsbDeviceConnection? = null
     private var controlInterface: UsbInterface? = null
@@ -89,6 +91,8 @@ class MainActivity : AppCompatActivity() {
         btnRFID = findViewById(R.id.btnRFID)
         btnSubGHz = findViewById(R.id.btnSubGHz)
         btnTest = findViewById(R.id.btnTest)
+        statusDot = findViewById(R.id.statusDot)
+        statusText = findViewById(R.id.statusText)
 
         val filter = IntentFilter().apply {
             addAction(ACTION_USB_PERMISSION)
@@ -396,6 +400,17 @@ class MainActivity : AppCompatActivity() {
         btnRFID.isEnabled = isConnected
         btnSubGHz.isEnabled = isConnected
         btnTest.isEnabled = isConnected
+
+        // Update status indicator
+        if (isConnected) {
+            statusDot.setBackgroundResource(R.drawable.indicator_status_connected)
+            statusText.text = "ONLINE"
+            statusText.setTextColor(resources.getColor(R.color.status_connected, null))
+        } else {
+            statusDot.setBackgroundResource(R.drawable.indicator_status)
+            statusText.text = "OFFLINE"
+            statusText.setTextColor(resources.getColor(R.color.text_secondary, null))
+        }
     }
 
     private fun log(msg: String) {

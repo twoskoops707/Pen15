@@ -1,53 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Glassmorphism Base Colors -->
-    <color name="glass_background">#0A0E1A</color>
-    <color name="glass_surface">#14192B</color>
-    <color name="glass_overlay">#1A1F33</color>
+    <!-- Cyberpunk Void Colors -->
+    <color name="void_black">#030305</color>
+    <color name="void_deep">#08080C</color>
+    <color name="surface_dark">#0E0E14</color>
+    <color name="surface_card">#14141C</color>
+    <color name="surface_elevated">#1C1C26</color>
+    <color name="surface_input">#0A0A10</color>
 
-    <!-- Glass Accent Colors -->
-    <color name="glass_primary">#6366F1</color>
-    <color name="glass_primary_variant">#818CF8</color>
-    <color name="glass_secondary">#8B5CF6</color>
-    <color name="glass_accent">#06B6D4</color>
+    <!-- Neon Primary - Electric Cyan -->
+    <color name="neon_cyan">#00FFFF</color>
+    <color name="neon_cyan_bright">#66FFFF</color>
+    <color name="neon_cyan_dim">#00AAAA</color>
+    <color name="neon_cyan_muted">#006666</color>
+    <color name="neon_cyan_glow">#2000FFFF</color>
 
-    <!-- Glass Effects -->
-    <color name="glass_blur_light">#33FFFFFF</color>
-    <color name="glass_blur_medium">#26FFFFFF</color>
-    <color name="glass_blur_dark">#1AFFFFFF</color>
+    <!-- Neon Secondary - Matrix Green -->
+    <color name="neon_green">#00FF41</color>
+    <color name="neon_green_bright">#66FF7D</color>
+    <color name="neon_green_dim">#00AA2B</color>
+    <color name="neon_green_muted">#005516</color>
 
-    <!-- Glass Borders -->
-    <color name="glass_border">#40FFFFFF</color>
-    <color name="glass_border_subtle">#20FFFFFF</color>
+    <!-- Neon Accent - Hot Magenta -->
+    <color name="neon_magenta">#FF0066</color>
+    <color name="neon_magenta_bright">#FF4D94</color>
+    <color name="neon_magenta_dim">#AA0044</color>
 
-    <!-- Status Colors -->
-    <color name="glass_success">#10B981</color>
-    <color name="glass_warning">#F59E0B</color>
-    <color name="glass_error">#EF4444</color>
-    <color name="glass_info">#3B82F6</color>
+    <!-- Neon Warning - Hazard Orange -->
+    <color name="neon_orange">#FF6600</color>
+    <color name="neon_orange_dim">#AA4400</color>
 
-    <!-- Text Colors -->
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#A0AEC0</color>
-    <color name="text_tertiary">#64748B</color>
-    <color name="text_disabled">#475569</color>
+    <!-- Neon Alert - Warning Yellow -->
+    <color name="neon_yellow">#FFFF00</color>
+    <color name="neon_yellow_dim">#AAAA00</color>
 
-    <!-- Connection Status -->
-    <color name="status_connected">#10B981</color>
-    <color name="status_connecting">#F59E0B</color>
-    <color name="status_disconnected">#64748B</color>
+    <!-- Text Hierarchy -->
+    <color name="text_primary">#EEEEF4</color>
+    <color name="text_secondary">#9999AA</color>
+    <color name="text_tertiary">#666677</color>
+    <color name="text_disabled">#444455</color>
+    <color name="text_terminal">#00FF41</color>
+    <color name="text_command">#00FFFF</color>
+    <color name="text_error">#FF4444</color>
 
-    <!-- Category Colors -->
-    <color name="category_flipper">#6366F1</color>
-    <color name="category_network">#06B6D4</color>
-    <color name="category_crypto">#8B5CF6</color>
-    <color name="category_utilities">#10B981</color>
+    <!-- Borders & Dividers -->
+    <color name="border_subtle">#1A1A24</color>
+    <color name="border_default">#2A2A38</color>
+    <color name="border_accent">#00FFFF</color>
+    <color name="divider">#1F1F2A</color>
 
-    <!-- Gradient Colors -->
-    <color name="gradient_start">#6366F1</color>
-    <color name="gradient_middle">#8B5CF6</color>
-    <color name="gradient_end">#06B6D4</color>
+    <!-- Status Indicators -->
+    <color name="status_connected">#00FF41</color>
+    <color name="status_connecting">#FFAA00</color>
+    <color name="status_disconnected">#666677</color>
+    <color name="status_error">#FF4444</color>
 
-    <!-- Launcher Icon -->
-    <color name="ic_launcher_background">#14192B</color>
+    <!-- Tool Category Colors -->
+    <color name="tool_rfid">#FF6600</color>
+    <color name="tool_subghz">#00FFFF</color>
+    <color name="tool_nfc">#9966FF</color>
+    <color name="tool_infrared">#FF0066</color>
+    <color name="tool_gpio">#00FF41</color>
+    <color name="tool_badusb">#FFFF00</color>
+
+    <!-- Button States -->
+    <color name="button_enabled">#00FFFF</color>
+    <color name="button_pressed">#00AAAA</color>
+    <color name="button_disabled">#333344</color>
+    <color name="ripple_light">#4000FFFF</color>
+
+    <!-- Glassmorphism Legacy -->
+    <color name="glass_background">#08080C</color>
+    <color name="glass_surface">#14141C</color>
+    <color name="glass_overlay">#1C1C26</color>
+    <color name="glass_blur_light">#20FFFFFF</color>
+    <color name="glass_border">#30FFFFFF</color>
+
+    <!-- Gradient Anchors -->
+    <color name="gradient_start">#00FFFF</color>
+    <color name="gradient_middle">#9966FF</color>
+    <color name="gradient_end">#FF0066</color>
+
+    <!-- Launcher -->
+    <color name="ic_launcher_background">#08080C</color>
 </resources>

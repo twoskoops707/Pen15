@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Pressed State -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <!-- Glow effect -->
+            <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#3000FFFF"/>
+                    <corners android:radius="8dp"/>
+                </shape>
+            </item>
+            <!-- Main button -->
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#00AAAA"/>
+                    <corners android:radius="6dp"/>
+                    <stroke android:width="2dp" android:color="#00FFFF"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- Disabled State -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="#1C1C26"/>
+            <corners android:radius="6dp"/>
+            <stroke android:width="1dp" android:color="#2A2A38"/>
+        </shape>
+    </item>
+
+    <!-- Default State -->
+    <item>
+        <layer-list>
+            <!-- Subtle glow -->
+            <item android:bottom="1dp" android:left="1dp" android:right="1dp" android:top="1dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#1500FFFF"/>
+                    <corners android:radius="7dp"/>
+                </shape>
+            </item>
+            <!-- Main button -->
+            <item>
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="135"
+                        android:startColor="#00DDDD"
+                        android:endColor="#00AAAA"/>
+                    <corners android:radius="6dp"/>
+                    <stroke android:width="1dp" android:color="#00FFFF"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base dark -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="160"
+                android:startColor="#030305"
+                android:centerColor="#08080C"
+                android:endColor="#0E0E14"
+                android:type="linear"/>
+        </shape>
+    </item>
+    <!-- Subtle vignette effect -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="600dp"
+                android:centerX="0.5"
+                android:centerY="0.3"
+                android:startColor="#00000000"
+                android:endColor="#40000000"/>
+        </shape>
+    </item>
+    <!-- Top accent glow -->
+    <item android:bottom="85%">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#1500FFFF"
+                android:endColor="#00000000"/>
+        </shape>
+    </item>
+</layer-list>
