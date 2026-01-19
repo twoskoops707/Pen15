@@ -1,95 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Cyberpunk Void Colors -->
-    <color name="void_black">#030305</color>
-    <color name="void_deep">#08080C</color>
-    <color name="surface_dark">#0E0E14</color>
-    <color name="surface_card">#14141C</color>
-    <color name="surface_elevated">#1C1C26</color>
-    <color name="surface_input">#0A0A10</color>
+    <!-- Modern Dark Theme - Clean & Subtle -->
 
-    <!-- Neon Primary - Electric Cyan -->
-    <color name="neon_cyan">#00FFFF</color>
-    <color name="neon_cyan_bright">#66FFFF</color>
-    <color name="neon_cyan_dim">#00AAAA</color>
-    <color name="neon_cyan_muted">#006666</color>
-    <color name="neon_cyan_glow">#2000FFFF</color>
+    <!-- Background Surfaces -->
+    <color name="void_black">#0D0D0F</color>
+    <color name="void_deep">#121214</color>
+    <color name="surface_dark">#161618</color>
+    <color name="surface_card">#1E1E21</color>
+    <color name="surface_elevated">#262629</color>
+    <color name="surface_input">#121214</color>
 
-    <!-- Neon Secondary - Matrix Green -->
-    <color name="neon_green">#00FF41</color>
-    <color name="neon_green_bright">#66FF7D</color>
-    <color name="neon_green_dim">#00AA2B</color>
-    <color name="neon_green_muted">#005516</color>
+    <!-- Primary Accent - Soft Blue -->
+    <color name="accent_primary">#5B8DEF</color>
+    <color name="accent_primary_light">#7BA3F3</color>
+    <color name="accent_primary_dim">#3D6BC7</color>
+    <color name="accent_primary_muted">#2A4A8A</color>
 
-    <!-- Neon Accent - Hot Magenta -->
-    <color name="neon_magenta">#FF0066</color>
-    <color name="neon_magenta_bright">#FF4D94</color>
-    <color name="neon_magenta_dim">#AA0044</color>
+    <!-- Secondary Accent - Soft Teal -->
+    <color name="accent_secondary">#4ECDC4</color>
+    <color name="accent_secondary_light">#6FD9D2</color>
+    <color name="accent_secondary_dim">#3BA39B</color>
 
-    <!-- Neon Warning - Hazard Orange -->
-    <color name="neon_orange">#FF6600</color>
-    <color name="neon_orange_dim">#AA4400</color>
+    <!-- Legacy neon names mapped to modern colors -->
+    <color name="neon_cyan">#5B8DEF</color>
+    <color name="neon_cyan_bright">#7BA3F3</color>
+    <color name="neon_cyan_dim">#3D6BC7</color>
+    <color name="neon_cyan_muted">#2A4A8A</color>
+    <color name="neon_cyan_glow">#205B8DEF</color>
 
-    <!-- Neon Alert - Warning Yellow -->
-    <color name="neon_yellow">#FFFF00</color>
-    <color name="neon_yellow_dim">#AAAA00</color>
+    <color name="neon_green">#4ECDC4</color>
+    <color name="neon_green_bright">#6FD9D2</color>
+    <color name="neon_green_dim">#3BA39B</color>
+    <color name="neon_green_muted">#2A726C</color>
 
-    <!-- Text Hierarchy -->
-    <color name="text_primary">#EEEEF4</color>
-    <color name="text_secondary">#9999AA</color>
-    <color name="text_tertiary">#666677</color>
-    <color name="text_disabled">#444455</color>
-    <color name="text_terminal">#00FF41</color>
-    <color name="text_command">#00FFFF</color>
-    <color name="text_error">#FF4444</color>
+    <color name="neon_magenta">#E07095</color>
+    <color name="neon_magenta_bright">#E8909F</color>
+    <color name="neon_magenta_dim">#B85A78</color>
+
+    <color name="neon_orange">#E09F6E</color>
+    <color name="neon_orange_dim">#B8825A</color>
+
+    <color name="neon_yellow">#E0D06E</color>
+    <color name="neon_yellow_dim">#B8A95A</color>
+
+    <!-- Text Hierarchy - Clean & Readable -->
+    <color name="text_primary">#F5F5F7</color>
+    <color name="text_secondary">#A0A0A8</color>
+    <color name="text_tertiary">#6B6B73</color>
+    <color name="text_disabled">#45454D</color>
+    <color name="text_terminal">#A0A0A8</color>
+    <color name="text_command">#5B8DEF</color>
+    <color name="text_error">#E07070</color>
 
     <!-- Borders & Dividers -->
-    <color name="border_subtle">#1A1A24</color>
-    <color name="border_default">#2A2A38</color>
-    <color name="border_accent">#00FFFF</color>
-    <color name="divider">#1F1F2A</color>
+    <color name="border_subtle">#222226</color>
+    <color name="border_default">#2D2D32</color>
+    <color name="border_accent">#5B8DEF</color>
+    <color name="divider">#1F1F23</color>
 
-    <!-- Status Indicators -->
-    <color name="status_connected">#00FF41</color>
-    <color name="status_connecting">#FFAA00</color>
-    <color name="status_disconnected">#666677</color>
-    <color name="status_error">#FF4444</color>
+    <!-- Status Indicators - Muted -->
+    <color name="status_connected">#4ECDC4</color>
+    <color name="status_connecting">#E0B86E</color>
+    <color name="status_disconnected">#6B6B73</color>
+    <color name="status_error">#E07070</color>
 
-    <!-- Tool Category Colors -->
-    <color name="tool_rfid">#FF6600</color>
-    <color name="tool_subghz">#00FFFF</color>
-    <color name="tool_nfc">#9966FF</color>
-    <color name="tool_infrared">#FF0066</color>
-    <color name="tool_gpio">#00FF41</color>
-    <color name="tool_badusb">#FFFF00</color>
+    <!-- Tool Category Colors - Subtle -->
+    <color name="tool_rfid">#E09F6E</color>
+    <color name="tool_subghz">#5B8DEF</color>
+    <color name="tool_nfc">#9B8AE0</color>
+    <color name="tool_infrared">#E07095</color>
+    <color name="tool_gpio">#4ECDC4</color>
+    <color name="tool_badusb">#E0D06E</color>
 
     <!-- Button States -->
-    <color name="button_enabled">#00FFFF</color>
-    <color name="button_pressed">#00AAAA</color>
-    <color name="button_disabled">#333344</color>
-    <color name="ripple_light">#4000FFFF</color>
+    <color name="button_enabled">#5B8DEF</color>
+    <color name="button_pressed">#3D6BC7</color>
+    <color name="button_disabled">#35353B</color>
+    <color name="ripple_light">#305B8DEF</color>
 
-    <!-- Glassmorphism Legacy -->
-    <color name="glass_background">#08080C</color>
-    <color name="glass_surface">#14141C</color>
-    <color name="glass_overlay">#1C1C26</color>
-    <color name="glass_blur_light">#20FFFFFF</color>
-    <color name="glass_blur_medium">#15FFFFFF</color>
-    <color name="glass_blur_dark">#10FFFFFF</color>
-    <color name="glass_border">#30FFFFFF</color>
-    <color name="glass_border_subtle">#18FFFFFF</color>
-    <color name="glass_primary">#00FFFF</color>
-    <color name="glass_primary_variant">#00AAAA</color>
-    <color name="glass_secondary">#00FF41</color>
-    <color name="glass_success">#00FF41</color>
-    <color name="glass_warning">#FFAA00</color>
-    <color name="glass_error">#FF4444</color>
+    <!-- Glass/Card Effects -->
+    <color name="glass_background">#121214</color>
+    <color name="glass_surface">#1E1E21</color>
+    <color name="glass_overlay">#262629</color>
+    <color name="glass_blur_light">#12FFFFFF</color>
+    <color name="glass_blur_medium">#0CFFFFFF</color>
+    <color name="glass_blur_dark">#08FFFFFF</color>
+    <color name="glass_border">#20FFFFFF</color>
+    <color name="glass_border_subtle">#10FFFFFF</color>
+    <color name="glass_primary">#5B8DEF</color>
+    <color name="glass_primary_variant">#3D6BC7</color>
+    <color name="glass_secondary">#4ECDC4</color>
+    <color name="glass_success">#4ECDC4</color>
+    <color name="glass_warning">#E0B86E</color>
+    <color name="glass_error">#E07070</color>
 
-    <!-- Gradient Anchors -->
-    <color name="gradient_start">#00FFFF</color>
-    <color name="gradient_middle">#9966FF</color>
-    <color name="gradient_end">#FF0066</color>
+    <!-- Gradient Anchors - Subtle -->
+    <color name="gradient_start">#5B8DEF</color>
+    <color name="gradient_middle">#9B8AE0</color>
+    <color name="gradient_end">#E07095</color>
 
     <!-- Launcher -->
-    <color name="ic_launcher_background">#08080C</color>
+    <color name="ic_launcher_background">#121214</color>
 </resources>

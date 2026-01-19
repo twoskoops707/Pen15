@@ -97,6 +97,74 @@
             android:indeterminateTint="@color/neon_cyan"/>
     </LinearLayout>
 
+    <!-- RESULT DISPLAY - Card/Tag Data at Top -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/resultCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:cardBackgroundColor="@color/surface_card"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/headerSection">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="// SCAN RESULT"
+                android:textSize="10sp"
+                android:textColor="@color/neon_green"
+                android:fontFamily="monospace"/>
+
+            <!-- Card/Tag ID - BIG and readable -->
+            <TextView
+                android:id="@+id/resultId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="--"
+                android:textSize="28sp"
+                android:textColor="@color/neon_cyan"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:letterSpacing="0.1"/>
+
+            <!-- Card Type -->
+            <TextView
+                android:id="@+id/resultType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TYPE: --"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:layout_marginTop="4dp"/>
+
+            <!-- Extra Info (expiry, protocol, etc) -->
+            <TextView
+                android:id="@+id/resultExtra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="@color/neon_green_dim"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
     <!-- Connect Button Card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/connectCard"
@@ -107,7 +175,7 @@
         app:cardBackgroundColor="@color/surface_card"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:layout_constraintTop_toBottomOf="@id/headerSection">
+        app:layout_constraintTop_toBottomOf="@id/resultCard">
 
         <LinearLayout
             android:layout_width="match_parent"

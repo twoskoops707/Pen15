@@ -62,6 +62,12 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var statusDot: View
     private lateinit var statusText: TextView
 
+    // Result Display
+    private lateinit var resultCard: View
+    private lateinit var resultId: TextView
+    private lateinit var resultType: TextView
+    private lateinit var resultExtra: TextView
+
     // USB Serial (using SerialInputOutputManager for proper async handling)
     private var usbSerialPort: UsbSerialPort? = null
     private var usbIoManager: SerialInputOutputManager? = null
@@ -109,6 +115,12 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnSubGHz = findViewById(R.id.btnSubGHz)
         statusDot = findViewById(R.id.statusDot)
         statusText = findViewById(R.id.statusText)
+
+        // Result display
+        resultCard = findViewById(R.id.resultCard)
+        resultId = findViewById(R.id.resultId)
+        resultType = findViewById(R.id.resultType)
+        resultExtra = findViewById(R.id.resultExtra)
     }
 
     private fun setupButtons() {
@@ -297,6 +309,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             val cleanResponse = parseFlipperResponse(cmd, response)
             if (cleanResponse.isNotEmpty()) {
                 log(cleanResponse)
+                // Show in result card if applicable
+                displayResult(response, cmd)
             } else {
                 log("(no response)")
             }
@@ -356,6 +370,76 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             }
             .joinToString("\n")
             .trim()
+    }
+
+    /**
+     * Display scan results prominently in the result card
+     */
+    private fun displayResult(response: String, cmdType: String) {
+        mainHandler.post {
+            // Parse based on command type
+            var cardId = ""
+            var cardType = ""
+            var extra = ""
+
+            when {
+                cmdType.contains("rfid", ignoreCase = true) -> {
+                    // Parse RFID response - look for Key: or ID:
+                    val keyMatch = Regex("Key:\\s*([A-Fa-f0-9\\s]+)").find(response)
+                    val typeMatch = Regex("(EM4100|HID|Indala|AWID|FDX-B)").find(response)
+
+                    cardId = keyMatch?.groupValues?.get(1)?.trim() ?: ""
+                    cardType = "RFID ${typeMatch?.value ?: "125kHz"}"
+                }
+                cmdType.contains("nfc", ignoreCase = true) -> {
+                    // Parse NFC response
+                    val uidMatch = Regex("UID:\\s*([A-Fa-f0-9\\s]+)").find(response)
+                    val typeMatch = Regex("(MIFARE|NTAG|ISO14443)").find(response)
+
+                    cardId = uidMatch?.groupValues?.get(1)?.trim() ?: ""
+                    cardType = "NFC ${typeMatch?.value ?: "Tag"}"
+                }
+                cmdType.contains("subghz", ignoreCase = true) -> {
+                    // Parse SubGHz response
+                    val freqMatch = Regex("(\\d+)\\s*Hz").find(response)
+                    val protocolMatch = Regex("Protocol:\\s*(\\w+)").find(response)
+                    val codeMatch = Regex("Code:\\s*([A-Fa-f0-9]+)").find(response)
+
+                    cardId = codeMatch?.groupValues?.get(1) ?: freqMatch?.groupValues?.get(1) ?: ""
+                    cardType = "SubGHz ${protocolMatch?.groupValues?.get(1) ?: ""}"
+                }
+                cmdType.contains("ikey", ignoreCase = true) -> {
+                    // Parse iButton response
+                    val keyMatch = Regex("Key:\\s*([A-Fa-f0-9\\s]+)").find(response)
+
+                    cardId = keyMatch?.groupValues?.get(1)?.trim() ?: ""
+                    cardType = "iButton"
+                }
+            }
+
+            // Show result card if we found data
+            if (cardId.isNotEmpty()) {
+                resultCard.visibility = View.VISIBLE
+                resultId.text = cardId.uppercase().chunked(2).joinToString(" ")
+                resultType.text = cardType.uppercase()
+
+                if (extra.isNotEmpty()) {
+                    resultExtra.visibility = View.VISIBLE
+                    resultExtra.text = extra
+                } else {
+                    resultExtra.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    /**
+     * Hide result card
+     */
+    private fun hideResult() {
+        mainHandler.post {
+            resultCard.visibility = View.GONE
+        }
     }
 
     // =====================
