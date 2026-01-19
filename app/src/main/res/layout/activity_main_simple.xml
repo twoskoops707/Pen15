@@ -319,7 +319,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="v73"
+                android:text="v74"
                 android:textSize="10sp"
                 android:textColor="@color/neon_green_dim"
                 android:fontFamily="monospace"
