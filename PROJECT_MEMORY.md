@@ -12,31 +12,39 @@
 ✅ **GitHub Workflows** - Build workflows updated and stable
 **NOTE:** These files are finalized. Do not suggest reviewing them before builds.
 
-## Current Status (2026-01-18)
-⏳ **Build #73+ IN PROGRESS** - USB Connection Stability Fixes
+## Current Status (2026-01-19)
+⏳ **Build #74 IN PROGRESS** - USB Connection FIX (CORRECT LIBRARY USAGE)
 
-### 2026-01-18: USB Stability Overhaul
+### 2026-01-19: USB Connection FIX (v74)
 **PROBLEM:** Flipper Zero connection drops after ~5 seconds
-**ROOT CAUSE IDENTIFIED:**
-1. DTR/RTS signals causing Flipper to reset/timeout
-2. No keep-alive mechanism to maintain connection
-3. Missing color resources causing build failures
+**ACTUAL ROOT CAUSE:**
+- Was using raw Android USB APIs (bulkTransfer, controlTransfer) with BLOCKING reads
+- The `usb-serial-for-android` library was already in build.gradle but NOT being used properly
+- Library requires `SerialInputOutputManager` for async non-blocking reads
 
-**FIXES APPLIED:**
-- ✅ Removed DTR/RTS from SET_CONTROL_LINE_STATE (was 0x03, now 0x00)
-- ✅ Added keep-alive mechanism (reads every 2 seconds)
-- ✅ Switched from UsbRequest API to simple bulkTransfer
-- ✅ Changed command termination from \r\n to just \r
-- ✅ Added write retry mechanism
-- ✅ Added connection health monitoring with auto-disconnect
-- ✅ Fixed all missing color resources (glass_blur_*, glass_border_subtle, glass_success)
-- ✅ Fixed bg_cyber_main.xml invalid '85%' dimension
+**CORRECT FIX APPLIED:**
+- ✅ Now using `SerialInputOutputManager` for async data handling (as per library FAQ)
+- ✅ DTR/RTS ENABLED (CDC-ACM devices require DTR=true)
+- ✅ Library handles all timing, buffering, and error recovery
+- ✅ Added glass_warning, glass_error colors
+
+**KEY INSIGHT FROM RESEARCH:**
+> "Most Arduinos with CDC-ACM driver use the DTR line to determine serial channel readiness.
+> In your Android code, call setDTR(true)"
+> - https://github.com/mik3y/usb-serial-for-android/wiki/FAQ
 
 **FILES MODIFIED:**
-- `MainActivity.kt` - Complete USB stability rewrite (v73)
-- `colors.xml` - Added missing glassmorphism colors
-- `bg_cyber_main.xml` - Fixed invalid dimension syntax
-- `activity_main_simple.xml` - Updated version to v73
+- `MainActivity.kt` - Complete rewrite using SerialInputOutputManager (v74)
+- `colors.xml` - Added glass_warning, glass_error
+- `activity_main_simple.xml` - Updated version to v74
+
+---
+
+### 2026-01-18: Failed USB Attempts (WRONG APPROACH)
+Previous attempts used raw USB APIs which caused the 5-second disconnect:
+- ❌ Removed DTR/RTS (WRONG - CDC-ACM needs DTR=true)
+- ❌ Keep-alive with blocking reads (WRONG - should use SerialInputOutputManager)
+- ❌ Raw bulkTransfer/controlTransfer (WRONG - library handles this)
 
 ---
 
