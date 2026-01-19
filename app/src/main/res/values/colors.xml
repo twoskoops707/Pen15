@@ -82,6 +82,8 @@
     <color name="glass_primary_variant">#00AAAA</color>
     <color name="glass_secondary">#00FF41</color>
     <color name="glass_success">#00FF41</color>
+    <color name="glass_warning">#FFAA00</color>
+    <color name="glass_error">#FF4444</color>
 
     <!-- Gradient Anchors -->
     <color name="gradient_start">#00FFFF</color>

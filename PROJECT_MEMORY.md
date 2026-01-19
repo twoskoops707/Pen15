@@ -12,7 +12,35 @@
 ✅ **GitHub Workflows** - Build workflows updated and stable
 **NOTE:** These files are finalized. Do not suggest reviewing them before builds.
 
-## Current Status (2026-01-16)
+## Current Status (2026-01-18)
+⏳ **Build #73+ IN PROGRESS** - USB Connection Stability Fixes
+
+### 2026-01-18: USB Stability Overhaul
+**PROBLEM:** Flipper Zero connection drops after ~5 seconds
+**ROOT CAUSE IDENTIFIED:**
+1. DTR/RTS signals causing Flipper to reset/timeout
+2. No keep-alive mechanism to maintain connection
+3. Missing color resources causing build failures
+
+**FIXES APPLIED:**
+- ✅ Removed DTR/RTS from SET_CONTROL_LINE_STATE (was 0x03, now 0x00)
+- ✅ Added keep-alive mechanism (reads every 2 seconds)
+- ✅ Switched from UsbRequest API to simple bulkTransfer
+- ✅ Changed command termination from \r\n to just \r
+- ✅ Added write retry mechanism
+- ✅ Added connection health monitoring with auto-disconnect
+- ✅ Fixed all missing color resources (glass_blur_*, glass_border_subtle, glass_success)
+- ✅ Fixed bg_cyber_main.xml invalid '85%' dimension
+
+**FILES MODIFIED:**
+- `MainActivity.kt` - Complete USB stability rewrite (v73)
+- `colors.xml` - Added missing glassmorphism colors
+- `bg_cyber_main.xml` - Fixed invalid dimension syntax
+- `activity_main_simple.xml` - Updated version to v73
+
+---
+
+## Previous Status (2026-01-16)
 ✅ **Build #64 - ALL BUTTONS WORKING**
 ✅ **Master Pentesting Suite - FULLY AUTOMATED**
 ✅ **Termux RUN_COMMAND execution (automatic command running)**
