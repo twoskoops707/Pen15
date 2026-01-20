@@ -57,13 +57,33 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var progressBar: ProgressBar
     private lateinit var btnConnect: Button
     private lateinit var btnTest: Button
-    private lateinit var btnRFID: Button
-    private lateinit var btnSubGHz: Button
-    private lateinit var btnNFC: Button
-    private lateinit var btnIButton: Button
-    private lateinit var btnIR: Button
     private lateinit var statusDot: View
     private lateinit var statusText: TextView
+
+    // WiFi/Marauder Buttons
+    private lateinit var btnWifiScan: Button
+    private lateinit var btnWifiDeauth: Button
+    private lateinit var btnWifiCapture: Button
+    private lateinit var btnWifiCrack: Button
+    private lateinit var btnWifiSniff: Button
+
+    // RFID Buttons
+    private lateinit var btnRFID: Button
+    private lateinit var btnRFIDBrute: Button
+
+    // SubGHz Buttons
+    private lateinit var btnSubGHz: Button
+    private lateinit var btnSubGHzBrute: Button
+    private lateinit var btnSubGHzRolling: Button
+
+    // NFC Buttons
+    private lateinit var btnNFC: Button
+    private lateinit var btnNFCMfkey: Button
+    private lateinit var btnNFCBrute: Button
+
+    // Other Tool Buttons
+    private lateinit var btnIButton: Button
+    private lateinit var btnIR: Button
 
     // Result Display
     private lateinit var resultCard: View
@@ -100,7 +120,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v78 ===")
+        log("=== PEN15 v79 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -114,13 +134,33 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         progressBar = findViewById(R.id.progressBar)
         btnConnect = findViewById(R.id.btnConnect)
         btnTest = findViewById(R.id.btnTest)
-        btnRFID = findViewById(R.id.btnRFID)
-        btnSubGHz = findViewById(R.id.btnSubGHz)
-        btnNFC = findViewById(R.id.btnNFC)
-        btnIButton = findViewById(R.id.btnIButton)
-        btnIR = findViewById(R.id.btnIR)
         statusDot = findViewById(R.id.statusDot)
         statusText = findViewById(R.id.statusText)
+
+        // WiFi/Marauder
+        btnWifiScan = findViewById(R.id.btnWifiScan)
+        btnWifiDeauth = findViewById(R.id.btnWifiDeauth)
+        btnWifiCapture = findViewById(R.id.btnWifiCapture)
+        btnWifiCrack = findViewById(R.id.btnWifiCrack)
+        btnWifiSniff = findViewById(R.id.btnWifiSniff)
+
+        // RFID
+        btnRFID = findViewById(R.id.btnRFID)
+        btnRFIDBrute = findViewById(R.id.btnRFIDBrute)
+
+        // SubGHz
+        btnSubGHz = findViewById(R.id.btnSubGHz)
+        btnSubGHzBrute = findViewById(R.id.btnSubGHzBrute)
+        btnSubGHzRolling = findViewById(R.id.btnSubGHzRolling)
+
+        // NFC
+        btnNFC = findViewById(R.id.btnNFC)
+        btnNFCMfkey = findViewById(R.id.btnNFCMfkey)
+        btnNFCBrute = findViewById(R.id.btnNFCBrute)
+
+        // Other
+        btnIButton = findViewById(R.id.btnIButton)
+        btnIR = findViewById(R.id.btnIR)
 
         // Result display
         resultCard = findViewById(R.id.resultCard)
@@ -132,11 +172,72 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private fun setupButtons() {
         btnConnect.setOnClickListener { connect() }
         btnTest.setOnClickListener { sendFlipperCommand("?") }
+
+        // WiFi/Marauder (via GPIO UART to WiFi Dev Board)
+        btnWifiScan.setOnClickListener { sendMarauderCommand("scanap") }
+        btnWifiDeauth.setOnClickListener { sendMarauderCommand("attack -t deauth") }
+        btnWifiCapture.setOnClickListener { sendMarauderCommand("sniffpmkid") }
+        btnWifiCrack.setOnClickListener { launchWifiCracker() }
+        btnWifiSniff.setOnClickListener { sendMarauderCommand("sniffraw") }
+
+        // RFID
         btnRFID.setOnClickListener { sendFlipperCommand("rfid read") }
-        btnSubGHz.setOnClickListener { sendFlipperCommand("subghz rx 433920000") }
+        btnRFIDBrute.setOnClickListener { sendFlipperCommand("rfid brute") }
+
+        // SubGHz
+        btnSubGHz.setOnClickListener { sendFlipperCommand("subghz rx") }
+        btnSubGHzBrute.setOnClickListener { sendFlipperCommand("subghz tx_from_file /ext/subghz/bruteforce.sub") }
+        btnSubGHzRolling.setOnClickListener { sendFlipperCommand("subghz decode_raw /ext/subghz/rolling.sub") }
+
+        // NFC
         btnNFC.setOnClickListener { sendFlipperCommand("nfc detect") }
+        btnNFCMfkey.setOnClickListener { sendFlipperCommand("nfc mfkey32") }
+        btnNFCBrute.setOnClickListener { sendFlipperCommand("nfc dictattack") }
+
+        // Other
         btnIButton.setOnClickListener { sendFlipperCommand("ikey read") }
         btnIR.setOnClickListener { sendFlipperCommand("ir rx") }
+    }
+
+    /**
+     * Send Marauder command via Flipper GPIO UART
+     * Marauder is on USART bridge, so we use gpio usart command
+     */
+    private fun sendMarauderCommand(cmd: String) {
+        log("")
+        log("[MARAUDER] $cmd")
+
+        // First ensure GPIO UART is set up for WiFi board
+        // Then send the Marauder command
+        sendFlipperCommand("gpio usart_bridge 115200")
+
+        // Small delay then send actual command
+        mainHandler.postDelayed({
+            sendFlipperCommand(cmd)
+        }, 500)
+    }
+
+    /**
+     * Launch external wifi_cracker.py script via Termux
+     */
+    private fun launchWifiCracker() {
+        log("")
+        log("Launching WiFi Cracker...")
+        log("Looking for .cap files...")
+
+        try {
+            val intent = android.content.Intent()
+            intent.setClassName("com.termux", "com.termux.app.RunCommandService")
+            intent.action = "com.termux.RUN_COMMAND"
+            intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/python")
+            intent.putExtra("com.termux.RUN_COMMAND_ARGUMENTS", arrayOf("/data/data/com.termux/files/home/Pen15/scripts/wifi_cracker.py"))
+            intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", false)
+            startService(intent)
+            log("Opened in Termux")
+        } catch (e: Exception) {
+            log("ERROR: ${e.message}")
+            log("Run manually: python ~/Pen15/scripts/wifi_cracker.py <capture.cap>")
+        }
     }
 
     private fun requestPermissions() {
@@ -648,9 +749,29 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
         btnConnect.text = if (connected) "DISCONNECT" else "CONNECT"
         btnTest.isEnabled = connected
+
+        // WiFi/Marauder
+        btnWifiScan.isEnabled = connected
+        btnWifiDeauth.isEnabled = connected
+        btnWifiCapture.isEnabled = connected
+        btnWifiCrack.isEnabled = true // Always enabled - uses local Python script
+        btnWifiSniff.isEnabled = connected
+
+        // RFID
         btnRFID.isEnabled = connected
+        btnRFIDBrute.isEnabled = connected
+
+        // SubGHz
         btnSubGHz.isEnabled = connected
+        btnSubGHzBrute.isEnabled = connected
+        btnSubGHzRolling.isEnabled = connected
+
+        // NFC
         btnNFC.isEnabled = connected
+        btnNFCMfkey.isEnabled = connected
+        btnNFCBrute.isEnabled = connected
+
+        // Other
         btnIButton.isEnabled = connected
         btnIR.isEnabled = connected
 
