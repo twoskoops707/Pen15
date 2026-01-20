@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v77 ===")
+        log("=== PEN15 v78 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -198,32 +198,33 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             }
 
             // Find Flipper Zero or use first device
-            var selectedDriver = drivers.firstOrNull {
+            val flipperDriver = drivers.firstOrNull {
                 it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID
             }
 
-            if (selectedDriver == null) {
-                selectedDriver = drivers[0]
-                runOnUI { log("Using first device (not Flipper)") }
-            } else {
+            val driver = if (flipperDriver != null) {
                 runOnUI { log("Found Flipper Zero!") }
+                flipperDriver
+            } else {
+                runOnUI { log("Using first device (not Flipper)") }
+                drivers[0]
             }
 
             // Check permission
-            if (!manager.hasPermission(selectedDriver.device)) {
+            if (!manager.hasPermission(driver.device)) {
                 runOnUI { log("ERROR: No USB permission granted") }
                 return false
             }
 
             // Open device
-            val connection = manager.openDevice(selectedDriver.device)
+            val connection = manager.openDevice(driver.device)
             if (connection == null) {
                 runOnUI { log("ERROR: Cannot open device") }
                 return false
             }
 
             // Open port
-            val port = selectedDriver.ports[0]
+            val port = driver.ports[0]
             port.open(connection)
             port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
 
