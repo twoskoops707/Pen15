@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v79 ===")
+        log("=== PEN15 v80 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")

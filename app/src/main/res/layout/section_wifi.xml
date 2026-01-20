@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_bg"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WIFI"
+        android:textSize="13sp"
+        android:textColor="#60A5FA"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Marauder / AWOK"
+        android:textSize="11sp"
+        android:textColor="#71717A"
+        android:layout_marginTop="2dp"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:id="@+id/btnWifiScan"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:text="Scan"
+            android:textSize="12sp"
+            android:textColor="#E4E4E7"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_tool"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/btnWifiSniff"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:text="Sniff"
+            android:textSize="12sp"
+            android:textColor="#E4E4E7"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_tool"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/btnWifiDeauth"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:text="Deauth"
+            android:textSize="12sp"
+            android:textColor="#F87171"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_attack"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/btnWifiCapture"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:text="Capture"
+            android:textSize="12sp"
+            android:textColor="#E4E4E7"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_tool"
+            android:enabled="false"/>
+    </GridLayout>
+
+    <Button
+        android:id="@+id/btnWifiCrack"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="6dp"
+        android:text="Crack Handshake"
+        android:textSize="12sp"
+        android:textColor="#FBBF24"
+        android:textAllCaps="false"
+        android:background="@drawable/btn_tool"/>
+
+</LinearLayout>

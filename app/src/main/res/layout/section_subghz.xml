@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_bg"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SUB-GHZ"
+        android:textSize="13sp"
+        android:textColor="#A78BFA"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="315/433/868 MHz"
+        android:textSize="11sp"
+        android:textColor="#71717A"
+        android:layout_marginTop="2dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:id="@+id/btnSubGHz"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="RX"
+            android:textSize="12sp"
+            android:textColor="#E4E4E7"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_tool"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/btnSubGHzBrute"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:text="Brute"
+            android:textSize="12sp"
+            android:textColor="#F87171"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_attack"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/btnSubGHzRolling"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Rolling"
+            android:textSize="12sp"
+            android:textColor="#FBBF24"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_tool"
+            android:enabled="false"/>
+    </LinearLayout>
+
+</LinearLayout>
