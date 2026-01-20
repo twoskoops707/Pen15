@@ -78,8 +78,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     // BLE Connection
     private var bluetoothGatt: BluetoothGatt? = null
-    private var bleRxChar: BluetoothCharacteristic? = null
-    private var bleTxChar: BluetoothCharacteristic? = null
+    private var bleRxChar: BluetoothGattCharacteristic? = null
+    private var bleTxChar: BluetoothGattCharacteristic? = null
 
     // State
     private val isConnected = AtomicBoolean(false)
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v76 ===")
+        log("=== PEN15 v77 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -523,9 +523,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
                 // Enable notifications
                 gatt.setCharacteristicNotification(bleTxChar, true)
-                bleTxChar?.getDescriptor(CCCD)?.let {
-                    it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    gatt.writeDescriptor(it)
+                bleTxChar?.getDescriptor(CCCD)?.let { descriptor ->
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        @Suppress("DEPRECATION")
+                        gatt.writeDescriptor(descriptor)
+                    }
                 }
 
                 isConnected.set(true)
@@ -536,14 +542,24 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, char: BluetoothCharacteristic) {
-            char.value?.let { data ->
-                mainHandler.post {
-                    responseBuffer.append(String(data))
-                    if (responseBuffer.contains(">:")) {
-                        responseCallback?.invoke(responseBuffer.toString())
-                        responseBuffer.clear()
-                    }
+        // New API for Android 13+
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, char: BluetoothGattCharacteristic, value: ByteArray) {
+            handleBleData(value)
+        }
+
+        // Deprecated API for older Android versions
+        @Deprecated("Deprecated in API 33")
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, char: BluetoothGattCharacteristic) {
+            @Suppress("DEPRECATION")
+            char.value?.let { handleBleData(it) }
+        }
+
+        private fun handleBleData(data: ByteArray) {
+            mainHandler.post {
+                responseBuffer.append(String(data))
+                if (responseBuffer.contains(">:")) {
+                    responseCallback?.invoke(responseBuffer.toString())
+                    responseBuffer.clear()
                 }
             }
         }
@@ -558,8 +574,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             responseBuffer.clear()
             waitingForResponse = true
 
-            rx.value = "$cmd\r".toByteArray()
-            gatt.writeCharacteristic(rx)
+            val cmdBytes = "$cmd\r".toByteArray()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                gatt.writeCharacteristic(rx, cmdBytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+            } else {
+                @Suppress("DEPRECATION")
+                rx.value = cmdBytes
+                @Suppress("DEPRECATION")
+                gatt.writeCharacteristic(rx)
+            }
 
             // Wait for response
             val start = System.currentTimeMillis()
