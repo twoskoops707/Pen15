@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var btnTest: Button
     private lateinit var btnRFID: Button
     private lateinit var btnSubGHz: Button
+    private lateinit var btnNFC: Button
+    private lateinit var btnIButton: Button
+    private lateinit var btnIR: Button
     private lateinit var statusDot: View
     private lateinit var statusText: TextView
 
@@ -97,7 +100,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v74 ===")
+        log("=== PEN15 v76 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -113,6 +116,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnTest = findViewById(R.id.btnTest)
         btnRFID = findViewById(R.id.btnRFID)
         btnSubGHz = findViewById(R.id.btnSubGHz)
+        btnNFC = findViewById(R.id.btnNFC)
+        btnIButton = findViewById(R.id.btnIButton)
+        btnIR = findViewById(R.id.btnIR)
         statusDot = findViewById(R.id.statusDot)
         statusText = findViewById(R.id.statusText)
 
@@ -128,6 +134,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnTest.setOnClickListener { sendFlipperCommand("?") }
         btnRFID.setOnClickListener { sendFlipperCommand("rfid read") }
         btnSubGHz.setOnClickListener { sendFlipperCommand("subghz rx 433920000") }
+        btnNFC.setOnClickListener { sendFlipperCommand("nfc detect") }
+        btnIButton.setOnClickListener { sendFlipperCommand("ikey read") }
+        btnIR.setOnClickListener { sendFlipperCommand("ir rx") }
     }
 
     private fun requestPermissions() {
@@ -617,6 +626,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnTest.isEnabled = connected
         btnRFID.isEnabled = connected
         btnSubGHz.isEnabled = connected
+        btnNFC.isEnabled = connected
+        btnIButton.isEnabled = connected
+        btnIR.isEnabled = connected
 
         if (connected) {
             statusDot.setBackgroundResource(R.drawable.indicator_status_connected)
@@ -632,9 +644,22 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private fun log(msg: String) {
         mainHandler.post {
             outputText.append("$msg\n")
+
+            // Limit to last 50 lines to keep UI responsive
+            val lines = outputText.text.toString().lines()
+            if (lines.size > 50) {
+                outputText.text = lines.takeLast(50).joinToString("\n")
+            }
+
             scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
         }
         Log.d(TAG, msg)
+    }
+
+    private fun clearLog() {
+        mainHandler.post {
+            outputText.text = ""
+        }
     }
 
     private fun showProgress(show: Boolean) {
