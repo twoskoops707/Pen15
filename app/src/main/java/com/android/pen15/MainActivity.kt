@@ -57,8 +57,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var progressBar: ProgressBar
     private lateinit var btnConnect: Button
     private lateinit var btnTest: Button
-    private lateinit var statusDot: View
-    private lateinit var statusText: TextView
+    private lateinit var statusChip: com.google.android.material.chip.Chip
 
     // WiFi/Marauder Buttons
     private lateinit var btnWifiScan: Button
@@ -120,7 +119,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v80 ===")
+        log("=== PEN15 v82 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -134,8 +133,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         progressBar = findViewById(R.id.progressBar)
         btnConnect = findViewById(R.id.btnConnect)
         btnTest = findViewById(R.id.btnTest)
-        statusDot = findViewById(R.id.statusDot)
-        statusText = findViewById(R.id.statusText)
+        statusChip = findViewById(R.id.statusChip)
 
         // WiFi/Marauder
         btnWifiScan = findViewById(R.id.btnWifiScan)
@@ -171,7 +169,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     private fun setupButtons() {
         btnConnect.setOnClickListener { connect() }
-        btnTest.setOnClickListener { sendFlipperCommand("?") }
+        btnTest.setOnClickListener { sendFlipperCommand("help") }
 
         // WiFi/Marauder (via GPIO UART to WiFi Dev Board)
         btnWifiScan.setOnClickListener { sendMarauderCommand("scanap") }
@@ -327,14 +325,14 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             // Open port
             val port = driver.ports[0]
             port.open(connection)
-            port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+            port.setParameters(230400, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
 
             // CRITICAL: Set DTR to indicate we're ready (required for CDC-ACM)
             // Ref: https://github.com/mik3y/usb-serial-for-android/wiki/FAQ
             port.dtr = true
             port.rts = true
 
-            runOnUI { log("Port opened: 115200 8N1, DTR=ON") }
+            runOnUI { log("Port opened: 230400 8N1, DTR=ON") }
 
             // Start SerialInputOutputManager for async reads
             // This is the CORRECT way to handle USB serial - NOT blocking reads
@@ -776,13 +774,13 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnIR.isEnabled = connected
 
         if (connected) {
-            statusDot.setBackgroundResource(R.drawable.indicator_status_connected)
-            statusText.text = connectionType
-            statusText.setTextColor(resources.getColor(R.color.status_connected, null))
+            statusChip.text = connectionType
+            statusChip.setTextColor(resources.getColor(R.color.status_connected, null))
+            statusChip.setChipIconTintResource(R.color.status_connected)
         } else {
-            statusDot.setBackgroundResource(R.drawable.indicator_status)
-            statusText.text = "OFFLINE"
-            statusText.setTextColor(resources.getColor(R.color.text_secondary, null))
+            statusChip.text = "Offline"
+            statusChip.setTextColor(resources.getColor(R.color.text_secondary, null))
+            statusChip.setChipIconTintResource(R.color.text_secondary)
         }
     }
 
