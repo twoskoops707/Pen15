@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v83 ===")
+        log("=== PEN15 v84 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -379,13 +379,12 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
             runOnUI { log("Port opened: 230400 8N1, DTR=ON") }
 
-            // Start SerialInputOutputManager for async reads
-            // This is the CORRECT way to handle USB serial - NOT blocking reads
+            // Start SerialInputOutputManager for async reads on executor thread
             usbSerialPort = port
             usbIoManager = SerialInputOutputManager(port, this)
-            usbIoManager?.start()
+            usbExecutor.submit { usbIoManager?.run() }
 
-            runOnUI { log("SerialInputOutputManager started") }
+            runOnUI { log("IO Manager started on executor") }
 
             // Send initial newline to wake CLI
             Thread.sleep(100)
@@ -406,14 +405,22 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     // SerialInputOutputManager.Listener implementation
     override fun onNewData(data: ByteArray) {
         val text = String(data)
-        Log.d(TAG, "USB RX: ${text.length} bytes")
+        Log.d(TAG, "USB RX: ${text.length} bytes: $text")
 
         mainHandler.post {
+            // ALWAYS show incoming data to user immediately
+            val displayText = text.replace("\r\n", "\n").replace("\r", "")
+            if (displayText.isNotBlank()) {
+                outputText.append(displayText)
+                scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+            }
+
             responseBuffer.append(text)
 
-            // Check if we have a complete response (ends with prompt)
+            // Check if we have a complete response (Flipper prompt varies)
             val response = responseBuffer.toString()
-            if (response.contains(">:") || response.endsWith(">")) {
+            if (response.contains(">:") || response.contains(">\r") ||
+                response.contains(">\n") || response.endsWith(">")) {
                 if (waitingForResponse) {
                     waitingForResponse = false
                     responseCallback?.invoke(response)
@@ -444,70 +451,23 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             return
         }
 
-        log("")
         log("> $cmd")
-        showProgress(true)
 
-        lifecycleScope.launch {
-            val response = withContext(Dispatchers.IO) {
-                when (connectionType) {
-                    "USB" -> sendUSBCommand(cmd)
-                    "BLE" -> sendBLECommand(cmd)
-                    else -> "Not connected"
+        // Send command directly - response will be shown by onNewData callback
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val port = usbSerialPort
+                if (port != null) {
+                    val cmdBytes = "$cmd\r".toByteArray()
+                    port.write(cmdBytes, 1000)
+                    Log.d(TAG, "Sent: $cmd")
+                } else if (connectionType == "BLE") {
+                    sendBLECommand(cmd)
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Send error", e)
+                runOnUI { log("Send error: ${e.message}") }
             }
-
-            showProgress(false)
-
-            // Parse and display response
-            val cleanResponse = parseFlipperResponse(cmd, response)
-            if (cleanResponse.isNotEmpty()) {
-                log(cleanResponse)
-                // Show in result card if applicable
-                displayResult(response, cmd)
-            } else {
-                log("(no response)")
-            }
-        }
-    }
-
-    private fun sendUSBCommand(cmd: String): String {
-        val port = usbSerialPort ?: return "USB not connected"
-
-        return try {
-            // Clear buffer for new command
-            responseBuffer.clear()
-            waitingForResponse = true
-
-            // Send command with CR (Flipper expects \r)
-            val cmdBytes = "$cmd\r".toByteArray()
-            port.write(cmdBytes, 1000)
-
-            // Wait for response with timeout
-            val startTime = System.currentTimeMillis()
-            var result = ""
-
-            // Simple wait loop - SerialInputOutputManager will populate responseBuffer
-            while (System.currentTimeMillis() - startTime < 5000) {
-                val currentResponse = responseBuffer.toString()
-                if (currentResponse.contains(">:") || currentResponse.contains("\r\n>")) {
-                    result = currentResponse
-                    break
-                }
-                Thread.sleep(50)
-            }
-
-            waitingForResponse = false
-
-            if (result.isEmpty()) {
-                result = responseBuffer.toString() // Get whatever we have
-            }
-
-            result
-
-        } catch (e: Exception) {
-            Log.e(TAG, "USB command error", e)
-            "Error: ${e.message}"
         }
     }
 
