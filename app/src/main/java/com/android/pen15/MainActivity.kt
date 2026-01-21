@@ -90,6 +90,11 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var resultType: TextView
     private lateinit var resultExtra: TextView
 
+    // Toolbar & Terminal buttons
+    private lateinit var btnHelp: View
+    private lateinit var btnSettings: View
+    private lateinit var btnClearTerminal: View
+
     // USB Serial (using SerialInputOutputManager for proper async handling)
     private var usbSerialPort: UsbSerialPort? = null
     private var usbIoManager: SerialInputOutputManager? = null
@@ -119,7 +124,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v82 ===")
+        log("=== PEN15 v83 ===")
         log("USB Serial via usb-serial-for-android")
         log("Using SerialInputOutputManager")
         log("")
@@ -165,6 +170,11 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         resultId = findViewById(R.id.resultId)
         resultType = findViewById(R.id.resultType)
         resultExtra = findViewById(R.id.resultExtra)
+
+        // Toolbar & Terminal buttons
+        btnHelp = findViewById(R.id.btnHelp)
+        btnSettings = findViewById(R.id.btnSettings)
+        btnClearTerminal = findViewById(R.id.btnClearTerminal)
     }
 
     private fun setupButtons() {
@@ -195,6 +205,41 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         // Other
         btnIButton.setOnClickListener { sendFlipperCommand("ikey read") }
         btnIR.setOnClickListener { sendFlipperCommand("ir rx") }
+
+        // Toolbar & Terminal
+        btnHelp.setOnClickListener { showHelp() }
+        btnSettings.setOnClickListener { showSettings() }
+        btnClearTerminal.setOnClickListener { clearLog() }
+    }
+
+    private fun showHelp() {
+        log("")
+        log("=== PEN15 HELP ===")
+        log("Connect Flipper via USB-C OTG")
+        log("")
+        log("WIFI: Requires Marauder board on GPIO")
+        log("  Scan - Scan for WiFi networks")
+        log("  Sniff - Monitor WiFi traffic")
+        log("  Deauth - Deauthentication attack")
+        log("  Capture - Capture PMKID/handshakes")
+        log("  Crack - Run hashcat on captures")
+        log("")
+        log("RFID (125kHz): Read/Brute LF cards")
+        log("NFC (13.56MHz): Detect/MFKey/Dict")
+        log("SubGHz: RX signals, Brute, Rolling")
+        log("iButton: Read 1-Wire keys")
+        log("IR: Receive infrared signals")
+    }
+
+    private fun showSettings() {
+        log("")
+        log("=== SETTINGS ===")
+        log("USB Baud: 230400")
+        log("DTR/RTS: Enabled")
+        log("Flipper VID: 0x0483")
+        log("Flipper PID: 0x5740")
+        log("")
+        log("BLE Service: ${FLIPPER_BLE_SERVICE}")
     }
 
     /**
