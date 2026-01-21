@@ -234,12 +234,10 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private fun showSettings() {
         log("")
         log("=== SETTINGS ===")
-        log("USB Baud: 230400")
+        log("USB Baud: 115200")
         log("DTR/RTS: Enabled")
         log("Flipper VID: 0x0483")
         log("Flipper PID: 0x5740")
-        log("")
-        log("BLE Service: ${FLIPPER_BLE_SERVICE}")
     }
 
     /**
@@ -370,14 +368,14 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             // Open port
             val port = driver.ports[0]
             port.open(connection)
-            port.setParameters(230400, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+            port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
 
             // CRITICAL: Set DTR to indicate we're ready (required for CDC-ACM)
             // Ref: https://github.com/mik3y/usb-serial-for-android/wiki/FAQ
             port.dtr = true
             port.rts = true
 
-            runOnUI { log("Port opened: 230400 8N1, DTR=ON") }
+            runOnUI { log("Port opened: 115200 8N1, DTR=ON") }
 
             // Start SerialInputOutputManager for async reads on executor thread
             usbSerialPort = port
