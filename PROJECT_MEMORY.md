@@ -12,31 +12,40 @@
 ✅ **GitHub Workflows** - Build workflows updated and stable
 **NOTE:** These files are finalized. Do not suggest reviewing them before builds.
 
-## Current Status (2026-01-19)
-⏳ **Build #74 IN PROGRESS** - USB Connection FIX (CORRECT LIBRARY USAGE)
+## Current Status (2026-01-20)
+✅ **v84 PUSHED** - USB Serial FIXED with correct settings
 
-### 2026-01-19: USB Connection FIX (v74)
-**PROBLEM:** Flipper Zero connection drops after ~5 seconds
-**ACTUAL ROOT CAUSE:**
-- Was using raw Android USB APIs (bulkTransfer, controlTransfer) with BLOCKING reads
-- The `usb-serial-for-android` library was already in build.gradle but NOT being used properly
-- Library requires `SerialInputOutputManager` for async non-blocking reads
+### 2026-01-20: USB Serial Communication FIX (v84)
 
-**CORRECT FIX APPLIED:**
-- ✅ Now using `SerialInputOutputManager` for async data handling (as per library FAQ)
-- ✅ DTR/RTS ENABLED (CDC-ACM devices require DTR=true)
-- ✅ Library handles all timing, buffering, and error recovery
-- ✅ Added glass_warning, glass_error colors
+**CRITICAL SETTINGS (VERIFIED FROM OFFICIAL DOCS):**
+```
+Baud Rate:  115200  ← CORRECT (was wrongly set to 230400)
+Data Bits:  8
+Stop Bits:  1
+Parity:     None
+DTR:        ENABLED (required for CDC-ACM)
+RTS:        ENABLED
+```
 
-**KEY INSIGHT FROM RESEARCH:**
-> "Most Arduinos with CDC-ACM driver use the DTR line to determine serial channel readiness.
-> In your Android code, call setDTR(true)"
-> - https://github.com/mik3y/usb-serial-for-android/wiki/FAQ
+**Source:** https://docs.flipper.net/zero/development/cli
+- `minicom -b 115200`
+- `tio -b 115200`
+- `putty -sercfg 115200,8,n,1,N`
+
+**FIXES APPLIED:**
+- ✅ Baud rate corrected to 115200 (was 230400 - WRONG)
+- ✅ SerialInputOutputManager runs on executor: `usbExecutor.submit { usbIoManager?.run() }`
+- ✅ Live data display via onNewData callback (shows response immediately)
+- ✅ Terminal moved inside scroll view (no longer blocks buttons)
+- ✅ Simplified command sending (removed complex response waiting)
+
+**KEY LESSON:**
+> ALWAYS check official documentation for correct serial settings.
+> Flipper Zero CLI uses 115200 baud, NOT 230400.
 
 **FILES MODIFIED:**
-- `MainActivity.kt` - Complete rewrite using SerialInputOutputManager (v74)
-- `colors.xml` - Added glass_warning, glass_error
-- `activity_main_simple.xml` - Updated version to v74
+- `MainActivity.kt` - Fixed baud rate, executor usage, simplified commands
+- `activity_main_simple.xml` - Terminal inside scroll view
 
 ---
 
