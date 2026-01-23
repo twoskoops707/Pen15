@@ -39,8 +39,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     companion object {
         private const val TAG = "Pen15"
+
+        // Flipper Zero USB CDC
         private const val FLIPPER_VID = 0x0483
         private const val FLIPPER_PID = 0x5740
+
+        // ESP32 Devices (AWOK Mini V3, Marauder boards)
+        private const val ESP32_VID = 0x303A     // Espressif
+        private const val CH340_VID = 0x1A86    // CH340/CH341
+        private const val CP210X_VID = 0x10C4   // Silicon Labs
+        private const val FTDI_VID = 0x0403     // FTDI
 
         // Flipper BLE UUIDs (from official app source)
         private val FLIPPER_BLE_SERVICE = UUID.fromString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
@@ -124,9 +132,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         setupButtons()
         requestPermissions()
 
-        log("=== PEN15 v84 ===")
+        log("=== PEN15 v87 ===")
+        log("Flipper Zero + AWOK/Marauder")
         log("USB Serial via usb-serial-for-android")
-        log("Using SerialInputOutputManager")
         log("")
         log("Connect Flipper via USB-C")
         log("Then tap CONNECT")
@@ -241,21 +249,52 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     /**
-     * Send Marauder command via Flipper GPIO UART
-     * Marauder is on USART bridge, so we use gpio usart command
+     * Send Marauder command to ESP32/AWOK board
+     * If connected directly via USB, sends command directly
+     * If using Flipper GPIO, shows instructions
      */
     private fun sendMarauderCommand(cmd: String) {
         log("")
         log("[MARAUDER] $cmd")
 
-        // First ensure GPIO UART is set up for WiFi board
-        // Then send the Marauder command
-        sendFlipperCommand("gpio usart_bridge 115200")
+        // Check if we're connected to an ESP32 device directly
+        val port = usbSerialPort
+        if (port != null && isESP32Device()) {
+            // Direct connection to ESP32 Marauder
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val cmdBytes = "$cmd\n".toByteArray()
+                    port.write(cmdBytes, 1000)
+                    Log.d(TAG, "Marauder sent: $cmd")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Marauder send error", e)
+                    runOnUI { log("Send error: ${e.message}") }
+                }
+            }
+        } else if (connectionType == "Flipper") {
+            // Connected to Flipper - show GPIO instructions
+            log("NOTE: Marauder via Flipper GPIO requires:")
+            log("1. On Flipper: GPIO > USB-UART Bridge")
+            log("2. Set baud to 115200")
+            log("3. Commands pass through to AWOK")
+            log("")
+            log("Or connect AWOK directly via USB-C")
+        } else {
+            log("Not connected!")
+        }
+    }
 
-        // Small delay then send actual command
-        mainHandler.postDelayed({
-            sendFlipperCommand(cmd)
-        }, 500)
+    /**
+     * Check if current device is an ESP32/Marauder board
+     */
+    private fun isESP32Device(): Boolean {
+        val port = usbSerialPort ?: return false
+        val vid = try {
+            port.driver.device.vendorId
+        } catch (e: Exception) {
+            return false
+        }
+        return vid == ESP32_VID || vid == CH340_VID || vid == CP210X_VID || vid == FTDI_VID
     }
 
     /**
@@ -313,7 +352,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
             if (success) {
                 isConnected.set(true)
-                connectionType = "USB"
+                // connectionType already set in connectUSB()
                 updateUI()
                 log("Connected! Tap TEST to verify.")
             } else {
@@ -339,17 +378,34 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                 return false
             }
 
-            // Find Flipper Zero or use first device
+            // Find Flipper Zero first, then ESP32/Marauder, then any device
             val flipperDriver = drivers.firstOrNull {
                 it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID
             }
 
-            val driver = if (flipperDriver != null) {
-                runOnUI { log("Found Flipper Zero!") }
-                flipperDriver
-            } else {
-                runOnUI { log("Using first device (not Flipper)") }
-                drivers[0]
+            val esp32Driver = drivers.firstOrNull {
+                it.device.vendorId == ESP32_VID ||
+                it.device.vendorId == CH340_VID ||
+                it.device.vendorId == CP210X_VID ||
+                it.device.vendorId == FTDI_VID
+            }
+
+            val driver = when {
+                flipperDriver != null -> {
+                    connectionType = "Flipper"
+                    runOnUI { log("Found Flipper Zero!") }
+                    flipperDriver
+                }
+                esp32Driver != null -> {
+                    connectionType = "Marauder"
+                    runOnUI { log("Found ESP32/Marauder device!") }
+                    esp32Driver
+                }
+                else -> {
+                    connectionType = "USB"
+                    runOnUI { log("Using first serial device") }
+                    drivers[0]
+                }
             }
 
             // Check permission

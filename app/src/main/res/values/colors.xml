@@ -1,104 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Modern Dark Theme - Clean & Subtle -->
+    <!-- PEN15 Pro Theme - Cyber Security Dark -->
 
-    <!-- Background Surfaces -->
-    <color name="void_black">#0D0D0F</color>
-    <color name="void_deep">#121214</color>
-    <color name="surface_dark">#161618</color>
-    <color name="surface_card">#1E1E21</color>
-    <color name="surface_elevated">#262629</color>
-    <color name="surface_input">#121214</color>
+    <!-- Core Backgrounds -->
+    <color name="bg_void">#080C14</color>
+    <color name="bg_primary">#0A1020</color>
+    <color name="bg_surface">#0D1526</color>
+    <color name="bg_card">#111B2E</color>
+    <color name="bg_elevated">#152238</color>
+    <color name="bg_input">#0A1222</color>
 
-    <!-- Primary Accent - Soft Blue -->
-    <color name="accent_primary">#5B8DEF</color>
-    <color name="accent_primary_light">#7BA3F3</color>
-    <color name="accent_primary_dim">#3D6BC7</color>
-    <color name="accent_primary_muted">#2A4A8A</color>
+    <!-- Accent Colors - Cyber -->
+    <color name="cyber_cyan">#00E5FF</color>
+    <color name="cyber_cyan_dim">#00B8D4</color>
+    <color name="cyber_cyan_glow">#2000E5FF</color>
 
-    <!-- Secondary Accent - Soft Teal -->
-    <color name="accent_secondary">#4ECDC4</color>
-    <color name="accent_secondary_light">#6FD9D2</color>
-    <color name="accent_secondary_dim">#3BA39B</color>
+    <color name="cyber_green">#00FF41</color>
+    <color name="cyber_green_dim">#00C853</color>
 
-    <!-- Legacy neon names mapped to modern colors -->
-    <color name="neon_cyan">#5B8DEF</color>
-    <color name="neon_cyan_bright">#7BA3F3</color>
-    <color name="neon_cyan_dim">#3D6BC7</color>
-    <color name="neon_cyan_muted">#2A4A8A</color>
-    <color name="neon_cyan_glow">#205B8DEF</color>
+    <color name="cyber_red">#FF1744</color>
+    <color name="cyber_red_dim">#D50000</color>
+    <color name="cyber_red_bg">#1A0A10</color>
 
-    <color name="neon_green">#4ECDC4</color>
-    <color name="neon_green_bright">#6FD9D2</color>
-    <color name="neon_green_dim">#3BA39B</color>
-    <color name="neon_green_muted">#2A726C</color>
+    <color name="cyber_amber">#FFD600</color>
+    <color name="cyber_amber_dim">#FFAB00</color>
+    <color name="cyber_amber_bg">#1A1608</color>
 
-    <color name="neon_magenta">#E07095</color>
-    <color name="neon_magenta_bright">#E8909F</color>
-    <color name="neon_magenta_dim">#B85A78</color>
+    <color name="cyber_purple">#B388FF</color>
+    <color name="cyber_purple_dim">#7C4DFF</color>
 
-    <color name="neon_orange">#E09F6E</color>
-    <color name="neon_orange_dim">#B8825A</color>
+    <color name="cyber_orange">#FF6E40</color>
 
-    <color name="neon_yellow">#E0D06E</color>
-    <color name="neon_yellow_dim">#B8A95A</color>
+    <!-- Text -->
+    <color name="text_primary">#E8F0FF</color>
+    <color name="text_secondary">#7A8BA8</color>
+    <color name="text_tertiary">#4A5B78</color>
+    <color name="text_disabled">#2A3548</color>
+    <color name="text_terminal">#00E5FF</color>
 
-    <!-- Text Hierarchy - Clean & Readable -->
-    <color name="text_primary">#F5F5F7</color>
-    <color name="text_secondary">#A0A0A8</color>
-    <color name="text_tertiary">#6B6B73</color>
-    <color name="text_disabled">#45454D</color>
-    <color name="text_terminal">#A0A0A8</color>
-    <color name="text_command">#5B8DEF</color>
-    <color name="text_error">#E07070</color>
+    <!-- Borders -->
+    <color name="border_subtle">#152238</color>
+    <color name="border_default">#1E3050</color>
+    <color name="border_accent">#00E5FF</color>
 
-    <!-- Borders & Dividers -->
-    <color name="border_subtle">#222226</color>
-    <color name="border_default">#2D2D32</color>
-    <color name="border_accent">#5B8DEF</color>
-    <color name="divider">#1F1F23</color>
+    <!-- Status -->
+    <color name="status_connected">#00FF41</color>
+    <color name="status_connecting">#FFD600</color>
+    <color name="status_disconnected">#4A5B78</color>
+    <color name="status_error">#FF1744</color>
 
-    <!-- Status Indicators - Muted -->
-    <color name="status_connected">#4ECDC4</color>
-    <color name="status_connecting">#E0B86E</color>
-    <color name="status_disconnected">#6B6B73</color>
-    <color name="status_error">#E07070</color>
-
-    <!-- Tool Category Colors - Subtle -->
-    <color name="tool_rfid">#E09F6E</color>
-    <color name="tool_subghz">#5B8DEF</color>
-    <color name="tool_nfc">#9B8AE0</color>
-    <color name="tool_infrared">#E07095</color>
-    <color name="tool_gpio">#4ECDC4</color>
-    <color name="tool_badusb">#E0D06E</color>
+    <!-- Tool Categories -->
+    <color name="tool_wifi">#00E5FF</color>
+    <color name="tool_rfid">#FF6E40</color>
+    <color name="tool_subghz">#B388FF</color>
+    <color name="tool_nfc">#00FF41</color>
+    <color name="tool_ir">#FF1744</color>
+    <color name="tool_ibutton">#00BCD4</color>
 
     <!-- Button States -->
-    <color name="button_enabled">#5B8DEF</color>
-    <color name="button_pressed">#3D6BC7</color>
-    <color name="button_disabled">#35353B</color>
-    <color name="ripple_light">#305B8DEF</color>
+    <color name="button_primary">#00E5FF</color>
+    <color name="button_primary_pressed">#00B8D4</color>
+    <color name="button_danger">#FF1744</color>
+    <color name="button_disabled">#1E3050</color>
 
-    <!-- Glass/Card Effects -->
-    <color name="glass_background">#121214</color>
-    <color name="glass_surface">#1E1E21</color>
-    <color name="glass_overlay">#262629</color>
-    <color name="glass_blur_light">#12FFFFFF</color>
-    <color name="glass_blur_medium">#0CFFFFFF</color>
-    <color name="glass_blur_dark">#08FFFFFF</color>
-    <color name="glass_border">#20FFFFFF</color>
-    <color name="glass_border_subtle">#10FFFFFF</color>
-    <color name="glass_primary">#5B8DEF</color>
-    <color name="glass_primary_variant">#3D6BC7</color>
-    <color name="glass_secondary">#4ECDC4</color>
-    <color name="glass_success">#4ECDC4</color>
-    <color name="glass_warning">#E0B86E</color>
-    <color name="glass_error">#E07070</color>
+    <!-- Legacy compatibility -->
+    <color name="neon_cyan">#00E5FF</color>
+    <color name="neon_cyan_bright">#40F4FF</color>
+    <color name="neon_cyan_dim">#00B8D4</color>
+    <color name="neon_cyan_muted">#006E85</color>
+    <color name="neon_cyan_glow">#2000E5FF</color>
+    <color name="neon_green">#00FF41</color>
+    <color name="neon_green_bright">#69F0AE</color>
+    <color name="neon_green_dim">#00C853</color>
+    <color name="neon_green_muted">#00894A</color>
+    <color name="neon_magenta">#FF1744</color>
+    <color name="neon_magenta_bright">#FF5252</color>
+    <color name="neon_magenta_dim">#D50000</color>
+    <color name="neon_orange">#FF6E40</color>
+    <color name="neon_orange_dim">#DD5730</color>
+    <color name="neon_yellow">#FFD600</color>
+    <color name="neon_yellow_dim">#FFAB00</color>
 
-    <!-- Gradient Anchors - Subtle -->
-    <color name="gradient_start">#5B8DEF</color>
-    <color name="gradient_middle">#9B8AE0</color>
-    <color name="gradient_end">#E07095</color>
+    <!-- Glass Effects -->
+    <color name="glass_background">#0A1020</color>
+    <color name="glass_surface">#111B2E</color>
+    <color name="glass_overlay">#152238</color>
+    <color name="glass_blur_light">#0CFFFFFF</color>
+    <color name="glass_blur_medium">#08FFFFFF</color>
+    <color name="glass_blur_dark">#04FFFFFF</color>
+    <color name="glass_border">#1500E5FF</color>
+    <color name="glass_border_subtle">#0800E5FF</color>
+    <color name="glass_primary">#00E5FF</color>
+    <color name="glass_primary_variant">#00B8D4</color>
+    <color name="glass_secondary">#00FF41</color>
+    <color name="glass_success">#00FF41</color>
+    <color name="glass_warning">#FFD600</color>
+    <color name="glass_error">#FF1744</color>
+
+    <!-- Gradients -->
+    <color name="gradient_start">#00E5FF</color>
+    <color name="gradient_middle">#B388FF</color>
+    <color name="gradient_end">#FF1744</color>
 
     <!-- Launcher -->
-    <color name="ic_launcher_background">#121214</color>
+    <color name="ic_launcher_background">#0A1929</color>
+
+    <!-- Compatibility -->
+    <color name="void_black">#080C14</color>
+    <color name="void_deep">#0A1020</color>
+    <color name="surface_dark">#0D1526</color>
+    <color name="surface_card">#111B2E</color>
+    <color name="surface_elevated">#152238</color>
+    <color name="surface_input">#0A1222</color>
+    <color name="accent_primary">#00E5FF</color>
+    <color name="accent_primary_light">#40F4FF</color>
+    <color name="accent_primary_dim">#00B8D4</color>
+    <color name="accent_primary_muted">#006E85</color>
+    <color name="accent_secondary">#00FF41</color>
+    <color name="accent_secondary_light">#69F0AE</color>
+    <color name="accent_secondary_dim">#00C853</color>
+    <color name="divider">#1E3050</color>
 </resources>
