@@ -380,7 +380,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             // Start SerialInputOutputManager for async reads on executor thread
             usbSerialPort = port
             usbIoManager = SerialInputOutputManager(port, this)
-            usbExecutor.execute { usbIoManager?.run() }
+            usbIoManager?.start()
 
             runOnUI { log("IO Manager started on executor") }
 
