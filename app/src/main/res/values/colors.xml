@@ -105,6 +105,10 @@
     <!-- Launcher -->
     <color name="ic_launcher_background">#0A1929</color>
 
+    <!-- Simple names -->
+    <color name="green">#22C55E</color>
+    <color name="gray">#6B7280</color>
+
     <!-- Compatibility -->
     <color name="void_black">#080C14</color>
     <color name="void_deep">#0A1020</color>

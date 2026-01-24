@@ -1,10 +1,12 @@
 package com.android.pen15
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.bluetooth.*
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
+import android.content.IntentFilter
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
 import android.os.Build
 import android.os.Bundle
@@ -12,865 +14,356 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.ScrollView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
+import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Pen15 - Flipper Zero Interface
- * Using usb-serial-for-android library with SerialInputOutputManager for stable USB CDC
- * Refs: https://github.com/mik3y/usb-serial-for-android
- *       https://github.com/flipperdevices/Flipper-Android-App
+ * PEN15 v88 - Clean rebuild based on SimpleUsbTerminal patterns
+ * Reference: https://github.com/kai-morich/SimpleUsbTerminal
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     companion object {
         private const val TAG = "Pen15"
+        private const val ACTION_USB_PERMISSION = "com.android.pen15.USB_PERMISSION"
 
-        // Flipper Zero USB CDC
+        // Flipper Zero USB IDs
         private const val FLIPPER_VID = 0x0483
         private const val FLIPPER_PID = 0x5740
 
-        // ESP32 Devices (AWOK Mini V3, Marauder boards)
-        private const val ESP32_VID = 0x303A     // Espressif
-        private const val CH340_VID = 0x1A86    // CH340/CH341
-        private const val CP210X_VID = 0x10C4   // Silicon Labs
-        private const val FTDI_VID = 0x0403     // FTDI
-
-        // Flipper BLE UUIDs (from official app source)
-        private val FLIPPER_BLE_SERVICE = UUID.fromString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
-        private val FLIPPER_BLE_RX = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e61fe0000")
-        private val FLIPPER_BLE_TX = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
-        private val CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-
-        private const val REQUEST_PERMISSIONS = 100
+        // Serial settings (Flipper CLI)
+        private const val BAUD_RATE = 115200
+        private const val WRITE_TIMEOUT = 200
     }
 
-    // UI Elements
+    // UI
     private lateinit var outputText: TextView
     private lateinit var scrollView: ScrollView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var btnConnect: Button
-    private lateinit var btnTest: Button
-    private lateinit var statusChip: com.google.android.material.chip.Chip
+    private lateinit var inputField: EditText
+    private lateinit var btnConnect: MaterialButton
+    private lateinit var btnSend: MaterialButton
+    private lateinit var statusText: TextView
+    private lateinit var deviceInfo: TextView
 
-    // WiFi/Marauder Buttons
-    private lateinit var btnWifiScan: Button
-    private lateinit var btnWifiDeauth: Button
-    private lateinit var btnWifiCapture: Button
-    private lateinit var btnWifiCrack: Button
-    private lateinit var btnWifiSniff: Button
+    // Tool buttons
+    private lateinit var btnRfid: MaterialButton
+    private lateinit var btnSubghz: MaterialButton
+    private lateinit var btnIbutton: MaterialButton
+    private lateinit var btnIr: MaterialButton
 
-    // RFID Buttons
-    private lateinit var btnRFID: Button
-    private lateinit var btnRFIDBrute: Button
-
-    // SubGHz Buttons
-    private lateinit var btnSubGHz: Button
-    private lateinit var btnSubGHzBrute: Button
-    private lateinit var btnSubGHzRolling: Button
-
-    // NFC Buttons
-    private lateinit var btnNFC: Button
-    private lateinit var btnNFCMfkey: Button
-    private lateinit var btnNFCBrute: Button
-
-    // Other Tool Buttons
-    private lateinit var btnIButton: Button
-    private lateinit var btnIR: Button
-
-    // Result Display
-    private lateinit var resultCard: View
-    private lateinit var resultId: TextView
-    private lateinit var resultType: TextView
-    private lateinit var resultExtra: TextView
-
-    // Toolbar & Terminal buttons
-    private lateinit var btnHelp: View
-    private lateinit var btnSettings: View
-    private lateinit var btnClearTerminal: View
-
-    // USB Serial (using SerialInputOutputManager for proper async handling)
+    // USB
+    private var usbManager: UsbManager? = null
+    private var usbConnection: UsbDeviceConnection? = null
     private var usbSerialPort: UsbSerialPort? = null
-    private var usbIoManager: SerialInputOutputManager? = null
-    private val usbExecutor = Executors.newSingleThreadExecutor()
+    private var ioManager: SerialInputOutputManager? = null
 
-    // BLE Connection
-    private var bluetoothGatt: BluetoothGatt? = null
-    private var bleRxChar: BluetoothGattCharacteristic? = null
-    private var bleTxChar: BluetoothGattCharacteristic? = null
-
-    // State
-    private val isConnected = AtomicBoolean(false)
-    private var connectionType = "NONE"
-
-    // Response handling for command/response pattern
-    private val responseBuffer = StringBuilder()
-    private var waitingForResponse = false
-    private var responseCallback: ((String) -> Unit)? = null
-
+    private var connected = false
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    // USB permission receiver
+    private val usbReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                ACTION_USB_PERMISSION -> {
+                    synchronized(this) {
+                        val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+                        }
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            device?.let { connectToDevice(it) }
+                        } else {
+                            log("USB permission denied")
+                        }
+                    }
+                }
+                UsbManager.ACTION_USB_DEVICE_DETACHED -> {
+                    log("USB device detached")
+                    disconnect()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_simple)
+        setContentView(R.layout.activity_main_v2)
 
         initViews()
-        setupButtons()
-        requestPermissions()
+        setupListeners()
+        registerUsbReceiver()
 
-        log("=== PEN15 v87 ===")
-        log("Flipper Zero + AWOK/Marauder")
-        log("USB Serial via usb-serial-for-android")
+        usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+
+        log("=== PEN15 v88 ===")
+        log("Connect Flipper via USB-C OTG")
         log("")
-        log("Connect Flipper via USB-C")
-        log("Then tap CONNECT")
     }
 
     private fun initViews() {
         outputText = findViewById(R.id.outputText)
         scrollView = findViewById(R.id.scrollView)
-        progressBar = findViewById(R.id.progressBar)
+        inputField = findViewById(R.id.inputField)
         btnConnect = findViewById(R.id.btnConnect)
-        btnTest = findViewById(R.id.btnTest)
-        statusChip = findViewById(R.id.statusChip)
+        btnSend = findViewById(R.id.btnSend)
+        statusText = findViewById(R.id.statusText)
+        deviceInfo = findViewById(R.id.deviceInfo)
 
-        // WiFi/Marauder
-        btnWifiScan = findViewById(R.id.btnWifiScan)
-        btnWifiDeauth = findViewById(R.id.btnWifiDeauth)
-        btnWifiCapture = findViewById(R.id.btnWifiCapture)
-        btnWifiCrack = findViewById(R.id.btnWifiCrack)
-        btnWifiSniff = findViewById(R.id.btnWifiSniff)
-
-        // RFID
-        btnRFID = findViewById(R.id.btnRFID)
-        btnRFIDBrute = findViewById(R.id.btnRFIDBrute)
-
-        // SubGHz
-        btnSubGHz = findViewById(R.id.btnSubGHz)
-        btnSubGHzBrute = findViewById(R.id.btnSubGHzBrute)
-        btnSubGHzRolling = findViewById(R.id.btnSubGHzRolling)
-
-        // NFC
-        btnNFC = findViewById(R.id.btnNFC)
-        btnNFCMfkey = findViewById(R.id.btnNFCMfkey)
-        btnNFCBrute = findViewById(R.id.btnNFCBrute)
-
-        // Other
-        btnIButton = findViewById(R.id.btnIButton)
-        btnIR = findViewById(R.id.btnIR)
-
-        // Result display
-        resultCard = findViewById(R.id.resultCard)
-        resultId = findViewById(R.id.resultId)
-        resultType = findViewById(R.id.resultType)
-        resultExtra = findViewById(R.id.resultExtra)
-
-        // Toolbar & Terminal buttons
-        btnHelp = findViewById(R.id.btnHelp)
-        btnSettings = findViewById(R.id.btnSettings)
-        btnClearTerminal = findViewById(R.id.btnClearTerminal)
+        btnRfid = findViewById(R.id.btnRfid)
+        btnSubghz = findViewById(R.id.btnSubghz)
+        btnIbutton = findViewById(R.id.btnIbutton)
+        btnIr = findViewById(R.id.btnIr)
     }
 
-    private fun setupButtons() {
-        btnConnect.setOnClickListener { connect() }
-        btnTest.setOnClickListener { sendFlipperCommand("help") }
-
-        // WiFi/Marauder (via GPIO UART to WiFi Dev Board)
-        btnWifiScan.setOnClickListener { sendMarauderCommand("scanap") }
-        btnWifiDeauth.setOnClickListener { sendMarauderCommand("attack -t deauth") }
-        btnWifiCapture.setOnClickListener { sendMarauderCommand("sniffpmkid") }
-        btnWifiCrack.setOnClickListener { launchWifiCracker() }
-        btnWifiSniff.setOnClickListener { sendMarauderCommand("sniffraw") }
-
-        // RFID
-        btnRFID.setOnClickListener { sendFlipperCommand("rfid read") }
-        btnRFIDBrute.setOnClickListener { sendFlipperCommand("rfid brute") }
-
-        // SubGHz
-        btnSubGHz.setOnClickListener { sendFlipperCommand("subghz rx") }
-        btnSubGHzBrute.setOnClickListener { sendFlipperCommand("subghz tx_from_file /ext/subghz/bruteforce.sub") }
-        btnSubGHzRolling.setOnClickListener { sendFlipperCommand("subghz decode_raw /ext/subghz/rolling.sub") }
-
-        // NFC
-        btnNFC.setOnClickListener { sendFlipperCommand("nfc detect") }
-        btnNFCMfkey.setOnClickListener { sendFlipperCommand("nfc mfkey32") }
-        btnNFCBrute.setOnClickListener { sendFlipperCommand("nfc dictattack") }
-
-        // Other
-        btnIButton.setOnClickListener { sendFlipperCommand("ikey read") }
-        btnIR.setOnClickListener { sendFlipperCommand("ir rx") }
-
-        // Toolbar & Terminal
-        btnHelp.setOnClickListener { showHelp() }
-        btnSettings.setOnClickListener { showSettings() }
-        btnClearTerminal.setOnClickListener { clearLog() }
-    }
-
-    private fun showHelp() {
-        log("")
-        log("=== PEN15 HELP ===")
-        log("Connect Flipper via USB-C OTG")
-        log("")
-        log("WIFI: Requires Marauder board on GPIO")
-        log("  Scan - Scan for WiFi networks")
-        log("  Sniff - Monitor WiFi traffic")
-        log("  Deauth - Deauthentication attack")
-        log("  Capture - Capture PMKID/handshakes")
-        log("  Crack - Run hashcat on captures")
-        log("")
-        log("RFID (125kHz): Read/Brute LF cards")
-        log("NFC (13.56MHz): Detect/MFKey/Dict")
-        log("SubGHz: RX signals, Brute, Rolling")
-        log("iButton: Read 1-Wire keys")
-        log("IR: Receive infrared signals")
-    }
-
-    private fun showSettings() {
-        log("")
-        log("=== SETTINGS ===")
-        log("USB Baud: 115200")
-        log("DTR/RTS: Enabled")
-        log("Flipper VID: 0x0483")
-        log("Flipper PID: 0x5740")
-    }
-
-    /**
-     * Send Marauder command to ESP32/AWOK board
-     * If connected directly via USB, sends command directly
-     * If using Flipper GPIO, shows instructions
-     */
-    private fun sendMarauderCommand(cmd: String) {
-        log("")
-        log("[MARAUDER] $cmd")
-
-        // Check if we're connected to an ESP32 device directly
-        val port = usbSerialPort
-        if (port != null && isESP32Device()) {
-            // Direct connection to ESP32 Marauder
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val cmdBytes = "$cmd\n".toByteArray()
-                    port.write(cmdBytes, 1000)
-                    Log.d(TAG, "Marauder sent: $cmd")
-                } catch (e: Exception) {
-                    Log.e(TAG, "Marauder send error", e)
-                    runOnUI { log("Send error: ${e.message}") }
-                }
+    private fun setupListeners() {
+        btnConnect.setOnClickListener {
+            if (connected) {
+                disconnect()
+            } else {
+                scanAndConnect()
             }
-        } else if (connectionType == "Flipper") {
-            // Connected to Flipper - show GPIO instructions
-            log("NOTE: Marauder via Flipper GPIO requires:")
-            log("1. On Flipper: GPIO > USB-UART Bridge")
-            log("2. Set baud to 115200")
-            log("3. Commands pass through to AWOK")
-            log("")
-            log("Or connect AWOK directly via USB-C")
+        }
+
+        btnSend.setOnClickListener {
+            val cmd = inputField.text.toString().trim()
+            if (cmd.isNotEmpty()) {
+                sendCommand(cmd)
+                inputField.text.clear()
+            }
+        }
+
+        // Tool buttons
+        btnRfid.setOnClickListener { sendCommand("rfid read") }
+        btnSubghz.setOnClickListener { sendCommand("subghz rx") }
+        btnIbutton.setOnClickListener { sendCommand("ikey read") }
+        btnIr.setOnClickListener { sendCommand("ir rx") }
+    }
+
+    private fun registerUsbReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(ACTION_USB_PERMISSION)
+            addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(usbReceiver, filter, RECEIVER_NOT_EXPORTED)
         } else {
-            log("Not connected!")
+            registerReceiver(usbReceiver, filter)
         }
     }
 
-    /**
-     * Check if current device is an ESP32/Marauder board
-     */
-    private fun isESP32Device(): Boolean {
-        val port = usbSerialPort ?: return false
-        val vid = try {
-            port.driver.device.vendorId
-        } catch (e: Exception) {
-            return false
-        }
-        return vid == ESP32_VID || vid == CH340_VID || vid == CP210X_VID || vid == FTDI_VID
-    }
-
-    /**
-     * Launch external wifi_cracker.py script via Termux
-     */
-    private fun launchWifiCracker() {
-        log("")
-        log("Launching WiFi Cracker...")
-        log("Looking for .cap files...")
-
-        try {
-            val intent = android.content.Intent()
-            intent.setClassName("com.termux", "com.termux.app.RunCommandService")
-            intent.action = "com.termux.RUN_COMMAND"
-            intent.putExtra("com.termux.RUN_COMMAND_PATH", "/data/data/com.termux/files/usr/bin/python")
-            intent.putExtra("com.termux.RUN_COMMAND_ARGUMENTS", arrayOf("/data/data/com.termux/files/home/Pen15/scripts/wifi_cracker.py"))
-            intent.putExtra("com.termux.RUN_COMMAND_BACKGROUND", false)
-            startService(intent)
-            log("Opened in Termux")
-        } catch (e: Exception) {
-            log("ERROR: ${e.message}")
-            log("Run manually: python ~/Pen15/scripts/wifi_cracker.py <capture.cap>")
-        }
-    }
-
-    private fun requestPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val needed = mutableListOf<String>()
-            if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED)
-                needed.add(Manifest.permission.BLUETOOTH_CONNECT)
-            if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED)
-                needed.add(Manifest.permission.BLUETOOTH_SCAN)
-            if (needed.isNotEmpty())
-                ActivityCompat.requestPermissions(this, needed.toTypedArray(), REQUEST_PERMISSIONS)
-        }
-    }
-
-    // =====================
+    // ==================
     // USB CONNECTION
-    // =====================
+    // ==================
 
-    private fun connect() {
-        if (isConnected.get()) {
-            disconnect()
+    private fun scanAndConnect() {
+        log("Scanning for USB devices...")
+
+        val manager = usbManager ?: return
+        val drivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+
+        if (drivers.isEmpty()) {
+            log("No USB serial devices found")
+
+            // Show raw USB devices for debug
+            manager.deviceList.forEach { (_, device) ->
+                log("  Raw: VID=${String.format("0x%04X", device.vendorId)} PID=${String.format("0x%04X", device.productId)}")
+            }
             return
         }
 
-        log("")
-        log("--- CONNECTING USB ---")
-        showProgress(true)
+        // Find Flipper Zero
+        val driver = drivers.find {
+            it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID
+        } ?: drivers[0]
 
-        lifecycleScope.launch {
-            val success = withContext(Dispatchers.IO) { connectUSB() }
-            showProgress(false)
+        val device = driver.device
+        log("Found: ${device.productName ?: "USB Device"}")
+        log("  VID=${String.format("0x%04X", device.vendorId)} PID=${String.format("0x%04X", device.productId)}")
 
-            if (success) {
-                isConnected.set(true)
-                // connectionType already set in connectUSB()
-                updateUI()
-                log("Connected! Tap TEST to verify.")
+        // Check permission
+        if (manager.hasPermission(device)) {
+            connectToDevice(device)
+        } else {
+            log("Requesting USB permission...")
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_MUTABLE
             } else {
-                log("Connection failed")
+                0
             }
+            val permissionIntent = PendingIntent.getBroadcast(this, 0,
+                Intent(ACTION_USB_PERMISSION), flags)
+            manager.requestPermission(device, permissionIntent)
         }
     }
 
-    private fun connectUSB(): Boolean {
+    private fun connectToDevice(device: UsbDevice) {
+        log("Connecting...")
+
         try {
-            val manager = getSystemService(Context.USB_SERVICE) as UsbManager
-            val drivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
+            val manager = usbManager ?: throw Exception("USB Manager null")
+            val driver = UsbSerialProber.getDefaultProber().probeDevice(device)
+                ?: throw Exception("No driver for device")
 
-            if (drivers.isEmpty()) {
-                runOnUI { log("No USB serial devices found") }
+            usbConnection = manager.openDevice(device)
+                ?: throw Exception("Cannot open device")
 
-                // Log raw USB devices for debugging
-                manager.deviceList.forEach { (_, device) ->
-                    runOnUI {
-                        log("Device: VID=0x${device.vendorId.toString(16)} PID=0x${device.productId.toString(16)}")
-                    }
-                }
-                return false
-            }
+            usbSerialPort = driver.ports[0]
+            usbSerialPort?.open(usbConnection)
+            usbSerialPort?.setParameters(BAUD_RATE, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
 
-            // Find Flipper Zero first, then ESP32/Marauder, then any device
-            val flipperDriver = drivers.firstOrNull {
-                it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID
-            }
+            // CRITICAL: Set DTR/RTS for CDC-ACM
+            usbSerialPort?.dtr = true
+            usbSerialPort?.rts = true
 
-            val esp32Driver = drivers.firstOrNull {
-                it.device.vendorId == ESP32_VID ||
-                it.device.vendorId == CH340_VID ||
-                it.device.vendorId == CP210X_VID ||
-                it.device.vendorId == FTDI_VID
-            }
+            log("Port: $BAUD_RATE 8N1, DTR=ON, RTS=ON")
 
-            val driver = when {
-                flipperDriver != null -> {
-                    connectionType = "Flipper"
-                    runOnUI { log("Found Flipper Zero!") }
-                    flipperDriver
-                }
-                esp32Driver != null -> {
-                    connectionType = "Marauder"
-                    runOnUI { log("Found ESP32/Marauder device!") }
-                    esp32Driver
-                }
-                else -> {
-                    connectionType = "USB"
-                    runOnUI { log("Using first serial device") }
-                    drivers[0]
-                }
-            }
+            // Start IO Manager with listener
+            ioManager = SerialInputOutputManager(usbSerialPort, this)
+            ioManager?.start()
 
-            // Check permission
-            if (!manager.hasPermission(driver.device)) {
-                runOnUI { log("ERROR: No USB permission granted") }
-                return false
-            }
+            connected = true
+            updateUI()
 
-            // Open device
-            val connection = manager.openDevice(driver.device)
-            if (connection == null) {
-                runOnUI { log("ERROR: Cannot open device") }
-                return false
-            }
+            // Wake CLI with newline
+            mainHandler.postDelayed({
+                usbSerialPort?.write("\r\n".toByteArray(), WRITE_TIMEOUT)
+            }, 100)
 
-            // Open port
-            val port = driver.ports[0]
-            port.open(connection)
-            port.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-
-            // CRITICAL: Set DTR to indicate we're ready (required for CDC-ACM)
-            // Ref: https://github.com/mik3y/usb-serial-for-android/wiki/FAQ
-            port.dtr = true
-            port.rts = true
-
-            runOnUI { log("Port opened: 115200 8N1, DTR=ON") }
-
-            // Start SerialInputOutputManager for async reads on executor thread
-            usbSerialPort = port
-            usbIoManager = SerialInputOutputManager(port, this)
-            usbIoManager?.start()
-
-            runOnUI { log("IO Manager started on executor") }
-
-            // Send initial newline to wake CLI
-            Thread.sleep(100)
-            port.write("\r\n".toByteArray(), 500)
-
-            Thread.sleep(200)
-            runOnUI { log("SUCCESS!") }
-
-            return true
+            log("Connected!")
 
         } catch (e: Exception) {
-            Log.e(TAG, "USB connect error", e)
-            runOnUI { log("ERROR: ${e.message}") }
-            return false
+            Log.e(TAG, "Connection error", e)
+            log("ERROR: ${e.message}")
+            disconnect()
         }
     }
 
-    // SerialInputOutputManager.Listener implementation
+    private fun disconnect() {
+        connected = false
+
+        ioManager?.listener = null
+        ioManager?.stop()
+        ioManager = null
+
+        try {
+            usbSerialPort?.dtr = false
+            usbSerialPort?.rts = false
+            usbSerialPort?.close()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error closing port", e)
+        }
+        usbSerialPort = null
+
+        try {
+            usbConnection?.close()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error closing connection", e)
+        }
+        usbConnection = null
+
+        updateUI()
+        log("Disconnected")
+    }
+
+    // ==================
+    // SERIAL I/O
+    // ==================
+
     override fun onNewData(data: ByteArray) {
         val text = String(data)
-        Log.d(TAG, "USB RX: ${text.length} bytes: $text")
+        Log.d(TAG, "RX [${data.size}]: $text")
 
         mainHandler.post {
-            // ALWAYS show incoming data to user immediately
-            val displayText = text.replace("\r\n", "\n").replace("\r", "")
-            if (displayText.isNotBlank()) {
-                outputText.append(displayText)
-                scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
-            }
-
-            responseBuffer.append(text)
-
-            // Check if we have a complete response (Flipper prompt varies)
-            val response = responseBuffer.toString()
-            if (response.contains(">:") || response.contains(">\r") ||
-                response.contains(">\n") || response.endsWith(">")) {
-                if (waitingForResponse) {
-                    waitingForResponse = false
-                    responseCallback?.invoke(response)
-                    responseCallback = null
-                }
+            val clean = text.replace("\r\n", "\n").replace("\r", "")
+            if (clean.isNotBlank()) {
+                outputText.append(clean)
+                scrollToBottom()
             }
         }
     }
 
     override fun onRunError(e: Exception) {
-        Log.e(TAG, "SerialInputOutputManager error", e)
+        Log.e(TAG, "IO Error", e)
         mainHandler.post {
-            log("USB Error: ${e.message}")
-            if (isConnected.get()) {
-                log("Connection lost!")
-                disconnect()
-            }
+            log("IO Error: ${e.message}")
+            disconnect()
         }
     }
 
-    // =====================
-    // COMMANDS
-    // =====================
-
-    private fun sendFlipperCommand(cmd: String) {
-        if (!isConnected.get()) {
-            log("Not connected!")
+    private fun sendCommand(cmd: String) {
+        if (!connected) {
+            log("Not connected")
             return
         }
 
         log("> $cmd")
 
-        // Send command directly - response will be shown by onNewData callback
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val port = usbSerialPort
-                if (port != null) {
-                    val cmdBytes = "$cmd\r".toByteArray()
-                    port.write(cmdBytes, 1000)
-                    Log.d(TAG, "Sent: $cmd")
-                } else if (connectionType == "BLE") {
-                    sendBLECommand(cmd)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Send error", e)
-                runOnUI { log("Send error: ${e.message}") }
-            }
-        }
-    }
-
-    private fun parseFlipperResponse(cmd: String, raw: String): String {
-        return raw
-            .replace("\r\n", "\n")
-            .replace("\r", "\n")
-            .lines()
-            .filterNot {
-                it.trim() == cmd ||
-                        it.trim().startsWith(">:") ||
-                        it.trim() == ">" ||
-                        it.trim().isEmpty()
-            }
-            .joinToString("\n")
-            .trim()
-    }
-
-    /**
-     * Display scan results prominently in the result card
-     */
-    private fun displayResult(response: String, cmdType: String) {
-        mainHandler.post {
-            // Parse based on command type
-            var cardId = ""
-            var cardType = ""
-            var extra = ""
-
-            when {
-                cmdType.contains("rfid", ignoreCase = true) -> {
-                    // Parse RFID response - look for Key: or ID:
-                    val keyMatch = Regex("Key:\\s*([A-Fa-f0-9\\s]+)").find(response)
-                    val typeMatch = Regex("(EM4100|HID|Indala|AWID|FDX-B)").find(response)
-
-                    cardId = keyMatch?.groupValues?.get(1)?.trim() ?: ""
-                    cardType = "RFID ${typeMatch?.value ?: "125kHz"}"
-                }
-                cmdType.contains("nfc", ignoreCase = true) -> {
-                    // Parse NFC response
-                    val uidMatch = Regex("UID:\\s*([A-Fa-f0-9\\s]+)").find(response)
-                    val typeMatch = Regex("(MIFARE|NTAG|ISO14443)").find(response)
-
-                    cardId = uidMatch?.groupValues?.get(1)?.trim() ?: ""
-                    cardType = "NFC ${typeMatch?.value ?: "Tag"}"
-                }
-                cmdType.contains("subghz", ignoreCase = true) -> {
-                    // Parse SubGHz response
-                    val freqMatch = Regex("(\\d+)\\s*Hz").find(response)
-                    val protocolMatch = Regex("Protocol:\\s*(\\w+)").find(response)
-                    val codeMatch = Regex("Code:\\s*([A-Fa-f0-9]+)").find(response)
-
-                    cardId = codeMatch?.groupValues?.get(1) ?: freqMatch?.groupValues?.get(1) ?: ""
-                    cardType = "SubGHz ${protocolMatch?.groupValues?.get(1) ?: ""}"
-                }
-                cmdType.contains("ikey", ignoreCase = true) -> {
-                    // Parse iButton response
-                    val keyMatch = Regex("Key:\\s*([A-Fa-f0-9\\s]+)").find(response)
-
-                    cardId = keyMatch?.groupValues?.get(1)?.trim() ?: ""
-                    cardType = "iButton"
-                }
-            }
-
-            // Show result card if we found data
-            if (cardId.isNotEmpty()) {
-                resultCard.visibility = View.VISIBLE
-                resultId.text = cardId.uppercase().chunked(2).joinToString(" ")
-                resultType.text = cardType.uppercase()
-
-                if (extra.isNotEmpty()) {
-                    resultExtra.visibility = View.VISIBLE
-                    resultExtra.text = extra
-                } else {
-                    resultExtra.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    /**
-     * Hide result card
-     */
-    private fun hideResult() {
-        mainHandler.post {
-            resultCard.visibility = View.GONE
-        }
-    }
-
-    // =====================
-    // BLE CONNECTION (Stub - uses official Flipper BLE UUIDs)
-    // =====================
-
-    @SuppressLint("MissingPermission")
-    private fun connectBLE() {
-        log("")
-        log("--- BLE CONNECTION ---")
-
-        val btManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val adapter = btManager.adapter
-
-        if (adapter == null || !adapter.isEnabled) {
-            log("ERROR: Bluetooth disabled")
-            return
-        }
-
-        // Find paired Flipper
-        val flipper = adapter.bondedDevices.firstOrNull { it.name?.startsWith("Flipper") == true }
-        if (flipper == null) {
-            log("ERROR: No paired Flipper found")
-            log("Pair in Settings > Bluetooth first")
-            return
-        }
-
-        log("Connecting to ${flipper.name}...")
-        showProgress(true)
-        bluetoothGatt = flipper.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
-    }
-
-    private val gattCallback = object : BluetoothGattCallback() {
-        @SuppressLint("MissingPermission")
-        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            runOnUI {
-                when (newState) {
-                    BluetoothProfile.STATE_CONNECTED -> {
-                        log("BLE connected")
-                        gatt.discoverServices()
-                    }
-
-                    BluetoothProfile.STATE_DISCONNECTED -> {
-                        log("BLE disconnected")
-                        isConnected.set(false)
-                        connectionType = "NONE"
-                        showProgress(false)
-                        updateUI()
-                    }
-                }
-            }
-        }
-
-        @SuppressLint("MissingPermission")
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            runOnUI {
-                if (status != BluetoothGatt.GATT_SUCCESS) {
-                    log("Service discovery failed")
-                    showProgress(false)
-                    return@runOnUI
-                }
-
-                val service = gatt.getService(FLIPPER_BLE_SERVICE)
-                if (service == null) {
-                    log("Flipper BLE service not found")
-                    showProgress(false)
-                    return@runOnUI
-                }
-
-                bleRxChar = service.getCharacteristic(FLIPPER_BLE_RX)
-                bleTxChar = service.getCharacteristic(FLIPPER_BLE_TX)
-
-                // Enable notifications
-                gatt.setCharacteristicNotification(bleTxChar, true)
-                bleTxChar?.getDescriptor(CCCD)?.let { descriptor ->
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                        @Suppress("DEPRECATION")
-                        gatt.writeDescriptor(descriptor)
-                    }
-                }
-
-                isConnected.set(true)
-                connectionType = "BLE"
-                showProgress(false)
-                updateUI()
-                log("BLE ready!")
-            }
-        }
-
-        // New API for Android 13+
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, char: BluetoothGattCharacteristic, value: ByteArray) {
-            handleBleData(value)
-        }
-
-        // Deprecated API for older Android versions
-        @Deprecated("Deprecated in API 33")
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, char: BluetoothGattCharacteristic) {
-            @Suppress("DEPRECATION")
-            char.value?.let { handleBleData(it) }
-        }
-
-        private fun handleBleData(data: ByteArray) {
-            mainHandler.post {
-                responseBuffer.append(String(data))
-                if (responseBuffer.contains(">:")) {
-                    responseCallback?.invoke(responseBuffer.toString())
-                    responseBuffer.clear()
-                }
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun sendBLECommand(cmd: String): String {
-        val gatt = bluetoothGatt ?: return "BLE not connected"
-        val rx = bleRxChar ?: return "BLE not ready"
-
-        return try {
-            responseBuffer.clear()
-            waitingForResponse = true
-
-            val cmdBytes = "$cmd\r".toByteArray()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.writeCharacteristic(rx, cmdBytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-            } else {
-                @Suppress("DEPRECATION")
-                rx.value = cmdBytes
-                @Suppress("DEPRECATION")
-                gatt.writeCharacteristic(rx)
-            }
-
-            // Wait for response
-            val start = System.currentTimeMillis()
-            while (waitingForResponse && System.currentTimeMillis() - start < 5000) {
-                Thread.sleep(50)
-            }
-
-            responseBuffer.toString()
-        } catch (e: Exception) {
-            "Error: ${e.message}"
-        }
-    }
-
-    // =====================
-    // DISCONNECT
-    // =====================
-
-    private fun disconnect() {
-        // Stop USB IO Manager first
-        usbIoManager?.stop()
-        usbIoManager = null
-
-        // Close USB port
         try {
-            usbSerialPort?.close()
+            usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
         } catch (e: Exception) {
-            Log.e(TAG, "Error closing USB", e)
+            Log.e(TAG, "Send error", e)
+            log("Send error: ${e.message}")
         }
-        usbSerialPort = null
-
-        // Close BLE
-        try {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                bluetoothGatt?.disconnect()
-                bluetoothGatt?.close()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error closing BLE", e)
-        }
-        bluetoothGatt = null
-
-        isConnected.set(false)
-        connectionType = "NONE"
-        updateUI()
-        log("Disconnected")
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disconnect()
-        usbExecutor.shutdown()
-    }
-
-    // =====================
-    // UI HELPERS
-    // =====================
+    // ==================
+    // UI
+    // ==================
 
     private fun updateUI() {
-        val connected = isConnected.get()
-
         btnConnect.text = if (connected) "DISCONNECT" else "CONNECT"
-        btnTest.isEnabled = connected
+        statusText.text = if (connected) "CONNECTED" else "OFFLINE"
+        statusText.setTextColor(getColor(if (connected) R.color.green else R.color.gray))
 
-        // WiFi/Marauder
-        btnWifiScan.isEnabled = connected
-        btnWifiDeauth.isEnabled = connected
-        btnWifiCapture.isEnabled = connected
-        btnWifiCrack.isEnabled = true // Always enabled - uses local Python script
-        btnWifiSniff.isEnabled = connected
-
-        // RFID
-        btnRFID.isEnabled = connected
-        btnRFIDBrute.isEnabled = connected
-
-        // SubGHz
-        btnSubGHz.isEnabled = connected
-        btnSubGHzBrute.isEnabled = connected
-        btnSubGHzRolling.isEnabled = connected
-
-        // NFC
-        btnNFC.isEnabled = connected
-        btnNFCMfkey.isEnabled = connected
-        btnNFCBrute.isEnabled = connected
-
-        // Other
-        btnIButton.isEnabled = connected
-        btnIR.isEnabled = connected
-
-        if (connected) {
-            statusChip.text = connectionType
-            statusChip.setTextColor(resources.getColor(R.color.status_connected, null))
-            statusChip.setChipIconTintResource(R.color.status_connected)
+        deviceInfo.text = if (connected) {
+            "Flipper Zero @ $BAUD_RATE"
         } else {
-            statusChip.text = "Offline"
-            statusChip.setTextColor(resources.getColor(R.color.text_secondary, null))
-            statusChip.setChipIconTintResource(R.color.text_secondary)
+            "No device"
         }
+
+        // Enable/disable tool buttons
+        btnRfid.isEnabled = connected
+        btnSubghz.isEnabled = connected
+        btnIbutton.isEnabled = connected
+        btnIr.isEnabled = connected
+        btnSend.isEnabled = connected
+        inputField.isEnabled = connected
     }
 
     private fun log(msg: String) {
         mainHandler.post {
             outputText.append("$msg\n")
 
-            // Limit to last 50 lines to keep UI responsive
+            // Keep last 100 lines
             val lines = outputText.text.toString().lines()
-            if (lines.size > 50) {
-                outputText.text = lines.takeLast(50).joinToString("\n")
+            if (lines.size > 100) {
+                outputText.text = lines.takeLast(100).joinToString("\n")
             }
 
-            scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+            scrollToBottom()
         }
         Log.d(TAG, msg)
     }
 
-    private fun clearLog() {
-        mainHandler.post {
-            outputText.text = ""
-        }
+    private fun scrollToBottom() {
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
-    private fun showProgress(show: Boolean) {
-        mainHandler.post {
-            progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    override fun onDestroy() {
+        super.onDestroy()
+        disconnect()
+        try {
+            unregisterReceiver(usbReceiver)
+        } catch (e: Exception) {
+            // Already unregistered
         }
-    }
-
-    private fun runOnUI(action: () -> Unit) {
-        mainHandler.post(action)
     }
 }
