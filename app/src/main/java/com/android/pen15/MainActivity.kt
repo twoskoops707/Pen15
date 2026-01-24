@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var btnSubghz: MaterialButton
     private lateinit var btnIbutton: MaterialButton
     private lateinit var btnIr: MaterialButton
+    private lateinit var btnStop: MaterialButton
+    private lateinit var btnClear: MaterialButton
 
     // USB
     private var usbManager: UsbManager? = null
@@ -103,7 +105,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
 
-        log("=== PEN15 v88 ===")
+        log("=== PEN15 v89 ===")
         log("Connect Flipper via USB-C OTG")
         log("")
     }
@@ -121,6 +123,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnSubghz = findViewById(R.id.btnSubghz)
         btnIbutton = findViewById(R.id.btnIbutton)
         btnIr = findViewById(R.id.btnIr)
+        btnStop = findViewById(R.id.btnStop)
+        btnClear = findViewById(R.id.btnClear)
     }
 
     private fun setupListeners() {
@@ -145,6 +149,28 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnSubghz.setOnClickListener { sendCommand("subghz rx") }
         btnIbutton.setOnClickListener { sendCommand("ikey read") }
         btnIr.setOnClickListener { sendCommand("ir rx") }
+
+        // Stop button - sends Ctrl+C to cancel running command
+        btnStop.setOnClickListener { sendCtrlC() }
+
+        // Clear terminal
+        btnClear.setOnClickListener { clearTerminal() }
+    }
+
+    private fun sendCtrlC() {
+        if (!connected) return
+        try {
+            // Send Ctrl+C (ASCII 0x03) to cancel running command
+            usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            log("[STOP]")
+        } catch (e: Exception) {
+            Log.e(TAG, "Stop error", e)
+        }
+    }
+
+    private fun clearTerminal() {
+        outputText.text = ""
+        log("Terminal cleared")
     }
 
     private fun registerUsbReceiver() {
@@ -334,6 +360,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnSubghz.isEnabled = connected
         btnIbutton.isEnabled = connected
         btnIr.isEnabled = connected
+        btnStop.isEnabled = connected
         btnSend.isEnabled = connected
         inputField.isEnabled = connected
     }
