@@ -34,8 +34,9 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v91 - Complete Flipper Zero + ESP32 Controller
+ * PEN15 v92 - Complete Flipper Zero + ESP32 Controller
  * Features: USB Serial, BLE fallback, Auto-reconnect, Command History, ESP32/Marauder
+ * FIXED: Correct Flipper CLI commands based on official docs
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -166,10 +167,11 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v91 ===")
+        log("=== PEN15 v93 ===")
         log("Flipper Zero + ESP32 Controller")
+        log("Fixed CLI commands")
         log("")
-        log("Connect via USB-C OTG or Bluetooth")
+        log("Connect via USB or Bluetooth")
     }
 
     private fun initViews() {
@@ -559,7 +561,22 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             if (clean.isNotBlank()) {
                 outputText.append(clean)
                 scrollToBottom()
+
+                // Detect sub-shell prompts and auto-exit
+                if (clean.contains("[nfc]>") || clean.contains("[rfid]>") ||
+                    clean.contains("[subghz]>") || clean.contains("[ir]>")) {
+                    log("[!] Sub-shell detected - sending exit")
+                    mainHandler.postDelayed({ sendRawCommand("exit") }, 200)
+                }
             }
+        }
+    }
+
+    private fun sendRawCommand(cmd: String) {
+        try {
+            usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
+        } catch (e: Exception) {
+            Log.e(TAG, "sendRaw error", e)
         }
     }
 
@@ -670,45 +687,47 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     // ==================
 
     private fun showRfidMenu() {
-        val options = arrayOf("Read Card", "Emulate Last", "Brute Force", "List Saved")
+        val options = arrayOf("Read Card", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("RFID (125kHz)")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> sendCommand("rfid read")
-                    1 -> sendCommand("rfid emulate")
-                    2 -> sendCommand("rfid brute")
-                    3 -> sendCommand("storage list /ext/lfrfid")
+                    1 -> sendCommand("storage list /ext/lfrfid")
+                    2 -> sendCommand("rfid")
                 }
             }.show()
     }
 
     private fun showNfcMenu() {
-        val options = arrayOf("Detect Card", "Read Full", "Emulate Last", "MFKey32", "List Saved")
+        // NOTE: Most NFC functions are GUI-only on Flipper
+        // CLI has limited NFC support
+        val options = arrayOf("Activate Field", "Scanner", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("NFC (13.56MHz)")
+            .setMessage("Note: Full NFC read/write requires Flipper screen")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("nfc detect")
-                    1 -> sendCommand("nfc read")
-                    2 -> sendCommand("nfc emulate")
-                    3 -> sendCommand("nfc mfkey32")
-                    4 -> sendCommand("storage list /ext/nfc")
+                    0 -> sendCommand("nfc field")
+                    1 -> sendCommand("nfc scanner")
+                    2 -> sendCommand("storage list /ext/nfc")
+                    3 -> sendCommand("nfc")
                 }
             }.show()
     }
 
     private fun showSubghzMenu() {
-        val options = arrayOf("RX (Listen)", "TX Last", "Frequency Analyzer", "Choose Frequency...", "List Saved")
+        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "Choose Frequency...", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Sub-GHz")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("subghz rx")
-                    1 -> sendCommand("subghz tx")
-                    2 -> sendCommand("subghz rx 433920000")
+                    0 -> sendCommand("subghz rx 433920000")
+                    1 -> sendCommand("subghz rx 315000000")
+                    2 -> sendCommand("subghz rx 868350000")
                     3 -> showFrequencyPicker()
                     4 -> sendCommand("storage list /ext/subghz")
+                    5 -> sendCommand("subghz")
                 }
             }.show()
     }
@@ -723,28 +742,27 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showIrMenu() {
-        val options = arrayOf("Receive Signal", "TX Last", "List Saved")
+        val options = arrayOf("Receive Signal", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Infrared")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> sendCommand("ir rx")
-                    1 -> sendCommand("ir tx")
-                    2 -> sendCommand("storage list /ext/infrared")
+                    1 -> sendCommand("storage list /ext/infrared")
+                    2 -> sendCommand("ir")
                 }
             }.show()
     }
 
     private fun showGpioMenu() {
-        val options = arrayOf("Enable 5V", "Enable 3.3V", "Disable Power", "GPIO Status")
+        val options = arrayOf("Enable OTG 5V", "Disable OTG 5V", "GPIO Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("GPIO")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("power 5v 1")
-                    1 -> sendCommand("power 3v3 1")
-                    2 -> sendCommand("power 5v 0")
-                    3 -> sendCommand("gpio")
+                    0 -> sendCommand("power ext 1")
+                    1 -> sendCommand("power ext 0")
+                    2 -> sendCommand("gpio")
                 }
             }.show()
     }
