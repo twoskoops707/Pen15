@@ -1,11 +1,17 @@
 package com.android.pen15
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
+import android.bluetooth.*
+import android.bluetooth.le.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import android.hardware.usb.UsbManager
@@ -13,72 +19,107 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.ParcelUuid
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
-import com.google.android.material.tabs.TabLayout
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
+import java.util.UUID
 
 /**
- * PEN15 v90 - Complete Flipper Zero Controller
- * USB Serial communication with Flipper Zero CLI
+ * PEN15 v91 - Complete Flipper Zero + ESP32 Controller
+ * Features: USB Serial, BLE fallback, Auto-reconnect, Command History, ESP32/Marauder
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     companion object {
         private const val TAG = "Pen15"
         private const val ACTION_USB_PERMISSION = "com.android.pen15.USB_PERMISSION"
+
+        // Flipper Zero USB
         private const val FLIPPER_VID = 0x0483
         private const val FLIPPER_PID = 0x5740
+
+        // ESP32 USB (common chips)
+        private const val ESP32_CP210X_VID = 0x10C4
+        private const val ESP32_CP210X_PID = 0xEA60
+        private const val ESP32_CH340_VID = 0x1A86
+        private const val ESP32_CH340_PID = 0x7523
+
+        // Serial settings
         private const val BAUD_RATE = 115200
         private const val WRITE_TIMEOUT = 200
+
+        // Flipper BLE
+        private val FLIPPER_SERVICE_UUID = UUID.fromString("8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000")
+        private val FLIPPER_RX_UUID = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e62fe0000")
+        private val FLIPPER_TX_UUID = UUID.fromString("19ed82ae-ed21-4c9d-4145-228e61fe0000")
+
+        private const val PREFS_NAME = "pen15_prefs"
+        private const val PREF_COMMAND_HISTORY = "command_history"
+        private const val MAX_HISTORY = 50
+        private const val RECONNECT_DELAY = 3000L
+        private const val MAX_RECONNECT_ATTEMPTS = 5
     }
 
-    // UI - Header
+    // Connection state
+    private enum class ConnectionType { NONE, USB_FLIPPER, USB_ESP32, BLE }
+    private var connectionType = ConnectionType.NONE
+    private var connected = false
+    private var autoReconnect = true
+    private var reconnectAttempts = 0
+
+    // UI
     private lateinit var statusChip: Chip
     private lateinit var deviceInfo: TextView
-
-    // UI - Terminal
     private lateinit var outputText: TextView
     private lateinit var scrollView: ScrollView
     private lateinit var inputField: EditText
     private lateinit var btnSend: MaterialButton
     private lateinit var btnStop: MaterialButton
     private lateinit var btnClear: MaterialButton
-
-    // UI - Connection
     private lateinit var btnConnect: MaterialButton
+    private lateinit var btnHistory: MaterialButton
 
-    // UI - Tool Buttons (Row 1: RFID, NFC, SubGHz, IR)
+    // Tool buttons
     private lateinit var btnRfid: MaterialButton
     private lateinit var btnNfc: MaterialButton
     private lateinit var btnSubghz: MaterialButton
     private lateinit var btnIr: MaterialButton
-
-    // UI - Tool Buttons (Row 2: iButton, GPIO, BadUSB, Storage)
     private lateinit var btnIbutton: MaterialButton
     private lateinit var btnGpio: MaterialButton
     private lateinit var btnBadusb: MaterialButton
     private lateinit var btnStorage: MaterialButton
-
-    // UI - Quick Actions
     private lateinit var btnInfo: MaterialButton
-    private lateinit var btnReboot: MaterialButton
+    private lateinit var btnWifi: MaterialButton  // ESP32/Marauder
 
     // USB
     private var usbManager: UsbManager? = null
     private var usbConnection: UsbDeviceConnection? = null
     private var usbSerialPort: UsbSerialPort? = null
     private var ioManager: SerialInputOutputManager? = null
-    private var connected = false
+
+    // BLE
+    private var bluetoothAdapter: BluetoothAdapter? = null
+    private var bleScanner: BluetoothLeScanner? = null
+    private var bluetoothGatt: BluetoothGatt? = null
+    private var txCharacteristic: BluetoothGattCharacteristic? = null
+    private var rxCharacteristic: BluetoothGattCharacteristic? = null
+
+    // Command history
+    private lateinit var prefs: SharedPreferences
+    private val commandHistory = mutableListOf<String>()
+
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    // SubGHz frequencies (common)
+    // SubGHz frequencies
     private val subghzFrequencies = arrayOf(
         "315.00 MHz" to "315000000",
         "433.92 MHz" to "433920000",
@@ -90,23 +131,22 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 ACTION_USB_PERMISSION -> {
-                    synchronized(this) {
-                        val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                        }
-                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                            device?.let { connectToDevice(it) }
-                        } else {
-                            log("USB permission denied")
-                        }
+                    val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE, UsbDevice::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
+                    }
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        device?.let { connectUSB(it) }
+                    } else {
+                        log("USB permission denied")
                     }
                 }
                 UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                    log("USB device detached")
+                    log("USB detached")
                     disconnect()
+                    if (autoReconnect) scheduleReconnect()
                 }
             }
         }
@@ -116,212 +156,95 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_v3)
 
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        loadCommandHistory()
+
         initViews()
         setupListeners()
         registerUsbReceiver()
 
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
+        bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v90 ===")
-        log("Flipper Zero Controller")
+        log("=== PEN15 v91 ===")
+        log("Flipper Zero + ESP32 Controller")
         log("")
-        log("Connect Flipper via USB-C OTG")
-        log("Then tap CONNECT")
+        log("Connect via USB-C OTG or Bluetooth")
     }
 
     private fun initViews() {
-        // Header
         statusChip = findViewById(R.id.statusChip)
         deviceInfo = findViewById(R.id.deviceInfo)
-
-        // Terminal
         outputText = findViewById(R.id.outputText)
         scrollView = findViewById(R.id.scrollView)
         inputField = findViewById(R.id.inputField)
         btnSend = findViewById(R.id.btnSend)
         btnStop = findViewById(R.id.btnStop)
         btnClear = findViewById(R.id.btnClear)
-
-        // Connection
         btnConnect = findViewById(R.id.btnConnect)
+        btnHistory = findViewById(R.id.btnHistory)
 
-        // Tool Row 1
         btnRfid = findViewById(R.id.btnRfid)
         btnNfc = findViewById(R.id.btnNfc)
         btnSubghz = findViewById(R.id.btnSubghz)
         btnIr = findViewById(R.id.btnIr)
-
-        // Tool Row 2
         btnIbutton = findViewById(R.id.btnIbutton)
         btnGpio = findViewById(R.id.btnGpio)
         btnBadusb = findViewById(R.id.btnBadusb)
         btnStorage = findViewById(R.id.btnStorage)
-
-        // Quick Actions
         btnInfo = findViewById(R.id.btnInfo)
-        btnReboot = findViewById(R.id.btnReboot)
+        btnWifi = findViewById(R.id.btnWifi)
     }
 
     private fun setupListeners() {
-        // Connection
         btnConnect.setOnClickListener {
-            if (connected) disconnect() else scanAndConnect()
+            if (connected) disconnect() else showConnectionMenu()
         }
 
-        // Terminal controls
         btnSend.setOnClickListener {
             val cmd = inputField.text.toString().trim()
             if (cmd.isNotEmpty()) {
                 sendCommand(cmd)
+                addToHistory(cmd)
                 inputField.text.clear()
             }
         }
+
         btnStop.setOnClickListener { sendCtrlC() }
         btnClear.setOnClickListener { clearTerminal() }
+        btnHistory.setOnClickListener { showHistoryMenu() }
 
-        // Row 1 tools
+        // Flipper tools
         btnRfid.setOnClickListener { showRfidMenu() }
         btnNfc.setOnClickListener { showNfcMenu() }
         btnSubghz.setOnClickListener { showSubghzMenu() }
         btnIr.setOnClickListener { showIrMenu() }
-
-        // Row 2 tools
         btnIbutton.setOnClickListener { sendCommand("ikey read") }
         btnGpio.setOnClickListener { showGpioMenu() }
         btnBadusb.setOnClickListener { showBadusbMenu() }
         btnStorage.setOnClickListener { showStorageMenu() }
-
-        // Quick Actions
         btnInfo.setOnClickListener { sendCommand("device_info") }
-        btnReboot.setOnClickListener { confirmReboot() }
+
+        // ESP32/Marauder WiFi
+        btnWifi.setOnClickListener { showWifiMenu() }
     }
 
     // ==================
-    // TOOL MENUS
+    // CONNECTION MENU
     // ==================
 
-    private fun showRfidMenu() {
-        val options = arrayOf("Read Card", "Emulate Last", "List Saved")
+    private fun showConnectionMenu() {
+        val options = arrayOf("USB (Auto-detect)", "USB Flipper Only", "USB ESP32 Only", "Bluetooth (Flipper)")
         AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("RFID (125kHz)")
+            .setTitle("Connect via")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("rfid read")
-                    1 -> sendCommand("rfid emulate")
-                    2 -> sendCommand("storage list /ext/lfrfid")
+                    0 -> scanAndConnectUSB(null)
+                    1 -> scanAndConnectUSB(FLIPPER_VID)
+                    2 -> scanAndConnectUSB(ESP32_CP210X_VID)
+                    3 -> connectBLE()
                 }
             }.show()
-    }
-
-    private fun showNfcMenu() {
-        val options = arrayOf("Detect Card", "Read Full", "Emulate Last", "MFKey32", "List Saved")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("NFC (13.56MHz)")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("nfc detect")
-                    1 -> sendCommand("nfc read")
-                    2 -> sendCommand("nfc emulate")
-                    3 -> sendCommand("nfc mfkey32")
-                    4 -> sendCommand("storage list /ext/nfc")
-                }
-            }.show()
-    }
-
-    private fun showSubghzMenu() {
-        val options = arrayOf("RX (Listen)", "TX Last Signal", "Frequency Analyzer", "Choose Frequency...", "List Saved")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("Sub-GHz")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("subghz rx")
-                    1 -> sendCommand("subghz tx")
-                    2 -> sendCommand("subghz rx 433920000") // Common freq
-                    3 -> showFrequencyPicker()
-                    4 -> sendCommand("storage list /ext/subghz")
-                }
-            }.show()
-    }
-
-    private fun showFrequencyPicker() {
-        val freqNames = subghzFrequencies.map { it.first }.toTypedArray()
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("Select Frequency")
-            .setItems(freqNames) { _, which ->
-                val freq = subghzFrequencies[which].second
-                sendCommand("subghz rx $freq")
-            }.show()
-    }
-
-    private fun showIrMenu() {
-        val options = arrayOf("Receive Signal", "TX Last", "Universal Remote", "List Saved")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("Infrared")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("ir rx")
-                    1 -> sendCommand("ir tx")
-                    2 -> sendCommand("storage list /ext/infrared")
-                    3 -> sendCommand("storage list /ext/infrared")
-                }
-            }.show()
-    }
-
-    private fun showGpioMenu() {
-        val options = arrayOf("Enable 5V", "Enable 3.3V", "Disable Power", "GPIO Status")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("GPIO")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("power 5v 1")
-                    1 -> sendCommand("power 3v3 1")
-                    2 -> sendCommand("power 5v 0")
-                    3 -> sendCommand("gpio")
-                }
-            }.show()
-    }
-
-    private fun showBadusbMenu() {
-        val options = arrayOf("List Payloads", "Run Last", "Demo Script")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("BadUSB")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("storage list /ext/badusb")
-                    1 -> {
-                        log("BadUSB requires GUI interaction")
-                        log("Use Flipper screen to run payloads")
-                    }
-                    2 -> sendCommand("storage read /ext/badusb/demo.txt")
-                }
-            }.show()
-    }
-
-    private fun showStorageMenu() {
-        val options = arrayOf("SD Card Root", "Saved RFID", "Saved NFC", "Saved SubGHz", "Saved IR", "Free Space")
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("Storage")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> sendCommand("storage list /ext")
-                    1 -> sendCommand("storage list /ext/lfrfid")
-                    2 -> sendCommand("storage list /ext/nfc")
-                    3 -> sendCommand("storage list /ext/subghz")
-                    4 -> sendCommand("storage list /ext/infrared")
-                    5 -> sendCommand("storage info /ext")
-                }
-            }.show()
-    }
-
-    private fun confirmReboot() {
-        AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("Reboot Flipper?")
-            .setMessage("This will restart the Flipper Zero.")
-            .setPositiveButton("Reboot") { _, _ ->
-                sendCommand("power reboot")
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 
     // ==================
@@ -340,29 +263,41 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         }
     }
 
-    private fun scanAndConnect() {
+    private fun scanAndConnectUSB(filterVid: Int?) {
         log("Scanning USB...")
+        reconnectAttempts = 0
 
         val manager = usbManager ?: return
         val drivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager)
 
         if (drivers.isEmpty()) {
-            log("No USB serial devices")
+            log("No USB serial devices found")
             manager.deviceList.forEach { (_, device) ->
-                log("  VID=${String.format("0x%04X", device.vendorId)} PID=${String.format("0x%04X", device.productId)}")
+                log("  Raw: VID=0x${device.vendorId.toString(16)} PID=0x${device.productId.toString(16)}")
             }
             return
         }
 
-        val driver = drivers.find {
-            it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID
-        } ?: drivers[0]
+        // Find matching device
+        val driver = if (filterVid != null) {
+            drivers.find { it.device.vendorId == filterVid }
+        } else {
+            // Priority: Flipper > ESP32
+            drivers.find { it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID }
+                ?: drivers.find { it.device.vendorId == ESP32_CP210X_VID || it.device.vendorId == ESP32_CH340_VID }
+                ?: drivers[0]
+        }
+
+        if (driver == null) {
+            log("No matching device found")
+            return
+        }
 
         val device = driver.device
-        log("Found: ${device.productName ?: "Serial Device"}")
+        log("Found: ${device.productName ?: "USB Device"}")
 
         if (manager.hasPermission(device)) {
-            connectToDevice(device)
+            connectUSB(device)
         } else {
             log("Requesting permission...")
             val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
@@ -371,8 +306,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         }
     }
 
-    private fun connectToDevice(device: UsbDevice) {
-        log("Connecting...")
+    private fun connectUSB(device: UsbDevice) {
+        log("Connecting USB...")
         try {
             val manager = usbManager ?: throw Exception("USB Manager null")
             val driver = UsbSerialProber.getDefaultProber().probeDevice(device)
@@ -388,24 +323,202 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             ioManager = SerialInputOutputManager(usbSerialPort, this)
             ioManager?.start()
 
+            // Determine device type
+            connectionType = when {
+                device.vendorId == FLIPPER_VID -> ConnectionType.USB_FLIPPER
+                device.vendorId == ESP32_CP210X_VID || device.vendorId == ESP32_CH340_VID -> ConnectionType.USB_ESP32
+                else -> ConnectionType.USB_FLIPPER
+            }
+
             connected = true
+            reconnectAttempts = 0
             updateUI()
 
             mainHandler.postDelayed({
                 usbSerialPort?.write("\r\n".toByteArray(), WRITE_TIMEOUT)
             }, 100)
 
-            log("Connected! Baud: $BAUD_RATE")
+            val deviceName = if (connectionType == ConnectionType.USB_ESP32) "ESP32/Marauder" else "Flipper Zero"
+            log("Connected: $deviceName @ $BAUD_RATE baud")
 
         } catch (e: Exception) {
-            Log.e(TAG, "Connection error", e)
+            Log.e(TAG, "USB connection error", e)
             log("ERROR: ${e.message}")
             disconnect()
         }
     }
 
+    // ==================
+    // BLUETOOTH CONNECTION
+    // ==================
+
+    @SuppressLint("MissingPermission")
+    private fun connectBLE() {
+        if (!hasBluetoothPermissions()) {
+            requestBluetoothPermissions()
+            return
+        }
+
+        log("Scanning for Flipper BLE...")
+
+        bleScanner = bluetoothAdapter?.bluetoothLeScanner
+        if (bleScanner == null) {
+            log("BLE not available")
+            return
+        }
+
+        val scanFilter = ScanFilter.Builder()
+            .setServiceUuid(ParcelUuid(FLIPPER_SERVICE_UUID))
+            .build()
+
+        val scanSettings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        bleScanner?.startScan(listOf(scanFilter), scanSettings, bleScanCallback)
+
+        // Stop scan after 10 seconds
+        mainHandler.postDelayed({
+            bleScanner?.stopScan(bleScanCallback)
+            if (!connected) {
+                log("No Flipper found via BLE")
+            }
+        }, 10000)
+    }
+
+    private val bleScanCallback = object : ScanCallback() {
+        @SuppressLint("MissingPermission")
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            bleScanner?.stopScan(this)
+            log("Found Flipper: ${result.device.name ?: result.device.address}")
+            connectGatt(result.device)
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            log("BLE scan failed: $errorCode")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun connectGatt(device: BluetoothDevice) {
+        log("Connecting BLE...")
+        bluetoothGatt = device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+    }
+
+    private val gattCallback = object : BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            when (newState) {
+                BluetoothProfile.STATE_CONNECTED -> {
+                    log("BLE connected, discovering services...")
+                    gatt.discoverServices()
+                }
+                BluetoothProfile.STATE_DISCONNECTED -> {
+                    mainHandler.post {
+                        log("BLE disconnected")
+                        disconnect()
+                        if (autoReconnect) scheduleReconnect()
+                    }
+                }
+            }
+        }
+
+        @SuppressLint("MissingPermission")
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                log("Service discovery failed")
+                return
+            }
+
+            val service = gatt.getService(FLIPPER_SERVICE_UUID)
+            if (service == null) {
+                log("Flipper service not found")
+                return
+            }
+
+            txCharacteristic = service.getCharacteristic(FLIPPER_TX_UUID)
+            rxCharacteristic = service.getCharacteristic(FLIPPER_RX_UUID)
+
+            // Enable notifications on RX
+            rxCharacteristic?.let { rx ->
+                gatt.setCharacteristicNotification(rx, true)
+                val descriptor = rx.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+                descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                gatt.writeDescriptor(descriptor)
+            }
+
+            mainHandler.post {
+                connectionType = ConnectionType.BLE
+                connected = true
+                reconnectAttempts = 0
+                updateUI()
+                log("BLE ready! Flipper connected")
+            }
+        }
+
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+            if (characteristic.uuid == FLIPPER_RX_UUID) {
+                val data = characteristic.value
+                mainHandler.post {
+                    val text = String(data).replace("\r\n", "\n").replace("\r", "")
+                    if (text.isNotBlank()) {
+                        outputText.append(text)
+                        scrollToBottom()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun hasBluetoothPermissions(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun requestBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), 100)
+        } else {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+        }
+    }
+
+    // ==================
+    // AUTO-RECONNECT
+    // ==================
+
+    private fun scheduleReconnect() {
+        if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+            log("Max reconnect attempts reached")
+            return
+        }
+
+        reconnectAttempts++
+        log("Reconnecting in ${RECONNECT_DELAY/1000}s (attempt $reconnectAttempts/$MAX_RECONNECT_ATTEMPTS)...")
+
+        mainHandler.postDelayed({
+            if (!connected && autoReconnect) {
+                scanAndConnectUSB(null)
+            }
+        }, RECONNECT_DELAY)
+    }
+
+    // ==================
+    // DISCONNECT
+    // ==================
+
+    @SuppressLint("MissingPermission")
     private fun disconnect() {
         connected = false
+        connectionType = ConnectionType.NONE
+
+        // USB cleanup
         ioManager?.listener = null
         ioManager?.stop()
         ioManager = null
@@ -419,6 +532,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
         try { usbConnection?.close() } catch (e: Exception) { }
         usbConnection = null
+
+        // BLE cleanup
+        try {
+            bluetoothGatt?.disconnect()
+            bluetoothGatt?.close()
+        } catch (e: Exception) { }
+        bluetoothGatt = null
+        txCharacteristic = null
+        rxCharacteristic = null
 
         updateUI()
         log("Disconnected")
@@ -446,17 +568,31 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         mainHandler.post {
             log("IO Error: ${e.message}")
             disconnect()
+            if (autoReconnect) scheduleReconnect()
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun sendCommand(cmd: String) {
         if (!connected) {
             log("Not connected!")
             return
         }
         log("> $cmd")
+
         try {
-            usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
+            when (connectionType) {
+                ConnectionType.USB_FLIPPER, ConnectionType.USB_ESP32 -> {
+                    usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
+                }
+                ConnectionType.BLE -> {
+                    txCharacteristic?.let { tx ->
+                        tx.value = "$cmd\r".toByteArray()
+                        bluetoothGatt?.writeCharacteristic(tx)
+                    }
+                }
+                else -> log("No connection")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Send error", e)
             log("Send error: ${e.message}")
@@ -466,15 +602,221 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private fun sendCtrlC() {
         if (!connected) return
         try {
-            usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            when (connectionType) {
+                ConnectionType.USB_FLIPPER, ConnectionType.USB_ESP32 -> {
+                    usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+                }
+                ConnectionType.BLE -> {
+                    txCharacteristic?.let { tx ->
+                        tx.value = byteArrayOf(0x03)
+                        bluetoothGatt?.writeCharacteristic(tx)
+                    }
+                }
+                else -> {}
+            }
             log("[STOP]")
         } catch (e: Exception) {
             Log.e(TAG, "Stop error", e)
         }
     }
 
-    private fun clearTerminal() {
-        outputText.text = ""
+    // ==================
+    // COMMAND HISTORY
+    // ==================
+
+    private fun loadCommandHistory() {
+        val saved = prefs.getString(PREF_COMMAND_HISTORY, "") ?: ""
+        commandHistory.clear()
+        if (saved.isNotEmpty()) {
+            commandHistory.addAll(saved.split("\n").filter { it.isNotBlank() })
+        }
+    }
+
+    private fun saveCommandHistory() {
+        prefs.edit().putString(PREF_COMMAND_HISTORY, commandHistory.joinToString("\n")).apply()
+    }
+
+    private fun addToHistory(cmd: String) {
+        commandHistory.remove(cmd) // Remove duplicate
+        commandHistory.add(0, cmd) // Add to front
+        if (commandHistory.size > MAX_HISTORY) {
+            commandHistory.removeAt(commandHistory.size - 1)
+        }
+        saveCommandHistory()
+    }
+
+    private fun showHistoryMenu() {
+        if (commandHistory.isEmpty()) {
+            log("No command history")
+            return
+        }
+
+        val items = commandHistory.take(20).toTypedArray()
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Command History")
+            .setItems(items) { _, which ->
+                inputField.setText(items[which])
+            }
+            .setNegativeButton("Clear All") { _, _ ->
+                commandHistory.clear()
+                saveCommandHistory()
+                log("History cleared")
+            }
+            .show()
+    }
+
+    // ==================
+    // TOOL MENUS
+    // ==================
+
+    private fun showRfidMenu() {
+        val options = arrayOf("Read Card", "Emulate Last", "Brute Force", "List Saved")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("RFID (125kHz)")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("rfid read")
+                    1 -> sendCommand("rfid emulate")
+                    2 -> sendCommand("rfid brute")
+                    3 -> sendCommand("storage list /ext/lfrfid")
+                }
+            }.show()
+    }
+
+    private fun showNfcMenu() {
+        val options = arrayOf("Detect Card", "Read Full", "Emulate Last", "MFKey32", "List Saved")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("NFC (13.56MHz)")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("nfc detect")
+                    1 -> sendCommand("nfc read")
+                    2 -> sendCommand("nfc emulate")
+                    3 -> sendCommand("nfc mfkey32")
+                    4 -> sendCommand("storage list /ext/nfc")
+                }
+            }.show()
+    }
+
+    private fun showSubghzMenu() {
+        val options = arrayOf("RX (Listen)", "TX Last", "Frequency Analyzer", "Choose Frequency...", "List Saved")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Sub-GHz")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("subghz rx")
+                    1 -> sendCommand("subghz tx")
+                    2 -> sendCommand("subghz rx 433920000")
+                    3 -> showFrequencyPicker()
+                    4 -> sendCommand("storage list /ext/subghz")
+                }
+            }.show()
+    }
+
+    private fun showFrequencyPicker() {
+        val freqNames = subghzFrequencies.map { it.first }.toTypedArray()
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Select Frequency")
+            .setItems(freqNames) { _, which ->
+                sendCommand("subghz rx ${subghzFrequencies[which].second}")
+            }.show()
+    }
+
+    private fun showIrMenu() {
+        val options = arrayOf("Receive Signal", "TX Last", "List Saved")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Infrared")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("ir rx")
+                    1 -> sendCommand("ir tx")
+                    2 -> sendCommand("storage list /ext/infrared")
+                }
+            }.show()
+    }
+
+    private fun showGpioMenu() {
+        val options = arrayOf("Enable 5V", "Enable 3.3V", "Disable Power", "GPIO Status")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("GPIO")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("power 5v 1")
+                    1 -> sendCommand("power 3v3 1")
+                    2 -> sendCommand("power 5v 0")
+                    3 -> sendCommand("gpio")
+                }
+            }.show()
+    }
+
+    private fun showBadusbMenu() {
+        val options = arrayOf("List Payloads", "Demo Script")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("BadUSB")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("storage list /ext/badusb")
+                    1 -> sendCommand("storage read /ext/badusb/demo.txt")
+                }
+            }.show()
+    }
+
+    private fun showStorageMenu() {
+        val options = arrayOf("SD Root", "RFID", "NFC", "SubGHz", "IR", "Free Space")
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Storage")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("storage list /ext")
+                    1 -> sendCommand("storage list /ext/lfrfid")
+                    2 -> sendCommand("storage list /ext/nfc")
+                    3 -> sendCommand("storage list /ext/subghz")
+                    4 -> sendCommand("storage list /ext/infrared")
+                    5 -> sendCommand("storage info /ext")
+                }
+            }.show()
+    }
+
+    // ==================
+    // ESP32/MARAUDER WIFI MENU
+    // ==================
+
+    private fun showWifiMenu() {
+        if (connectionType != ConnectionType.USB_ESP32) {
+            // Show Flipper GPIO passthrough options
+            val options = arrayOf("Enable GPIO UART", "Scan Networks (via Marauder)", "Sniff Packets", "Deauth Attack", "List Captures")
+            AlertDialog.Builder(this, R.style.DarkDialog)
+                .setTitle("WiFi (Flipper GPIO)")
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> {
+                            sendCommand("gpio set 13 1") // TX
+                            sendCommand("gpio set 14 1") // RX
+                            log("GPIO UART enabled for ESP32")
+                        }
+                        1 -> sendCommand("scanap")
+                        2 -> sendCommand("sniffpmkid")
+                        3 -> log("Select target first with scanap")
+                        4 -> sendCommand("storage list /ext/marauder")
+                    }
+                }.show()
+        } else {
+            // Direct ESP32/Marauder commands
+            val options = arrayOf("Scan APs", "Scan Stations", "Sniff PMKID", "Sniff Beacon", "Deauth", "Stop All", "List Captures")
+            AlertDialog.Builder(this, R.style.DarkDialog)
+                .setTitle("ESP32 Marauder")
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> sendCommand("scanap")
+                        1 -> sendCommand("scansta")
+                        2 -> sendCommand("sniffpmkid")
+                        3 -> sendCommand("sniffbeacon")
+                        4 -> sendCommand("attack -t deauth")
+                        5 -> sendCommand("stopscan")
+                        6 -> sendCommand("list -p")
+                    }
+                }.show()
+        }
     }
 
     // ==================
@@ -485,17 +827,32 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnConnect.text = if (connected) "DISCONNECT" else "CONNECT"
         btnConnect.setBackgroundColor(getColor(if (connected) R.color.red else R.color.blue))
 
-        statusChip.text = if (connected) "ONLINE" else "OFFLINE"
+        val statusText = when (connectionType) {
+            ConnectionType.USB_FLIPPER -> "FLIPPER"
+            ConnectionType.USB_ESP32 -> "ESP32"
+            ConnectionType.BLE -> "BLE"
+            else -> "OFFLINE"
+        }
+        statusChip.text = statusText
         statusChip.setChipBackgroundColorResource(if (connected) R.color.chip_connected else R.color.chip_offline)
 
-        deviceInfo.text = if (connected) "Flipper Zero @ $BAUD_RATE baud" else "No device connected"
+        deviceInfo.text = when (connectionType) {
+            ConnectionType.USB_FLIPPER -> "Flipper Zero @ $BAUD_RATE baud (USB)"
+            ConnectionType.USB_ESP32 -> "ESP32/Marauder @ $BAUD_RATE baud (USB)"
+            ConnectionType.BLE -> "Flipper Zero (Bluetooth)"
+            else -> "No device connected"
+        }
 
-        val toolButtons = listOf(btnRfid, btnNfc, btnSubghz, btnIr, btnIbutton, btnGpio, btnBadusb, btnStorage, btnInfo, btnReboot)
+        val toolButtons = listOf(btnRfid, btnNfc, btnSubghz, btnIr, btnIbutton, btnGpio, btnBadusb, btnStorage, btnInfo, btnWifi)
         toolButtons.forEach { it.isEnabled = connected }
 
         btnStop.isEnabled = connected
         btnSend.isEnabled = connected
         inputField.isEnabled = connected
+    }
+
+    private fun clearTerminal() {
+        outputText.text = ""
     }
 
     private fun log(msg: String) {
@@ -514,8 +871,10 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onDestroy() {
         super.onDestroy()
+        autoReconnect = false
         disconnect()
         try { unregisterReceiver(usbReceiver) } catch (e: Exception) { }
     }

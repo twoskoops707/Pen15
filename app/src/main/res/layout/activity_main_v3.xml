@@ -172,6 +172,18 @@
                     android:enabled="false"/>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnHistory"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="H"
+                    android:textSize="12sp"
+                    app:backgroundTint="#27272A"
+                    app:cornerRadius="8dp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="0dp"/>
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSend"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
@@ -263,7 +275,7 @@
                 app:backgroundTint="#1A1A1F"/>
         </LinearLayout>
 
-        <!-- Row 3: Info, Reboot -->
+        <!-- Row 3: WiFi, Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -271,18 +283,18 @@
             android:layout_marginTop="6dp">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInfo"
+                android:id="@+id/btnWifi"
                 style="@style/ToolButton"
-                android:text="Device Info"
-                android:textColor="#6B7280"
-                app:backgroundTint="#1A1A1F"/>
+                android:text="WiFi"
+                android:textColor="#22D3EE"
+                app:backgroundTint="#0D1820"/>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnReboot"
+                android:id="@+id/btnInfo"
                 style="@style/ToolButton"
-                android:text="Reboot"
-                android:textColor="#EF4444"
-                app:backgroundTint="#1C0A0A"/>
+                android:text="Info"
+                android:textColor="#6B7280"
+                app:backgroundTint="#1A1A1F"/>
         </LinearLayout>
     </LinearLayout>
 
