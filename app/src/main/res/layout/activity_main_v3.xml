@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0A0A0F">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#0F0F14">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PEN15"
+            android:textSize="22sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/statusChip"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="OFFLINE"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            app:chipBackgroundColor="@color/chip_offline"
+            app:chipCornerRadius="14dp"
+            app:chipMinHeight="28dp"/>
+    </LinearLayout>
+
+    <!-- Device Info -->
+    <TextView
+        android:id="@+id/deviceInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No device connected"
+        android:textSize="12sp"
+        android:textColor="#6B7280"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:background="#0F0F14"/>
+
+    <!-- Connect Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConnect"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:text="CONNECT"
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:backgroundTint="@color/blue"
+        app:cornerRadius="12dp"/>
+
+    <!-- Terminal -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="12dp"
+        app:cardBackgroundColor="#111116"
+        app:cardCornerRadius="12dp"
+        app:strokeColor="#1F1F28"
+        app:strokeWidth="1dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Terminal Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:background="#0D0D12">
+
+                <View
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:background="@drawable/dot_green"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Terminal"
+                    android:textSize="11sp"
+                    android:textColor="#6B7280"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStop"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:text="STOP"
+                    android:textSize="10sp"
+                    android:textColor="#EF4444"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="8dp"
+                    android:enabled="false"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnClear"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:text="CLEAR"
+                    android:textSize="10sp"
+                    android:textColor="#6B7280"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="8dp"/>
+            </LinearLayout>
+
+            <!-- Output -->
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/outputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp"
+                    android:lineSpacingExtra="3dp"
+                    android:textIsSelectable="true"/>
+            </ScrollView>
+
+            <!-- Input -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:background="#0D0D12">
+
+                <EditText
+                    android:id="@+id/inputField"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/input_bg"
+                    android:hint="Command..."
+                    android:textColorHint="#4B5563"
+                    android:textColor="#E5E7EB"
+                    android:textSize="13sp"
+                    android:paddingHorizontal="12dp"
+                    android:fontFamily="monospace"
+                    android:inputType="text"
+                    android:imeOptions="actionSend"
+                    android:enabled="false"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="SEND"
+                    android:textSize="12sp"
+                    app:backgroundTint="#374151"
+                    app:cornerRadius="8dp"
+                    android:enabled="false"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Tools Grid -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="8dp">
+
+        <!-- Row 1: RFID, NFC, SubGHz, IR -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRfid"
+                style="@style/ToolButton"
+                android:text="RFID"
+                android:textColor="#FB923C"
+                app:backgroundTint="#1C1510"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNfc"
+                style="@style/ToolButton"
+                android:text="NFC"
+                android:textColor="#34D399"
+                app:backgroundTint="#0D1816"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSubghz"
+                style="@style/ToolButton"
+                android:text="SubGHz"
+                android:textColor="#A78BFA"
+                app:backgroundTint="#16101C"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnIr"
+                style="@style/ToolButton"
+                android:text="IR"
+                android:textColor="#EC4899"
+                app:backgroundTint="#1C0D14"/>
+        </LinearLayout>
+
+        <!-- Row 2: iButton, GPIO, BadUSB, Storage -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnIbutton"
+                style="@style/ToolButton"
+                android:text="iButton"
+                android:textColor="#14B8A6"
+                app:backgroundTint="#0D1816"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGpio"
+                style="@style/ToolButton"
+                android:text="GPIO"
+                android:textColor="#60A5FA"
+                app:backgroundTint="#0D1420"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBadusb"
+                style="@style/ToolButton"
+                android:text="BadUSB"
+                android:textColor="#F87171"
+                app:backgroundTint="#1C0D0D"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStorage"
+                style="@style/ToolButton"
+                android:text="Files"
+                android:textColor="#9CA3AF"
+                app:backgroundTint="#1A1A1F"/>
+        </LinearLayout>
+
+        <!-- Row 3: Info, Reboot -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInfo"
+                style="@style/ToolButton"
+                android:text="Device Info"
+                android:textColor="#6B7280"
+                app:backgroundTint="#1A1A1F"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReboot"
+                style="@style/ToolButton"
+                android:text="Reboot"
+                android:textColor="#EF4444"
+                app:backgroundTint="#1C0A0A"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
