@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
             // CRITICAL: Use executor NOT .start() - per CLAUDE.md
             ioManager = SerialInputOutputManager(usbSerialPort, this)
-            ioExecutor.execute(ioManager!!)
+            ioExecutor.execute(ioManager as Runnable)
 
             // Determine device type
             connectionType = when {
