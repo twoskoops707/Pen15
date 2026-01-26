@@ -32,11 +32,12 @@ import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
+import java.util.concurrent.Executors
 
 /**
- * PEN15 v98 - Flipper Zero + ESP32 Controller
- * Fixed: Removed sub-shell commands that break CLI
- * Uses one-shot commands only (no interactive shells)
+ * PEN15 v99 - Flipper Zero + ESP32 Controller
+ * Fixed: SerialInputOutputManager uses executor (not .start())
+ * This is CRITICAL for receiving data from Flipper
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private var usbConnection: UsbDeviceConnection? = null
     private var usbSerialPort: UsbSerialPort? = null
     private var ioManager: SerialInputOutputManager? = null
+    private val ioExecutor = Executors.newSingleThreadExecutor()
 
     // BLE
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -167,7 +169,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v98 ===")
+        log("=== PEN15 v99 ===")
         log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
@@ -320,8 +322,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             usbSerialPort?.dtr = true
             usbSerialPort?.rts = true
 
+            // CRITICAL: Use executor.submit(run) NOT .start() - per CLAUDE.md
             ioManager = SerialInputOutputManager(usbSerialPort, this)
-            ioManager?.start()
+            ioExecutor.submit { ioManager?.run() }
 
             // Determine device type
             connectionType = when {
@@ -877,6 +880,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         super.onDestroy()
         autoReconnect = false
         disconnect()
+        ioExecutor.shutdownNow()
         try { unregisterReceiver(usbReceiver) } catch (e: Exception) { }
     }
 }
