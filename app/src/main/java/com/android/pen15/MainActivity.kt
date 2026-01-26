@@ -34,9 +34,9 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v94 - Complete Flipper Zero + ESP32 Controller
- * Features: USB Serial, BLE fallback, Auto-reconnect, Command History, ESP32/Marauder
- * FIXED: SubGHz rx requires device parameter (0=internal, 1=external CC1101)
+ * PEN15 v95 - Flipper Zero + ESP32 Controller
+ * USB Serial @ 115200, BLE fallback, Auto-reconnect, Command History
+ * SubGHz: subghz rx <freq> <device> (0=internal CC1101)
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -167,11 +167,10 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v94 ===")
-        log("Flipper Zero + ESP32 Controller")
-        log("SubGHz rx syntax fixed")
+        log("=== PEN15 v95 ===")
+        log("Flipper + ESP32 Controller")
         log("")
-        log("Connect via USB or Bluetooth")
+        log("Tap CONNECT to start")
     }
 
     private fun initViews() {
@@ -717,7 +716,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showSubghzMenu() {
-        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "RX 915MHz", "Choose Frequency...", "TX from file", "List Saved", "Help")
+        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "RX 915MHz", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Sub-GHz")
             .setItems(options) { _, which ->
@@ -726,10 +725,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                     1 -> sendCommand("subghz rx 315000000 0")
                     2 -> sendCommand("subghz rx 868350000 0")
                     3 -> sendCommand("subghz rx 915000000 0")
-                    4 -> showFrequencyPicker()
-                    5 -> sendCommand("storage list /ext/subghz")
-                    6 -> sendCommand("storage list /ext/subghz")
-                    7 -> sendCommand("subghz")
+                    4 -> sendCommand("storage list /ext/subghz")
+                    5 -> sendCommand("subghz")
                 }
             }.show()
     }
