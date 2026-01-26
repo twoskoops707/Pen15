@@ -34,9 +34,9 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v92 - Complete Flipper Zero + ESP32 Controller
+ * PEN15 v94 - Complete Flipper Zero + ESP32 Controller
  * Features: USB Serial, BLE fallback, Auto-reconnect, Command History, ESP32/Marauder
- * FIXED: Correct Flipper CLI commands based on official docs
+ * FIXED: SubGHz rx requires device parameter (0=internal, 1=external CC1101)
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -167,9 +167,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v93 ===")
+        log("=== PEN15 v94 ===")
         log("Flipper Zero + ESP32 Controller")
-        log("Fixed CLI commands")
+        log("SubGHz rx syntax fixed")
         log("")
         log("Connect via USB or Bluetooth")
     }
@@ -717,17 +717,19 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showSubghzMenu() {
-        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "Choose Frequency...", "List Saved", "Help")
+        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "RX 915MHz", "Choose Frequency...", "TX from file", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Sub-GHz")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("subghz rx 433920000")
-                    1 -> sendCommand("subghz rx 315000000")
-                    2 -> sendCommand("subghz rx 868350000")
-                    3 -> showFrequencyPicker()
-                    4 -> sendCommand("storage list /ext/subghz")
-                    5 -> sendCommand("subghz")
+                    0 -> sendCommand("subghz rx 433920000 0")
+                    1 -> sendCommand("subghz rx 315000000 0")
+                    2 -> sendCommand("subghz rx 868350000 0")
+                    3 -> sendCommand("subghz rx 915000000 0")
+                    4 -> showFrequencyPicker()
+                    5 -> sendCommand("storage list /ext/subghz")
+                    6 -> sendCommand("storage list /ext/subghz")
+                    7 -> sendCommand("subghz")
                 }
             }.show()
     }
@@ -737,7 +739,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Select Frequency")
             .setItems(freqNames) { _, which ->
-                sendCommand("subghz rx ${subghzFrequencies[which].second}")
+                // Device 0 = internal CC1101, 1 = external
+                sendCommand("subghz rx ${subghzFrequencies[which].second} 0")
             }.show()
     }
 
