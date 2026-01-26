@@ -34,8 +34,8 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v100 - Flipper Zero + ESP32 Controller
- * Back to .start() - the library handles its own threading
+ * PEN15 v103 - Flipper Zero + ESP32 Controller
+ * Proper CLI reset: Ctrl+C to stop, exit to escape sub-shells
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v102 ===")
+        log("=== PEN15 v103 ===")
         log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
@@ -334,16 +334,27 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             reconnectAttempts = 0
             updateUI()
 
-            // Exit any sub-shell and wake CLI
+            // Reset CLI: Ctrl+C to stop any process, then exit sub-shells
             mainHandler.postDelayed({
-                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
-            }, 200)
+                // Ctrl+C - stop any running command
+                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            }, 100)
             mainHandler.postDelayed({
+                // Ctrl+C again
+                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            }, 300)
+            mainHandler.postDelayed({
+                // Exit sub-shell (if in one)
                 usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
             }, 500)
             mainHandler.postDelayed({
+                // Exit again (might be nested)
+                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+            }, 700)
+            mainHandler.postDelayed({
+                // Final CR to get prompt
                 usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 800)
+            }, 900)
 
             val deviceName = if (connectionType == ConnectionType.USB_ESP32) "ESP32/Marauder" else "Flipper Zero"
             log("Connected: $deviceName @ $BAUD_RATE baud")
