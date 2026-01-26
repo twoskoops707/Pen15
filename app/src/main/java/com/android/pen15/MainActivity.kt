@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v101 ===")
+        log("=== PEN15 v102 ===")
         log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
@@ -334,16 +334,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             reconnectAttempts = 0
             updateUI()
 
-            // Wake up CLI - send multiple carriage returns
+            // Exit any sub-shell and wake CLI
             mainHandler.postDelayed({
-                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
+                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
             }, 200)
             mainHandler.postDelayed({
-                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 400)
+                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+            }, 500)
             mainHandler.postDelayed({
                 usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 600)
+            }, 800)
 
             val deviceName = if (connectionType == ConnectionType.USB_ESP32) "ESP32/Marauder" else "Flipper Zero"
             log("Connected: $deviceName @ $BAUD_RATE baud")
@@ -566,6 +566,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             if (clean.isNotBlank()) {
                 outputText.append(clean)
                 scrollToBottom()
+
+                // Auto-exit sub-shells
+                if (clean.contains("[nfc]>") || clean.contains("[subghz]>") ||
+                    clean.contains("[ir]>") || clean.contains("[lfrfid]>")) {
+                    log("[!] Exiting sub-shell...")
+                    mainHandler.postDelayed({
+                        try { usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT) } catch (e: Exception) {}
+                    }, 100)
+                }
             }
         }
     }
