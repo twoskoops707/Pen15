@@ -34,9 +34,8 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v95 - Flipper Zero + ESP32 Controller
- * USB Serial @ 115200, BLE fallback, Auto-reconnect, Command History
- * SubGHz: subghz rx <freq> <device> (0=internal CC1101)
+ * PEN15 v97 - Flipper Zero + ESP32 Controller
+ * All CLI commands verified for Unleashed firmware
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -167,9 +166,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v95 ===")
-        log("Flipper + ESP32 Controller")
-        log("")
+        log("=== PEN15 v97 ===")
+        log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
 
@@ -699,18 +697,17 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showNfcMenu() {
-        // NOTE: Most NFC functions are GUI-only on Flipper
-        // CLI has limited NFC support
-        val options = arrayOf("Activate Field", "Scanner", "List Saved", "Help")
+        // NFC CLI is limited - most functions require Flipper screen
+        val options = arrayOf("Detect Card", "Field On", "Field Off", "List Saved", "Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("NFC (13.56MHz)")
-            .setMessage("Note: Full NFC read/write requires Flipper screen")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("nfc field")
-                    1 -> sendCommand("nfc scanner")
-                    2 -> sendCommand("storage list /ext/nfc")
-                    3 -> sendCommand("nfc")
+                    0 -> sendCommand("nfc detect")
+                    1 -> sendCommand("nfc field on")
+                    2 -> sendCommand("nfc field off")
+                    3 -> sendCommand("storage list /ext/nfc")
+                    4 -> sendCommand("nfc")
                 }
             }.show()
     }
@@ -755,14 +752,17 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showGpioMenu() {
-        val options = arrayOf("Enable OTG 5V", "Disable OTG 5V", "GPIO Help")
+        val options = arrayOf("5V Power ON", "5V Power OFF", "3.3V Power ON", "3.3V Power OFF", "Power Info", "GPIO Help")
         AlertDialog.Builder(this, R.style.DarkDialog)
-            .setTitle("GPIO")
+            .setTitle("GPIO / Power")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("power ext 1")
-                    1 -> sendCommand("power ext 0")
-                    2 -> sendCommand("gpio")
+                    0 -> sendCommand("power 5v 1")
+                    1 -> sendCommand("power 5v 0")
+                    2 -> sendCommand("power 3v3 1")
+                    3 -> sendCommand("power 3v3 0")
+                    4 -> sendCommand("power")
+                    5 -> sendCommand("gpio")
                 }
             }.show()
     }
@@ -800,27 +800,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     // ==================
 
     private fun showWifiMenu() {
-        if (connectionType != ConnectionType.USB_ESP32) {
-            // Show Flipper GPIO passthrough options
-            val options = arrayOf("Enable GPIO UART", "Scan Networks (via Marauder)", "Sniff Packets", "Deauth Attack", "List Captures")
-            AlertDialog.Builder(this, R.style.DarkDialog)
-                .setTitle("WiFi (Flipper GPIO)")
-                .setItems(options) { _, which ->
-                    when (which) {
-                        0 -> {
-                            sendCommand("gpio set 13 1") // TX
-                            sendCommand("gpio set 14 1") // RX
-                            log("GPIO UART enabled for ESP32")
-                        }
-                        1 -> sendCommand("scanap")
-                        2 -> sendCommand("sniffpmkid")
-                        3 -> log("Select target first with scanap")
-                        4 -> sendCommand("storage list /ext/marauder")
-                    }
-                }.show()
-        } else {
+        if (connectionType == ConnectionType.USB_ESP32) {
             // Direct ESP32/Marauder commands
-            val options = arrayOf("Scan APs", "Scan Stations", "Sniff PMKID", "Sniff Beacon", "Deauth", "Stop All", "List Captures")
+            val options = arrayOf("Scan APs", "Scan Stations", "Sniff PMKID", "Sniff Beacon", "Deauth All", "Stop Scan", "Help")
             AlertDialog.Builder(this, R.style.DarkDialog)
                 .setTitle("ESP32 Marauder")
                 .setItems(options) { _, which ->
@@ -831,9 +813,19 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                         3 -> sendCommand("sniffbeacon")
                         4 -> sendCommand("attack -t deauth")
                         5 -> sendCommand("stopscan")
-                        6 -> sendCommand("list -p")
+                        6 -> sendCommand("help")
                     }
                 }.show()
+        } else {
+            // Flipper - show info about WiFi board
+            AlertDialog.Builder(this, R.style.DarkDialog)
+                .setTitle("WiFi / ESP32")
+                .setMessage("WiFi requires ESP32 board.\n\nConnect ESP32/Marauder directly via USB, or use WiFi Devboard on Flipper GPIO.\n\nFor GPIO boards, use the Flipper screen to access WiFi features.")
+                .setPositiveButton("OK", null)
+                .setNeutralButton("List WiFi Files") { _, _ ->
+                    sendCommand("storage list /ext/apps_data/marauder")
+                }
+                .show()
         }
     }
 
