@@ -30,18 +30,13 @@ PID: 0x5740 (Virtual COM Port)
 
 **CORRECT USAGE:**
 ```kotlin
-// Create manager with listener
-usbIoManager = SerialInputOutputManager(port, listener)
-
-// Run on executor thread (NOT .start())
-usbExecutor.submit { usbIoManager?.run() }
+// Create manager with listener and start (library handles threading)
+ioManager = SerialInputOutputManager(port, listener)
+ioManager?.start()  // This is CORRECT - library manages its own thread
 ```
 
-**WRONG (causes issues):**
-```kotlin
-// DON'T DO THIS:
-usbIoManager?.start()  // Wrong - doesn't use executor properly
-```
+**Note:** The library's API changed. `.start()` is now the correct method.
+Do NOT try to use executor.submit() - SerialInputOutputManager is NOT a Runnable.
 
 ## Flipper CLI Commands (Verified Working)
 

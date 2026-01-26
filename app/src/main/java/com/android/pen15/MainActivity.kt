@@ -34,8 +34,8 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v103 - Flipper Zero + ESP32 Controller
- * Proper CLI reset: Ctrl+C to stop, exit to escape sub-shells
+ * PEN15 v104 - Flipper Zero + ESP32 Controller
+ * CLI state machine: detects prompts, queues commands, auto-escapes sub-shells
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -71,10 +71,13 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     // Connection state
     private enum class ConnectionType { NONE, USB_FLIPPER, USB_ESP32, BLE }
+    private enum class CliState { IDLE, WAKING, READY, SUBSHELL, BUSY }
     private var connectionType = ConnectionType.NONE
+    private var cliState = CliState.IDLE
     private var connected = false
     private var autoReconnect = true
     private var reconnectAttempts = 0
+    private val commandQueue = mutableListOf<String>()
 
     // UI
     private lateinit var statusChip: Chip
@@ -166,7 +169,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v103 ===")
+        log("=== PEN15 v104 ===")
         log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
@@ -332,29 +335,40 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
             connected = true
             reconnectAttempts = 0
+            cliState = CliState.WAKING
+            commandQueue.clear()
             updateUI()
 
-            // Reset CLI: Ctrl+C to stop any process, then exit sub-shells
+            // Wake up CLI with proper sequence and delays
+            // Step 1: Wait for serial to stabilize, then Ctrl+C
             mainHandler.postDelayed({
-                // Ctrl+C - stop any running command
-                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
-            }, 100)
-            mainHandler.postDelayed({
-                // Ctrl+C again
-                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
-            }, 300)
-            mainHandler.postDelayed({
-                // Exit sub-shell (if in one)
-                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+                log("Waking CLI...")
+                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT) // Ctrl+C
             }, 500)
+            // Step 2: Another Ctrl+C
             mainHandler.postDelayed({
-                // Exit again (might be nested)
+                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            }, 800)
+            // Step 3: Exit any sub-shell
+            mainHandler.postDelayed({
                 usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
-            }, 700)
+            }, 1100)
+            // Step 4: Exit again (nested shells)
             mainHandler.postDelayed({
-                // Final CR to get prompt
+                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+            }, 1400)
+            // Step 5: Send CR to wake CLI
+            mainHandler.postDelayed({
                 usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 900)
+            }, 1700)
+            // Step 6: Send CR again
+            mainHandler.postDelayed({
+                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
+            }, 2000)
+            // Step 7: Final CR
+            mainHandler.postDelayed({
+                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
+            }, 2300)
 
             val deviceName = if (connectionType == ConnectionType.USB_ESP32) "ESP32/Marauder" else "Flipper Zero"
             log("Connected: $deviceName @ $BAUD_RATE baud")
@@ -578,15 +592,48 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                 outputText.append(clean)
                 scrollToBottom()
 
-                // Auto-exit sub-shells
-                if (clean.contains("[nfc]>") || clean.contains("[subghz]>") ||
-                    clean.contains("[ir]>") || clean.contains("[lfrfid]>")) {
-                    log("[!] Exiting sub-shell...")
-                    mainHandler.postDelayed({
-                        try { usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT) } catch (e: Exception) {}
-                    }, 100)
+                // Detect CLI state from prompts
+                when {
+                    // Main CLI prompt detected - ready for commands
+                    clean.contains(">:") && !clean.contains("[") -> {
+                        if (cliState != CliState.READY) {
+                            cliState = CliState.READY
+                            log("[CLI Ready]")
+                            processCommandQueue()
+                        }
+                    }
+                    // Sub-shell prompt detected - need to exit
+                    clean.contains("[nfc]>") || clean.contains("[subghz]>") ||
+                    clean.contains("[ir]>") || clean.contains("[lfrfid]>") ||
+                    clean.contains("[rfid]>") -> {
+                        cliState = CliState.SUBSHELL
+                        log("[!] Sub-shell detected, exiting...")
+                        mainHandler.postDelayed({
+                            try {
+                                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+                            } catch (e: Exception) {}
+                        }, 100)
+                    }
                 }
             }
+        }
+    }
+
+    private fun processCommandQueue() {
+        if (commandQueue.isNotEmpty() && cliState == CliState.READY) {
+            val cmd = commandQueue.removeAt(0)
+            log("[Queue] Sending: $cmd")
+            sendCommandDirect(cmd)
+        }
+    }
+
+    private fun sendCommandDirect(cmd: String) {
+        try {
+            usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
+            cliState = CliState.BUSY
+        } catch (e: Exception) {
+            Log.e(TAG, "Send error", e)
+            log("Send error: ${e.message}")
         }
     }
 
@@ -618,7 +665,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         try {
             when (connectionType) {
                 ConnectionType.USB_FLIPPER, ConnectionType.USB_ESP32 -> {
-                    usbSerialPort?.write("$cmd\r".toByteArray(), WRITE_TIMEOUT)
+                    if (cliState == CliState.READY) {
+                        sendCommandDirect(cmd)
+                    } else {
+                        // Queue command for when CLI is ready
+                        commandQueue.add(cmd)
+                        log("[Queued - CLI not ready yet]")
+                        // Try to wake CLI
+                        usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
+                    }
                 }
                 ConnectionType.BLE -> {
                     txCharacteristic?.let { tx ->
