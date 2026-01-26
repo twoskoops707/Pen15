@@ -4,104 +4,73 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Professional Pentesting Icon - Digital Lock with Breach Effect -->
+    <!-- Modern Flipper/Hacker Icon - Clean Terminal Style -->
 
-    <!-- Outer glow ring -->
+    <!-- Background circle -->
     <path
-        android:pathData="M54,18 A36,36 0 1,1 53.99,18"
+        android:pathData="M54,54m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0"
+        android:fillColor="#00E5FF"
+        android:fillAlpha="0.15"/>
+
+    <!-- Terminal window frame -->
+    <path
+        android:pathData="M30,36 L78,36 Q80,36 80,38 L80,70 Q80,72 78,72 L30,72 Q28,72 28,70 L28,38 Q28,36 30,36 Z"
+        android:fillColor="#0D1526"
         android:strokeColor="#00E5FF"
-        android:strokeWidth="1.5"
-        android:fillColor="#00000000"
-        android:strokeAlpha="0.3"/>
+        android:strokeWidth="1.5"/>
 
-    <!-- Hexagon frame -->
+    <!-- Terminal title bar -->
     <path
-        android:pathData="M54,22 L78,36 L78,64 L54,78 L30,64 L30,36 Z"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="2"
-        android:fillColor="#0A1929"
-        android:fillAlpha="0.95"/>
+        android:pathData="M28,36 L80,36 L80,44 L28,44 Z"
+        android:fillColor="#1A2744"/>
 
-    <!-- Inner hexagon accent -->
+    <!-- Window buttons -->
     <path
-        android:pathData="M54,28 L72,39 L72,61 L54,72 L36,61 L36,39 Z"
-        android:strokeColor="#00BCD4"
-        android:strokeWidth="1"
-        android:fillColor="#00000000"
-        android:strokeAlpha="0.5"/>
+        android:pathData="M34,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+        android:fillColor="#FF5F57"/>
+    <path
+        android:pathData="M42,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+        android:fillColor="#FEBC2E"/>
+    <path
+        android:pathData="M50,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
+        android:fillColor="#28C840"/>
 
-    <!-- Digital lock body -->
+    <!-- Prompt line 1 -->
     <path
-        android:pathData="M44,48 L64,48 L64,66 Q64,68 62,68 L46,68 Q44,68 44,66 Z"
-        android:fillColor="#00E5FF"/>
-
-    <!-- Lock shackle - broken/opened to show "breach" -->
-    <path
-        android:pathData="M48,48 L48,42 Q48,36 54,36"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="3"
-        android:fillColor="#00000000"
-        android:strokeLineCap="round"/>
-
-    <!-- Broken shackle piece (right side, detached) -->
-    <path
-        android:pathData="M57,34 Q62,34 62,40 L62,44"
-        android:strokeColor="#FF1744"
-        android:strokeWidth="3"
-        android:fillColor="#00000000"
-        android:strokeLineCap="round"/>
-
-    <!-- Keyhole -->
-    <path
-        android:pathData="M54,53 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0"
-        android:fillColor="#0A1929"/>
-    <path
-        android:pathData="M52,55 L56,55 L55,63 L53,63 Z"
-        android:fillColor="#0A1929"/>
-
-    <!-- Scan line effect -->
-    <path
-        android:pathData="M36,50 L72,50"
+        android:pathData="M34,52 L40,52"
         android:strokeColor="#00FF41"
-        android:strokeWidth="0.5"
-        android:strokeAlpha="0.6"/>
-
-    <!-- Binary data decoration -->
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
     <path
-        android:pathData="M32,42 L28,42 M32,46 L26,46 M32,50 L28,50"
+        android:pathData="M44,52 L66,52"
         android:strokeColor="#00E5FF"
-        android:strokeWidth="1"
-        android:strokeAlpha="0.4"/>
-    <path
-        android:pathData="M76,42 L80,42 M76,46 L82,46 M76,50 L80,50"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="1"
-        android:strokeAlpha="0.4"/>
+        android:strokeWidth="2"
+        android:strokeLineCap="round"/>
 
-    <!-- Corner brackets -->
+    <!-- Prompt line 2 -->
     <path
-        android:pathData="M30,36 L30,32 L34,32"
-        android:strokeColor="#FF1744"
+        android:pathData="M34,60 L40,60"
+        android:strokeColor="#00FF41"
         android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:strokeLineCap="square"/>
+        android:strokeLineCap="round"/>
     <path
-        android:pathData="M78,36 L78,32 L74,32"
-        android:strokeColor="#FF1744"
+        android:pathData="M44,60 L58,60"
+        android:strokeColor="#FFFFFF"
         android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:strokeLineCap="square"/>
+        android:strokeAlpha="0.7"
+        android:strokeLineCap="round"/>
+
+    <!-- Cursor -->
     <path
-        android:pathData="M30,64 L30,68 L34,68"
-        android:strokeColor="#FF1744"
+        android:pathData="M62,58 L62,64"
+        android:strokeColor="#00E5FF"
         android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:strokeLineCap="square"/>
+        android:strokeLineCap="round"/>
+
+    <!-- Dolphin silhouette (Flipper) - small, in corner -->
     <path
-        android:pathData="M78,64 L78,68 L74,68"
-        android:strokeColor="#FF1744"
-        android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:strokeLineCap="square"/>
+        android:pathData="M68,66 Q72,64 74,66 Q76,68 74,70 L68,70 Q66,68 68,66"
+        android:fillColor="#00E5FF"
+        android:fillAlpha="0.6"/>
 
 </vector>
