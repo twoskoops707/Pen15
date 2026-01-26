@@ -34,8 +34,9 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v97 - Flipper Zero + ESP32 Controller
- * All CLI commands verified for Unleashed firmware
+ * PEN15 v98 - Flipper Zero + ESP32 Controller
+ * Fixed: Removed sub-shell commands that break CLI
+ * Uses one-shot commands only (no interactive shells)
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v97 ===")
+        log("=== PEN15 v98 ===")
         log("Flipper Zero Controller")
         log("Tap CONNECT to start")
     }
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnNfc.setOnClickListener { showNfcMenu() }
         btnSubghz.setOnClickListener { showSubghzMenu() }
         btnIr.setOnClickListener { showIrMenu() }
-        btnIbutton.setOnClickListener { sendCommand("ikey read") }
+        btnIbutton.setOnClickListener { sendCommand("ikey read") }  // Correct for Unleashed
         btnGpio.setOnClickListener { showGpioMenu() }
         btnBadusb.setOnClickListener { showBadusbMenu() }
         btnStorage.setOnClickListener { showStorageMenu() }
@@ -558,13 +559,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             if (clean.isNotBlank()) {
                 outputText.append(clean)
                 scrollToBottom()
-
-                // Detect sub-shell prompts and auto-exit
-                if (clean.contains("[nfc]>") || clean.contains("[rfid]>") ||
-                    clean.contains("[subghz]>") || clean.contains("[ir]>")) {
-                    log("[!] Sub-shell detected - sending exit")
-                    mainHandler.postDelayed({ sendRawCommand("exit") }, 200)
-                }
             }
         }
     }
@@ -684,46 +678,44 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     // ==================
 
     private fun showRfidMenu() {
-        val options = arrayOf("Read Card", "List Saved", "Help")
+        val options = arrayOf("Read Card (hold near)", "List Saved", "Emulate Last")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("RFID (125kHz)")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("rfid read")
+                    0 -> sendCommand("lfrfid read")
                     1 -> sendCommand("storage list /ext/lfrfid")
-                    2 -> sendCommand("rfid")
+                    2 -> sendCommand("lfrfid emulate")
                 }
             }.show()
     }
 
     private fun showNfcMenu() {
-        // NFC CLI is limited - most functions require Flipper screen
-        val options = arrayOf("Detect Card", "Field On", "Field Off", "List Saved", "Help")
+        // Unleashed: nfc commands enter sub-shell - use one-shot commands only
+        val options = arrayOf("Field ON (detect)", "Field OFF", "List Saved")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("NFC (13.56MHz)")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("nfc detect")
-                    1 -> sendCommand("nfc field on")
-                    2 -> sendCommand("nfc field off")
-                    3 -> sendCommand("storage list /ext/nfc")
-                    4 -> sendCommand("nfc")
+                    0 -> sendCommand("nfc field on")
+                    1 -> sendCommand("nfc field off")
+                    2 -> sendCommand("storage list /ext/nfc")
                 }
             }.show()
     }
 
     private fun showSubghzMenu() {
-        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "RX 915MHz", "List Saved", "Help")
+        val options = arrayOf("RX 433.92MHz", "RX 315MHz", "RX 868MHz", "RX 915MHz", "List Saved", "TX (use Flipper)")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Sub-GHz")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("subghz rx 433920000 0")
-                    1 -> sendCommand("subghz rx 315000000 0")
-                    2 -> sendCommand("subghz rx 868350000 0")
-                    3 -> sendCommand("subghz rx 915000000 0")
+                    0 -> sendCommand("subghz rx 433920000")
+                    1 -> sendCommand("subghz rx 315000000")
+                    2 -> sendCommand("subghz rx 868350000")
+                    3 -> sendCommand("subghz rx 915000000")
                     4 -> sendCommand("storage list /ext/subghz")
-                    5 -> sendCommand("subghz")
+                    5 -> log("TX requires Flipper screen - use SubGHz app")
                 }
             }.show()
     }
@@ -739,30 +731,29 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showIrMenu() {
-        val options = arrayOf("Receive Signal", "List Saved", "Help")
+        val options = arrayOf("Receive Signal", "List Saved", "List Universal DBs")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Infrared")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> sendCommand("ir rx")
                     1 -> sendCommand("storage list /ext/infrared")
-                    2 -> sendCommand("ir")
+                    2 -> sendCommand("storage list /ext/infrared/assets")
                 }
             }.show()
     }
 
     private fun showGpioMenu() {
-        val options = arrayOf("5V Power ON", "5V Power OFF", "3.3V Power ON", "3.3V Power OFF", "Power Info", "GPIO Help")
+        val options = arrayOf("5V Power ON", "5V Power OFF", "OTG ON", "OTG OFF", "Power Info")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("GPIO / Power")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("power 5v 1")
-                    1 -> sendCommand("power 5v 0")
-                    2 -> sendCommand("power 3v3 1")
-                    3 -> sendCommand("power 3v3 0")
-                    4 -> sendCommand("power")
-                    5 -> sendCommand("gpio")
+                    0 -> sendCommand("power 5v on")
+                    1 -> sendCommand("power 5v off")
+                    2 -> sendCommand("power otg on")
+                    3 -> sendCommand("power otg off")
+                    4 -> sendCommand("power info")
                 }
             }.show()
     }
