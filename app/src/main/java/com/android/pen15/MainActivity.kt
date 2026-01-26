@@ -322,9 +322,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             usbSerialPort?.dtr = true
             usbSerialPort?.rts = true
 
-            // CRITICAL: Use executor.submit(run) NOT .start() - per CLAUDE.md
+            // CRITICAL: Use executor.execute(run) NOT .start() - per CLAUDE.md
             ioManager = SerialInputOutputManager(usbSerialPort, this)
-            ioExecutor.submit { ioManager?.run() }
+            ioExecutor.execute { ioManager?.run() }
 
             // Determine device type
             connectionType = when {
