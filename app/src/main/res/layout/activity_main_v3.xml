@@ -69,6 +69,111 @@
             app:cornerRadius="8dp"/>
     </LinearLayout>
 
+    <!-- Result Card (collapsible, shown when parsed result available) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/resultCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#111B2E"
+        app:cardCornerRadius="12dp"
+        app:strokeColor="#1E3050"
+        app:strokeWidth="1dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- Result Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/resultTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Result"
+                    android:textSize="14sp"
+                    android:textColor="#00E5FF"
+                    android:textStyle="bold"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDismissResult"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:text="X"
+                    android:textSize="10sp"
+                    android:textColor="#4A5B78"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="8dp"/>
+            </LinearLayout>
+
+            <!-- Result Fields -->
+            <TextView
+                android:id="@+id/resultFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="monospace"
+                android:textSize="12sp"
+                android:textColor="#9CA3AF"
+                android:lineSpacingExtra="3dp"
+                android:textIsSelectable="true"/>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:id="@+id/resultActions"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResultSave"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="Save"
+                    android:textSize="10sp"
+                    android:textColor="#00E5FF"
+                    app:backgroundTint="#0D1526"
+                    app:cornerRadius="6dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minHeight="0dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnResultCopy"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="Copy"
+                    android:textSize="10sp"
+                    android:textColor="#7A8BA8"
+                    app:backgroundTint="#0D1526"
+                    app:cornerRadius="6dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minHeight="0dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Terminal Card -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

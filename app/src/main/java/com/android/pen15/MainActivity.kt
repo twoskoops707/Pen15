@@ -7,6 +7,8 @@ import android.app.PendingIntent
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.BroadcastReceiver
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -27,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
@@ -34,8 +37,8 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.util.UUID
 
 /**
- * PEN15 v104 - Flipper Zero + ESP32 Controller
- * CLI state machine: detects prompts, queues commands, auto-escapes sub-shells
+ * PEN15 v106 - Flipper Zero + AWOK Mini V3 Pentest Sidekick
+ * Result parsing, AWOK/Marauder menu, cleaned dead code
  */
 class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
@@ -79,6 +82,11 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private var reconnectAttempts = 0
     private val commandQueue = mutableListOf<String>()
 
+    // Track last command for result parsing
+    private var lastCommand = ""
+    private val outputBuffer = StringBuilder()
+    private var bufferTimeoutRunnable: Runnable? = null
+
     // UI
     private lateinit var statusChip: Chip
     private lateinit var deviceInfo: TextView
@@ -91,6 +99,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var btnConnect: MaterialButton
     private lateinit var btnHistory: MaterialButton
 
+    // Result card UI
+    private lateinit var resultCard: MaterialCardView
+    private lateinit var resultTitle: TextView
+    private lateinit var resultFields: TextView
+    private lateinit var resultActions: LinearLayout
+    private lateinit var btnDismissResult: MaterialButton
+    private lateinit var btnResultSave: MaterialButton
+    private lateinit var btnResultCopy: MaterialButton
+
     // Tool buttons
     private lateinit var btnRfid: MaterialButton
     private lateinit var btnNfc: MaterialButton
@@ -101,7 +118,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private lateinit var btnBadusb: MaterialButton
     private lateinit var btnStorage: MaterialButton
     private lateinit var btnInfo: MaterialButton
-    private lateinit var btnWifi: MaterialButton  // ESP32/Marauder
+    private lateinit var btnWifi: MaterialButton
 
     // USB
     private var usbManager: UsbManager? = null
@@ -155,6 +172,21 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         }
     }
 
+    // ==================
+    // PARSED RESULT DATA
+    // ==================
+
+    data class ParsedResult(
+        val title: String,
+        val fields: Map<String, String>,
+        val hasActions: Boolean = false,
+        val rawData: String = ""
+    )
+
+    // ==================
+    // LIFECYCLE
+    // ==================
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_v3)
@@ -169,8 +201,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         usbManager = getSystemService(Context.USB_SERVICE) as UsbManager
         bluetoothAdapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
 
-        log("=== PEN15 v104 ===")
-        log("Flipper Zero Controller")
+        log("=== PEN15 v106 ===")
+        log("Flipper Zero + AWOK Controller")
         log("Tap CONNECT to start")
     }
 
@@ -186,6 +218,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnConnect = findViewById(R.id.btnConnect)
         btnHistory = findViewById(R.id.btnHistory)
 
+        // Result card
+        resultCard = findViewById(R.id.resultCard)
+        resultTitle = findViewById(R.id.resultTitle)
+        resultFields = findViewById(R.id.resultFields)
+        resultActions = findViewById(R.id.resultActions)
+        btnDismissResult = findViewById(R.id.btnDismissResult)
+        btnResultSave = findViewById(R.id.btnResultSave)
+        btnResultCopy = findViewById(R.id.btnResultCopy)
+
+        // Tool buttons
         btnRfid = findViewById(R.id.btnRfid)
         btnNfc = findViewById(R.id.btnNfc)
         btnSubghz = findViewById(R.id.btnSubghz)
@@ -216,18 +258,23 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         btnClear.setOnClickListener { clearTerminal() }
         btnHistory.setOnClickListener { showHistoryMenu() }
 
+        // Result card actions
+        btnDismissResult.setOnClickListener { hideResultCard() }
+        btnResultCopy.setOnClickListener { copyResultToClipboard() }
+        btnResultSave.setOnClickListener { log("[Save] Not yet implemented — coming in v107") }
+
         // Flipper tools
         btnRfid.setOnClickListener { showRfidMenu() }
         btnNfc.setOnClickListener { showNfcMenu() }
         btnSubghz.setOnClickListener { showSubghzMenu() }
         btnIr.setOnClickListener { showIrMenu() }
-        btnIbutton.setOnClickListener { sendCommand("ikey read") }  // Correct for Unleashed
+        btnIbutton.setOnClickListener { sendCommand("ikey read") }
         btnGpio.setOnClickListener { showGpioMenu() }
         btnBadusb.setOnClickListener { showBadusbMenu() }
         btnStorage.setOnClickListener { showStorageMenu() }
         btnInfo.setOnClickListener { sendCommand("device_info") }
 
-        // ESP32/Marauder WiFi
+        // ESP32/Marauder WiFi / AWOK
         btnWifi.setOnClickListener { showWifiMenu() }
     }
 
@@ -280,11 +327,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             return
         }
 
-        // Find matching device
         val driver = if (filterVid != null) {
             drivers.find { it.device.vendorId == filterVid }
         } else {
-            // Priority: Flipper > ESP32
             drivers.find { it.device.vendorId == FLIPPER_VID && it.device.productId == FLIPPER_PID }
                 ?: drivers.find { it.device.vendorId == ESP32_CP210X_VID || it.device.vendorId == ESP32_CH340_VID }
                 ?: drivers[0]
@@ -322,11 +367,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             usbSerialPort?.dtr = true
             usbSerialPort?.rts = true
 
-            // SerialInputOutputManager handles its own threading
             ioManager = SerialInputOutputManager(usbSerialPort, this)
             ioManager?.start()
 
-            // Determine device type
             connectionType = when {
                 device.vendorId == FLIPPER_VID -> ConnectionType.USB_FLIPPER
                 device.vendorId == ESP32_CP210X_VID || device.vendorId == ESP32_CH340_VID -> ConnectionType.USB_ESP32
@@ -339,36 +382,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             commandQueue.clear()
             updateUI()
 
-            // Wake up CLI with proper sequence and delays
-            // Step 1: Wait for serial to stabilize, then Ctrl+C
             mainHandler.postDelayed({
                 log("Waking CLI...")
-                usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT) // Ctrl+C
-            }, 500)
-            // Step 2: Another Ctrl+C
-            mainHandler.postDelayed({
                 usbSerialPort?.write(byteArrayOf(0x03), WRITE_TIMEOUT)
+            }, 500)
+            mainHandler.postDelayed({
+                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
             }, 800)
-            // Step 3: Exit any sub-shell
             mainHandler.postDelayed({
-                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
             }, 1100)
-            // Step 4: Exit again (nested shells)
-            mainHandler.postDelayed({
-                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
-            }, 1400)
-            // Step 5: Send CR to wake CLI
-            mainHandler.postDelayed({
-                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 1700)
-            // Step 6: Send CR again
-            mainHandler.postDelayed({
-                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 2000)
-            // Step 7: Final CR
-            mainHandler.postDelayed({
-                usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
-            }, 2300)
 
             val deviceName = if (connectionType == ConnectionType.USB_ESP32) "ESP32/Marauder" else "Flipper Zero"
             log("Connected: $deviceName @ $BAUD_RATE baud")
@@ -409,7 +432,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
         bleScanner?.startScan(listOf(scanFilter), scanSettings, bleScanCallback)
 
-        // Stop scan after 10 seconds
         mainHandler.postDelayed({
             bleScanner?.stopScan(bleScanCallback)
             if (!connected) {
@@ -471,7 +493,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             txCharacteristic = service.getCharacteristic(FLIPPER_TX_UUID)
             rxCharacteristic = service.getCharacteristic(FLIPPER_RX_UUID)
 
-            // Enable notifications on RX
             rxCharacteristic?.let { rx ->
                 gatt.setCharacteristicNotification(rx, true)
                 val descriptor = rx.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
@@ -550,7 +571,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         connected = false
         connectionType = ConnectionType.NONE
 
-        // USB cleanup
         ioManager?.listener = null
         ioManager?.stop()
         ioManager = null
@@ -565,7 +585,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         try { usbConnection?.close() } catch (e: Exception) { }
         usbConnection = null
 
-        // BLE cleanup
         try {
             bluetoothGatt?.disconnect()
             bluetoothGatt?.close()
@@ -579,7 +598,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     // ==================
-    // SERIAL I/O
+    // SERIAL I/O + RESULT BUFFERING
     // ==================
 
     override fun onNewData(data: ByteArray) {
@@ -592,30 +611,51 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                 outputText.append(clean)
                 scrollToBottom()
 
+                // Buffer output for result parsing
+                outputBuffer.append(clean)
+                resetBufferTimeout()
+
                 // Detect CLI state from prompts
-                when {
-                    // Main CLI prompt detected - ready for commands
-                    clean.contains(">:") && !clean.contains("[") -> {
-                        if (cliState != CliState.READY) {
-                            cliState = CliState.READY
-                            log("[CLI Ready]")
-                            processCommandQueue()
-                        }
-                    }
-                    // Sub-shell prompt detected - need to exit
-                    clean.contains("[nfc]>") || clean.contains("[subghz]>") ||
+                if (clean.contains("[nfc]>") || clean.contains("[subghz]>") ||
                     clean.contains("[ir]>") || clean.contains("[lfrfid]>") ||
-                    clean.contains("[rfid]>") -> {
-                        cliState = CliState.SUBSHELL
-                        log("[!] Sub-shell detected, exiting...")
-                        mainHandler.postDelayed({
-                            try {
-                                usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
-                            } catch (e: Exception) {}
-                        }, 100)
+                    clean.contains("[rfid]>")) {
+                    cliState = CliState.SUBSHELL
+                    log("[!] Sub-shell detected, exiting...")
+                    mainHandler.postDelayed({
+                        try {
+                            usbSerialPort?.write("exit\r".toByteArray(), WRITE_TIMEOUT)
+                        } catch (e: Exception) {}
+                    }, 100)
+                }
+                else if (clean.contains(">: ") || clean.endsWith(">:") ||
+                         clean.contains(">:\n") || clean.contains(">:\r")) {
+                    if (cliState != CliState.READY) {
+                        cliState = CliState.READY
+                        log("[CLI Ready]")
                     }
+                    // Command finished — try to parse buffered output
+                    tryParseResult()
+                    processCommandQueue()
                 }
             }
+        }
+    }
+
+    private fun resetBufferTimeout() {
+        bufferTimeoutRunnable?.let { mainHandler.removeCallbacks(it) }
+        bufferTimeoutRunnable = Runnable { tryParseResult() }
+        mainHandler.postDelayed(bufferTimeoutRunnable!!, 3000)
+    }
+
+    private fun tryParseResult() {
+        bufferTimeoutRunnable?.let { mainHandler.removeCallbacks(it) }
+        val raw = outputBuffer.toString()
+        outputBuffer.clear()
+        if (raw.isBlank() || lastCommand.isBlank()) return
+
+        val result = parseResult(lastCommand, raw)
+        if (result != null) {
+            showResultCard(result)
         }
     }
 
@@ -661,6 +701,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             return
         }
         log("> $cmd")
+        lastCommand = cmd
+        outputBuffer.clear()
 
         try {
             when (connectionType) {
@@ -668,10 +710,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                     if (cliState == CliState.READY) {
                         sendCommandDirect(cmd)
                     } else {
-                        // Queue command for when CLI is ready
                         commandQueue.add(cmd)
                         log("[Queued - CLI not ready yet]")
-                        // Try to wake CLI
                         usbSerialPort?.write("\r".toByteArray(), WRITE_TIMEOUT)
                     }
                 }
@@ -711,6 +751,248 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     // ==================
+    // RESULT PARSING
+    // ==================
+
+    private fun parseResult(command: String, rawOutput: String): ParsedResult? {
+        return when {
+            command.startsWith("lfrfid") || command.startsWith("rfid") -> parseRfidResult(rawOutput)
+            command.startsWith("subghz") -> parseSubghzResult(rawOutput)
+            command.startsWith("ir ") -> parseIrResult(rawOutput)
+            command.startsWith("ikey") -> parseIkeyResult(rawOutput)
+            command.startsWith("storage list") -> parseStorageList(rawOutput)
+            command.startsWith("storage info") -> parseStorageInfo(rawOutput)
+            command == "device_info" -> parseDeviceInfo(rawOutput)
+            command.startsWith("power") -> parsePowerResult(rawOutput)
+            // AWOK / Marauder results
+            command == "scanap" -> parseMarauderScanAp(rawOutput)
+            command == "list -a" || command == "list" -> parseMarauderListAp(rawOutput)
+            command.startsWith("attack") -> parseMarauderAttack(rawOutput)
+            command.startsWith("sniff") -> parseMarauderSniff(rawOutput)
+            else -> null
+        }
+    }
+
+    private fun parseRfidResult(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        // Look for protocol and data patterns
+        val protoMatch = Regex("Protocol:\\s*(\\S+)", RegexOption.IGNORE_CASE).find(raw)
+        val dataMatch = Regex("Data:\\s*([0-9A-Fa-f\\s]+)", RegexOption.IGNORE_CASE).find(raw)
+        val typeMatch = Regex("Type:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+
+        if (protoMatch != null) fields["Protocol"] = protoMatch.groupValues[1]
+        if (dataMatch != null) fields["Data"] = dataMatch.groupValues[1].trim()
+        if (typeMatch != null) fields["Type"] = typeMatch.groupValues[1].trim()
+
+        if (fields.isEmpty()) {
+            if (raw.contains("Reading", ignoreCase = true)) {
+                return ParsedResult("RFID Reading...", mapOf("Status" to "Waiting for card..."), rawData = raw)
+            }
+            return null
+        }
+        return ParsedResult("RFID Card Detected", fields, hasActions = true, rawData = raw)
+    }
+
+    private fun parseSubghzResult(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val freqMatch = Regex("Frequency:\\s*(\\d+)", RegexOption.IGNORE_CASE).find(raw)
+        val protoMatch = Regex("Protocol:\\s*(\\S+)", RegexOption.IGNORE_CASE).find(raw)
+        val keyMatch = Regex("Key:\\s*([0-9A-Fa-f\\s]+)", RegexOption.IGNORE_CASE).find(raw)
+        val bitMatch = Regex("Bit:\\s*(\\d+)", RegexOption.IGNORE_CASE).find(raw)
+
+        if (freqMatch != null) {
+            val freq = freqMatch.groupValues[1].toLongOrNull()
+            fields["Frequency"] = if (freq != null) "${freq / 1_000_000.0} MHz" else freqMatch.groupValues[1]
+        }
+        if (protoMatch != null) fields["Protocol"] = protoMatch.groupValues[1]
+        if (keyMatch != null) fields["Key"] = keyMatch.groupValues[1].trim()
+        if (bitMatch != null) fields["Bits"] = bitMatch.groupValues[1]
+
+        if (fields.isEmpty()) return null
+        return ParsedResult("Sub-GHz Signal Captured", fields, hasActions = true, rawData = raw)
+    }
+
+    private fun parseIrResult(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val protoMatch = Regex("Protocol:\\s*(\\S+)", RegexOption.IGNORE_CASE).find(raw)
+        val addrMatch = Regex("Address:\\s*([0-9A-Fa-fxX]+)", RegexOption.IGNORE_CASE).find(raw)
+        val cmdMatch = Regex("Command:\\s*([0-9A-Fa-fxX]+)", RegexOption.IGNORE_CASE).find(raw)
+
+        if (protoMatch != null) fields["Protocol"] = protoMatch.groupValues[1]
+        if (addrMatch != null) fields["Address"] = addrMatch.groupValues[1]
+        if (cmdMatch != null) fields["Command"] = cmdMatch.groupValues[1]
+
+        if (fields.isEmpty()) return null
+        return ParsedResult("IR Signal Received", fields, hasActions = true, rawData = raw)
+    }
+
+    private fun parseIkeyResult(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val typeMatch = Regex("Type:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+        val idMatch = Regex("ID:\\s*([0-9A-Fa-f\\s:]+)", RegexOption.IGNORE_CASE).find(raw)
+
+        if (typeMatch != null) fields["Type"] = typeMatch.groupValues[1].trim()
+        if (idMatch != null) fields["ID"] = idMatch.groupValues[1].trim()
+
+        if (fields.isEmpty()) return null
+        return ParsedResult("iButton Key Read", fields, hasActions = true, rawData = raw)
+    }
+
+    private fun parseStorageList(raw: String): ParsedResult? {
+        val lines = raw.lines().filter { it.contains("[D]") || it.contains("[F]") || it.contains("Storage") }
+        if (lines.isEmpty()) return null
+
+        val dirs = raw.lines().count { it.contains("[D]") }
+        val files = raw.lines().count { it.contains("[F]") }
+        val fields = mutableMapOf<String, String>()
+        fields["Directories"] = dirs.toString()
+        fields["Files"] = files.toString()
+
+        // Show first few entries
+        val entries = raw.lines()
+            .filter { it.trimStart().startsWith("[D]") || it.trimStart().startsWith("[F]") }
+            .take(8)
+            .joinToString("\n") { it.trim() }
+        if (entries.isNotEmpty()) fields["Contents"] = "\n$entries"
+
+        return ParsedResult("Storage Listing", fields, rawData = raw)
+    }
+
+    private fun parseStorageInfo(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val totalMatch = Regex("Total:\\s*(\\d+)", RegexOption.IGNORE_CASE).find(raw)
+        val freeMatch = Regex("Free:\\s*(\\d+)", RegexOption.IGNORE_CASE).find(raw)
+        if (totalMatch != null) fields["Total"] = "${totalMatch.groupValues[1].toLongOrNull()?.div(1024) ?: "?"} KB"
+        if (freeMatch != null) fields["Free"] = "${freeMatch.groupValues[1].toLongOrNull()?.div(1024) ?: "?"} KB"
+        if (fields.isEmpty()) return null
+        return ParsedResult("Storage Info", fields, rawData = raw)
+    }
+
+    private fun parseDeviceInfo(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val hwMatch = Regex("hardware\\.model\\s*:\\s*(.+)").find(raw)
+        val fwMatch = Regex("firmware\\.version\\s*:\\s*(.+)").find(raw)
+        val buildMatch = Regex("firmware\\.build\\.date\\s*:\\s*(.+)").find(raw)
+        val radioMatch = Regex("radio\\.stack\\.major\\s*:\\s*(.+)").find(raw)
+
+        if (hwMatch != null) fields["Model"] = hwMatch.groupValues[1].trim()
+        if (fwMatch != null) fields["Firmware"] = fwMatch.groupValues[1].trim()
+        if (buildMatch != null) fields["Build Date"] = buildMatch.groupValues[1].trim()
+        if (radioMatch != null) fields["Radio Stack"] = radioMatch.groupValues[1].trim()
+
+        if (fields.isEmpty()) return null
+        return ParsedResult("Device Info", fields, rawData = raw)
+    }
+
+    private fun parsePowerResult(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        val voltMatch = Regex("Voltage:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+        val chargeMatch = Regex("Charge:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+        val tempMatch = Regex("Temperature:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+        val currentMatch = Regex("Current:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
+
+        if (voltMatch != null) fields["Voltage"] = voltMatch.groupValues[1].trim()
+        if (chargeMatch != null) fields["Charge"] = chargeMatch.groupValues[1].trim()
+        if (tempMatch != null) fields["Temperature"] = tempMatch.groupValues[1].trim()
+        if (currentMatch != null) fields["Current"] = currentMatch.groupValues[1].trim()
+
+        // Also handle "5v on/off" confirmations
+        if (fields.isEmpty() && (raw.contains("5v", ignoreCase = true) || raw.contains("otg", ignoreCase = true))) {
+            return ParsedResult("Power", mapOf("Status" to raw.trim().lines().last().trim()), rawData = raw)
+        }
+        if (fields.isEmpty()) return null
+        return ParsedResult("Power Info", fields, rawData = raw)
+    }
+
+    // Marauder result parsers
+    private fun parseMarauderScanAp(raw: String): ParsedResult? {
+        val apCount = Regex("(\\d+)\\s+APs?\\s+found", RegexOption.IGNORE_CASE).find(raw)
+        val fields = mutableMapOf<String, String>()
+        if (apCount != null) {
+            fields["APs Found"] = apCount.groupValues[1]
+        }
+        // Look for scan lines like "0: SSID (CH:6) RSSI:-45"
+        val aps = raw.lines().filter { it.matches(Regex("^\\s*\\d+:.*")) }.take(10)
+        if (aps.isNotEmpty()) {
+            fields["Networks"] = "\n" + aps.joinToString("\n") { it.trim() }
+        }
+        if (fields.isEmpty()) {
+            if (raw.contains("scan", ignoreCase = true)) {
+                return ParsedResult("AP Scan", mapOf("Status" to "Scanning..."), rawData = raw)
+            }
+            return null
+        }
+        return ParsedResult("AP Scan Complete", fields, rawData = raw)
+    }
+
+    private fun parseMarauderListAp(raw: String): ParsedResult? {
+        val aps = raw.lines().filter { it.matches(Regex("^\\s*\\d+:.*")) || it.contains("SSID", ignoreCase = true) }
+        if (aps.isEmpty()) return null
+        val fields = mutableMapOf<String, String>()
+        fields["APs"] = "\n" + aps.take(15).joinToString("\n") { it.trim() }
+        return ParsedResult("AP List", fields, rawData = raw)
+    }
+
+    private fun parseMarauderAttack(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        if (raw.contains("deauth", ignoreCase = true)) fields["Type"] = "Deauth"
+        if (raw.contains("beacon", ignoreCase = true)) fields["Type"] = "Beacon Spam"
+        if (raw.contains("probe", ignoreCase = true)) fields["Type"] = "Probe Spam"
+        if (raw.contains("started", ignoreCase = true)) fields["Status"] = "Running"
+        if (raw.contains("stopped", ignoreCase = true)) fields["Status"] = "Stopped"
+        val pktMatch = Regex("(\\d+)\\s+packets?", RegexOption.IGNORE_CASE).find(raw)
+        if (pktMatch != null) fields["Packets"] = pktMatch.groupValues[1]
+        if (fields.isEmpty()) return null
+        return ParsedResult("Attack Status", fields, rawData = raw)
+    }
+
+    private fun parseMarauderSniff(raw: String): ParsedResult? {
+        val fields = mutableMapOf<String, String>()
+        if (raw.contains("pmkid", ignoreCase = true)) fields["Type"] = "PMKID Sniff"
+        if (raw.contains("beacon", ignoreCase = true)) fields["Type"] = "Beacon Sniff"
+        if (raw.contains("deauth", ignoreCase = true)) fields["Type"] = "Deauth Sniff"
+        val capMatch = Regex("(\\d+)\\s+captured", RegexOption.IGNORE_CASE).find(raw)
+        if (capMatch != null) fields["Captured"] = capMatch.groupValues[1]
+        if (raw.contains("started", ignoreCase = true)) fields["Status"] = "Running"
+        if (raw.contains("stopped", ignoreCase = true)) fields["Status"] = "Stopped"
+        if (fields.isEmpty()) return null
+        return ParsedResult("Sniff Status", fields, rawData = raw)
+    }
+
+    // ==================
+    // RESULT CARD UI
+    // ==================
+
+    private fun showResultCard(result: ParsedResult) {
+        resultTitle.text = result.title
+        val sb = StringBuilder()
+        for ((key, value) in result.fields) {
+            if (value.startsWith("\n")) {
+                sb.append("$key:$value\n")
+            } else {
+                sb.append("$key: $value\n")
+            }
+        }
+        resultFields.text = sb.toString().trimEnd()
+        resultActions.visibility = if (result.hasActions) View.VISIBLE else View.GONE
+        resultCard.visibility = View.VISIBLE
+
+        // Store raw data for copy
+        resultCard.tag = result.rawData
+    }
+
+    private fun hideResultCard() {
+        resultCard.visibility = View.GONE
+    }
+
+    private fun copyResultToClipboard() {
+        val text = resultFields.text.toString()
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("PEN15 Result", text))
+        log("[Copied to clipboard]")
+    }
+
+    // ==================
     // COMMAND HISTORY
     // ==================
 
@@ -727,8 +1009,8 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun addToHistory(cmd: String) {
-        commandHistory.remove(cmd) // Remove duplicate
-        commandHistory.add(0, cmd) // Add to front
+        commandHistory.remove(cmd)
+        commandHistory.add(0, cmd)
         if (commandHistory.size > MAX_HISTORY) {
             commandHistory.removeAt(commandHistory.size - 1)
         }
@@ -773,7 +1055,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showNfcMenu() {
-        // Unleashed: nfc commands enter sub-shell - use one-shot commands only
         val options = arrayOf("Field ON (detect)", "Field OFF", "List Saved")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("NFC (13.56MHz)")
@@ -807,7 +1088,6 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("Select Frequency")
             .setItems(freqNames) { _, which ->
-                // Device 0 = internal CC1101, 1 = external
                 sendCommand("subghz rx ${subghzFrequencies[which].second} 0")
             }.show()
     }
@@ -869,37 +1149,106 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     // ==================
-    // ESP32/MARAUDER WIFI MENU
+    // AWOK MINI V3 / ESP32 MARAUDER WIFI MENU
     // ==================
 
     private fun showWifiMenu() {
         if (connectionType == ConnectionType.USB_ESP32) {
-            // Direct ESP32/Marauder commands
-            val options = arrayOf("Scan APs", "Scan Stations", "Sniff PMKID", "Sniff Beacon", "Deauth All", "Stop Scan", "Help")
-            AlertDialog.Builder(this, R.style.DarkDialog)
-                .setTitle("ESP32 Marauder")
-                .setItems(options) { _, which ->
-                    when (which) {
-                        0 -> sendCommand("scanap")
-                        1 -> sendCommand("scansta")
-                        2 -> sendCommand("sniffpmkid")
-                        3 -> sendCommand("sniffbeacon")
-                        4 -> sendCommand("attack -t deauth")
-                        5 -> sendCommand("stopscan")
-                        6 -> sendCommand("help")
-                    }
-                }.show()
+            showMarauderDirectMenu()
+        } else if (connectionType == ConnectionType.USB_FLIPPER) {
+            showMarauderViaFlipperMenu()
         } else {
-            // Flipper - show info about WiFi board
             AlertDialog.Builder(this, R.style.DarkDialog)
-                .setTitle("WiFi / ESP32")
-                .setMessage("WiFi requires ESP32 board.\n\nConnect ESP32/Marauder directly via USB, or use WiFi Devboard on Flipper GPIO.\n\nFor GPIO boards, use the Flipper screen to access WiFi features.")
+                .setTitle("WiFi / AWOK")
+                .setMessage("Connect to Flipper or ESP32 first.")
                 .setPositiveButton("OK", null)
-                .setNeutralButton("List WiFi Files") { _, _ ->
-                    sendCommand("storage list /ext/apps_data/marauder")
-                }
                 .show()
         }
+    }
+
+    private fun showMarauderDirectMenu() {
+        val options = arrayOf(
+            "Scan APs", "List APs", "Select AP...",
+            "Deauth Attack", "Beacon Spam", "Probe Spam",
+            "Sniff PMKID", "Sniff Beacons", "Sniff Deauth",
+            "BLE Spam All", "Sniff BT",
+            "Stop", "Help"
+        )
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("ESP32 Marauder (Direct)")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("scanap")
+                    1 -> sendCommand("list -a")
+                    2 -> showSelectApDialog()
+                    3 -> sendCommand("attack -t deauth")
+                    4 -> sendCommand("attack -t beacon")
+                    5 -> sendCommand("attack -t probe")
+                    6 -> sendCommand("sniffpmkid")
+                    7 -> sendCommand("sniffbeacon")
+                    8 -> sendCommand("sniffdeauth")
+                    9 -> sendCommand("btspamall")
+                    10 -> sendCommand("sniffbt")
+                    11 -> sendCommand("stopscan")
+                    12 -> sendCommand("help")
+                }
+            }.show()
+    }
+
+    private fun showMarauderViaFlipperMenu() {
+        // AWOK/Marauder through Flipper GPIO UART bridge
+        // User must have UART Bridge active on Flipper screen (GPIO → UART Bridge)
+        val options = arrayOf(
+            "Scan APs", "List APs", "Select AP...",
+            "Deauth Attack", "Beacon Spam", "Probe Spam",
+            "Sniff PMKID", "Sniff Beacons", "Sniff Deauth",
+            "BLE Spam All", "Sniff BT",
+            "Stop", "Help",
+            "--- Flipper WiFi Files ---"
+        )
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("AWOK Marauder (via Flipper)")
+            .setMessage("Ensure UART Bridge is active on Flipper screen (GPIO → UART Bridge)")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> sendCommand("scanap")
+                    1 -> sendCommand("list -a")
+                    2 -> showSelectApDialog()
+                    3 -> sendCommand("attack -t deauth")
+                    4 -> sendCommand("attack -t beacon")
+                    5 -> sendCommand("attack -t probe")
+                    6 -> sendCommand("sniffpmkid")
+                    7 -> sendCommand("sniffbeacon")
+                    8 -> sendCommand("sniffdeauth")
+                    9 -> sendCommand("btspamall")
+                    10 -> sendCommand("sniffbt")
+                    11 -> sendCommand("stopscan")
+                    12 -> sendCommand("help")
+                    13 -> sendCommand("storage list /ext/apps_data/marauder")
+                }
+            }.show()
+    }
+
+    private fun showSelectApDialog() {
+        val input = EditText(this).apply {
+            hint = "AP index (0-based)"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setPadding(48, 24, 48, 24)
+            setTextColor(0xFFE5E7EB.toInt())
+            setHintTextColor(0xFF4A5B78.toInt())
+        }
+        AlertDialog.Builder(this, R.style.DarkDialog)
+            .setTitle("Select AP")
+            .setMessage("Run 'Scan APs' first, then enter the AP index:")
+            .setView(input)
+            .setPositiveButton("Select") { _, _ ->
+                val idx = input.text.toString().trim()
+                if (idx.isNotEmpty()) {
+                    sendCommand("select -a $idx")
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     // ==================
@@ -936,6 +1285,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     private fun clearTerminal() {
         outputText.text = ""
+        hideResultCard()
     }
 
     private fun log(msg: String) {
@@ -958,6 +1308,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     override fun onDestroy() {
         super.onDestroy()
         autoReconnect = false
+        bufferTimeoutRunnable?.let { mainHandler.removeCallbacks(it) }
         disconnect()
         try { unregisterReceiver(usbReceiver) } catch (e: Exception) { }
     }
