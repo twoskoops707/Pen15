@@ -630,12 +630,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                 // Flipper prompt: ">: " (stock) or "[Name]>: " (Unleashed)
                 else if (clean.contains("]>:") || clean.contains(">: ") ||
                          clean.endsWith(">:") || clean.contains(">:\n")) {
+                    val wasBusy = (cliState == CliState.BUSY)
                     if (cliState != CliState.READY) {
                         cliState = CliState.READY
                         log("[CLI Ready]")
                     }
-                    // Command finished — try to parse buffered output
-                    tryParseResult()
+                    // Only parse results when command actually finished (BUSY→READY)
+                    // Skip if we were already READY (stale prompt echo)
+                    if (wasBusy) {
+                        tryParseResult()
+                    }
                     processCommandQueue()
                 }
             }
@@ -654,7 +658,15 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         outputBuffer.clear()
         if (raw.isBlank() || lastCommand.isBlank()) return
 
-        val preview = raw.take(80).replace("\n", "\\n")
+        // Skip tiny buffers — likely just command echo, not real output
+        // Don't clear buffer — let it accumulate for next prompt
+        if (raw.length < 50) {
+            Log.d(TAG, "PARSE: skip tiny buffer ${raw.length}b, keeping")
+            outputBuffer.append(raw) // Put it back
+            return
+        }
+
+        val preview = raw.take(120).replace("\n", "\\n")
         log("[DBG] parse: cmd='$lastCommand' buf=${raw.length}b")
         log("[DBG] raw: $preview")
 
