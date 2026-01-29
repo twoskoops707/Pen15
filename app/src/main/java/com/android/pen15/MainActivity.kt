@@ -653,9 +653,14 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         outputBuffer.clear()
         if (raw.isBlank() || lastCommand.isBlank()) return
 
+        log("[DBG] parse: cmd='$lastCommand' buf=${raw.length}b")
+
         val result = parseResult(lastCommand, raw)
         if (result != null) {
+            log("[Result: ${result.title} — ${result.fields.size} fields]")
             showResultCard(result)
+        } else {
+            log("[DBG] no parse match for '$lastCommand'")
         }
     }
 
@@ -688,9 +693,27 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     override fun onRunError(e: Exception) {
         Log.e(TAG, "IO Error", e)
         mainHandler.post {
-            log("IO Error: ${e.message}")
-            disconnect()
-            if (autoReconnect) scheduleReconnect()
+            // USB get_status errors during active reads (rfid, subghz rx) are recoverable
+            // Don't spam disconnect/reconnect — try to recover first
+            val msg = e.message ?: ""
+            if (msg.contains("get_status") && connected) {
+                log("IO Warning: ${e.message} — retrying...")
+                try {
+                    // Restart the IO manager
+                    ioManager?.stop()
+                    ioManager = SerialInputOutputManager(usbSerialPort, this@MainActivity)
+                    ioManager?.start()
+                    log("[IO recovered]")
+                } catch (retryErr: Exception) {
+                    log("IO Error: recovery failed")
+                    disconnect()
+                    if (autoReconnect) scheduleReconnect()
+                }
+            } else {
+                log("IO Error: ${e.message}")
+                disconnect()
+                if (autoReconnect) scheduleReconnect()
+            }
         }
     }
 
@@ -871,8 +894,10 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     private fun parseDeviceInfo(raw: String): ParsedResult? {
         val fields = mutableMapOf<String, String>()
         // Actual Flipper format: "hardware_model                : Flipper Zero"
+        // Key, then lots of spaces, then " : ", then value
         val hwMatch = Regex("hardware_model\\s+:\\s*(.+)").find(raw)
         val hwName = Regex("hardware_name\\s+:\\s*(.+)").find(raw)
+        Log.d(TAG, "PARSE_DEV: hwMatch=${hwMatch?.groupValues?.getOrNull(1)}, hwName=${hwName?.groupValues?.getOrNull(1)}")
         val fwMatch = Regex("firmware_version\\s+:\\s*(.+)").find(raw)
         val buildMatch = Regex("firmware_build_date\\s+:\\s*(.+)").find(raw)
         val fwBranch = Regex("firmware_branch\\s+:\\s*(.+)").find(raw)
@@ -893,6 +918,27 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         }
         if (bleMac != null) fields["BLE MAC"] = bleMac.groupValues[1].trim()
         if (hwUid != null) fields["UID"] = hwUid.groupValues[1].trim()
+
+        // Fallback: try generic "key  : value" pattern if specific regexes missed
+        if (fields.isEmpty()) {
+            Log.d(TAG, "PARSE_DEV: specific regexes failed, trying generic")
+            val genericPattern = Regex("(\\w+)\\s+:\\s+(.+)")
+            val allMatches = genericPattern.findAll(raw).toList()
+            Log.d(TAG, "PARSE_DEV: generic found ${allMatches.size} matches")
+            // Pick interesting fields
+            for (m in allMatches) {
+                val key = m.groupValues[1]
+                val value = m.groupValues[2].trim()
+                when {
+                    key == "hardware_model" -> fields["Model"] = value
+                    key == "hardware_name" -> fields["Name"] = value
+                    key == "firmware_version" -> fields["Firmware"] = value
+                    key == "firmware_origin_fork" -> fields["Fork"] = value
+                    key == "firmware_build_date" -> fields["Build Date"] = value
+                    key == "radio_ble_mac" -> fields["BLE MAC"] = value
+                }
+            }
+        }
 
         if (fields.isEmpty()) return null
         return ParsedResult("Device Info", fields, rawData = raw)
