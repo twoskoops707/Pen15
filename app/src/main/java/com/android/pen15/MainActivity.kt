@@ -756,7 +756,7 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     private fun parseResult(command: String, rawOutput: String): ParsedResult? {
         return when {
-            command.startsWith("lfrfid") || command.startsWith("rfid") -> parseRfidResult(rawOutput)
+            command.startsWith("rfid") || command.startsWith("lfrfid") -> parseRfidResult(rawOutput)
             command.startsWith("subghz") -> parseSubghzResult(rawOutput)
             command.startsWith("ir ") -> parseIrResult(rawOutput)
             command.startsWith("ikey") -> parseIkeyResult(rawOutput)
@@ -870,38 +870,50 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
 
     private fun parseDeviceInfo(raw: String): ParsedResult? {
         val fields = mutableMapOf<String, String>()
-        val hwMatch = Regex("hardware\\.model\\s*:\\s*(.+)").find(raw)
-        val fwMatch = Regex("firmware\\.version\\s*:\\s*(.+)").find(raw)
-        val buildMatch = Regex("firmware\\.build\\.date\\s*:\\s*(.+)").find(raw)
-        val radioMatch = Regex("radio\\.stack\\.major\\s*:\\s*(.+)").find(raw)
+        // Actual Flipper format: "hardware_model                : Flipper Zero"
+        val hwMatch = Regex("hardware_model\\s+:\\s*(.+)").find(raw)
+        val hwName = Regex("hardware_name\\s+:\\s*(.+)").find(raw)
+        val fwMatch = Regex("firmware_version\\s+:\\s*(.+)").find(raw)
+        val buildMatch = Regex("firmware_build_date\\s+:\\s*(.+)").find(raw)
+        val fwBranch = Regex("firmware_branch\\s+:\\s*(.+)").find(raw)
+        val fwOrigin = Regex("firmware_origin_fork\\s+:\\s*(.+)").find(raw)
+        val radioMajor = Regex("radio_stack_major\\s+:\\s*(.+)").find(raw)
+        val radioMinor = Regex("radio_stack_minor\\s+:\\s*(.+)").find(raw)
+        val bleMac = Regex("radio_ble_mac\\s+:\\s*(.+)").find(raw)
+        val hwUid = Regex("hardware_uid\\s+:\\s*(.+)").find(raw)
 
         if (hwMatch != null) fields["Model"] = hwMatch.groupValues[1].trim()
+        if (hwName != null) fields["Name"] = hwName.groupValues[1].trim()
         if (fwMatch != null) fields["Firmware"] = fwMatch.groupValues[1].trim()
+        if (fwOrigin != null) fields["Fork"] = fwOrigin.groupValues[1].trim()
+        if (fwBranch != null) fields["Branch"] = fwBranch.groupValues[1].trim()
         if (buildMatch != null) fields["Build Date"] = buildMatch.groupValues[1].trim()
-        if (radioMatch != null) fields["Radio Stack"] = radioMatch.groupValues[1].trim()
+        if (radioMajor != null && radioMinor != null) {
+            fields["Radio Stack"] = "${radioMajor.groupValues[1].trim()}.${radioMinor.groupValues[1].trim()}"
+        }
+        if (bleMac != null) fields["BLE MAC"] = bleMac.groupValues[1].trim()
+        if (hwUid != null) fields["UID"] = hwUid.groupValues[1].trim()
 
         if (fields.isEmpty()) return null
         return ParsedResult("Device Info", fields, rawData = raw)
     }
 
     private fun parsePowerResult(raw: String): ParsedResult? {
+        // Flipper power commands: 5v 0/1, off, reboot, reboot2dfu
+        // They don't return structured data — just confirmation or usage text
         val fields = mutableMapOf<String, String>()
-        val voltMatch = Regex("Voltage:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
-        val chargeMatch = Regex("Charge:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
-        val tempMatch = Regex("Temperature:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
-        val currentMatch = Regex("Current:\\s*(.+)", RegexOption.IGNORE_CASE).find(raw)
-
-        if (voltMatch != null) fields["Voltage"] = voltMatch.groupValues[1].trim()
-        if (chargeMatch != null) fields["Charge"] = chargeMatch.groupValues[1].trim()
-        if (tempMatch != null) fields["Temperature"] = tempMatch.groupValues[1].trim()
-        if (currentMatch != null) fields["Current"] = currentMatch.groupValues[1].trim()
-
-        // Also handle "5v on/off" confirmations
-        if (fields.isEmpty() && (raw.contains("5v", ignoreCase = true) || raw.contains("otg", ignoreCase = true))) {
-            return ParsedResult("Power", mapOf("Status" to raw.trim().lines().last().trim()), rawData = raw)
+        if (raw.contains("5v", ignoreCase = true)) {
+            fields["Command"] = "5V External Power"
+            fields["Status"] = if (raw.contains("1") || raw.contains("on", ignoreCase = true)) "ON" else "OFF"
+        } else if (raw.contains("reboot", ignoreCase = true)) {
+            fields["Command"] = "Reboot"
+            fields["Status"] = "Rebooting..."
+        } else if (raw.contains("off") && !raw.contains("Cmd list")) {
+            fields["Command"] = "Shutdown"
+            fields["Status"] = "Shutting down..."
         }
         if (fields.isEmpty()) return null
-        return ParsedResult("Power Info", fields, rawData = raw)
+        return ParsedResult("Power", fields, rawData = raw)
     }
 
     // Marauder result parsers
@@ -1047,9 +1059,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
             .setTitle("RFID (125kHz)")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("lfrfid read")
+                    0 -> sendCommand("rfid read")
                     1 -> sendCommand("storage list /ext/lfrfid")
-                    2 -> sendCommand("lfrfid emulate")
+                    2 -> sendCommand("rfid emulate")
                 }
             }.show()
     }
@@ -1106,16 +1118,16 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
     }
 
     private fun showGpioMenu() {
-        val options = arrayOf("5V Power ON", "5V Power OFF", "OTG ON", "OTG OFF", "Power Info")
+        val options = arrayOf("5V Power ON", "5V Power OFF", "Reboot Flipper", "Shutdown Flipper", "GPIO Info")
         AlertDialog.Builder(this, R.style.DarkDialog)
             .setTitle("GPIO / Power")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> sendCommand("power 5v on")
-                    1 -> sendCommand("power 5v off")
-                    2 -> sendCommand("power otg on")
-                    3 -> sendCommand("power otg off")
-                    4 -> sendCommand("power info")
+                    0 -> sendCommand("power 5v 1")
+                    1 -> sendCommand("power 5v 0")
+                    2 -> sendCommand("power reboot")
+                    3 -> sendCommand("power off")
+                    4 -> sendCommand("gpio mode")
                 }
             }.show()
     }

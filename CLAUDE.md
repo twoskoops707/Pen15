@@ -38,18 +38,46 @@ ioManager?.start()  // This is CORRECT - library manages its own thread
 **Note:** The library's API changed. `.start()` is now the correct method.
 Do NOT try to use executor.submit() - SerialInputOutputManager is NOT a Runnable.
 
-## Flipper CLI Commands (Verified Working)
+## Flipper CLI Commands (Verified Working - Unleashed 084e)
+
+Available commands from `help`:
+```
+bt loader crypto js nfc exit buzzer input neofetch
+echo log onewire device_info free_blocks top factory_reset
+uptime ? storage vibro ikey ! start_rpc_session power
+subshell_demo i2c subghz ir update reload_ext_cmds hello_world
+rfid sleep help sysctl info gpio date led free
+```
 
 | Feature | Command | Notes |
 |---------|---------|-------|
 | Help | `help` | List all commands |
-| RFID Read | `rfid read` | Works |
-| NFC | N/A | GUI only - removed from CLI |
+| RFID Read | `rfid read` | NOT `lfrfid read` — `lfrfid` doesn't exist in CLI |
+| NFC | `nfc field on/off` | Read/detect via GUI only |
 | iButton | `ikey read` | NOT `ibutton read` |
-| SubGHz RX | `subghz rx` | Works |
+| SubGHz RX | `subghz rx <freq>` | e.g., `subghz rx 433920000` |
 | IR Receive | `ir rx` | Works |
 | Storage | `storage list /ext/` | Works |
-| Device Info | `device_info` | Works |
+| Device Info | `device_info` | Key format: `key_name                : value` |
+| Power 5V | `power 5v 1` / `power 5v 0` | Enable/disable 5V external |
+| Reboot | `power reboot` | Reboots Flipper |
+| Shutdown | `power off` | Powers off |
+| GPIO | `gpio mode` | GPIO pin info |
+
+### device_info Output Format
+```
+hardware_model                : Flipper Zero
+hardware_name                 : Scoops
+firmware_version              : unlshd-084e
+firmware_build_date           : 13-12-2025
+firmware_origin_fork          : Unleashed
+radio_ble_mac                 : 53636F26E180
+```
+Keys use underscores, values padded with spaces before ` : `.
+
+### Power Commands
+`power` only supports: `off`, `reboot`, `reboot2dfu`, `5v <0 or 1>`.
+There is NO `power info` or `power otg` command.
 
 ## Build Rules
 
@@ -58,6 +86,7 @@ Do NOT try to use executor.submit() - SerialInputOutputManager is NOT a Runnable
 3. **Test before commit** - Verify code compiles
 
 ## Current Version
-- v84+ with 115200 baud rate fix
-- SerialInputOutputManager on executor
-- Live data display via onNewData callback
+- v106 with result parsing, AWOK Marauder menu
+- Single-activity architecture (MainActivity.kt only)
+- SerialInputOutputManager.start() — library manages own thread
+- Live data display via onNewData callback + output buffering for parsed results
