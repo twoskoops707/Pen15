@@ -627,8 +627,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
                         } catch (e: Exception) {}
                     }, 100)
                 }
-                else if (clean.contains(">: ") || clean.endsWith(">:") ||
-                         clean.contains(">:\n") || clean.contains(">:\r")) {
+                // Flipper prompt: ">: " (stock) or "[Name]>: " (Unleashed)
+                else if (clean.contains("]>:") || clean.contains(">: ") ||
+                         clean.endsWith(">:") || clean.contains(">:\n")) {
                     if (cliState != CliState.READY) {
                         cliState = CliState.READY
                         log("[CLI Ready]")
@@ -653,7 +654,9 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         outputBuffer.clear()
         if (raw.isBlank() || lastCommand.isBlank()) return
 
+        val preview = raw.take(80).replace("\n", "\\n")
         log("[DBG] parse: cmd='$lastCommand' buf=${raw.length}b")
+        log("[DBG] raw: $preview")
 
         val result = parseResult(lastCommand, raw)
         if (result != null) {
@@ -830,6 +833,22 @@ class MainActivity : AppCompatActivity(), SerialInputOutputManager.Listener {
         if (protoMatch != null) fields["Protocol"] = protoMatch.groupValues[1]
         if (keyMatch != null) fields["Key"] = keyMatch.groupValues[1].trim()
         if (bitMatch != null) fields["Bits"] = bitMatch.groupValues[1]
+
+        // Handle status output like "Receiving at 433920000" or frequency from command
+        if (fields.isEmpty()) {
+            // Extract freq from the raw output or the command itself
+            val rxFreq = Regex("(\\d{6,})").find(raw)
+            if (rxFreq != null) {
+                val freq = rxFreq.groupValues[1].toLongOrNull()
+                if (freq != null && freq > 100000) {
+                    fields["Frequency"] = "${freq / 1_000_000.0} MHz"
+                }
+            }
+            if (raw.contains("Receiv", ignoreCase = true) || raw.contains("rx", ignoreCase = true)) {
+                fields["Status"] = "Listening..."
+                return ParsedResult("Sub-GHz RX Active", fields, rawData = raw)
+            }
+        }
 
         if (fields.isEmpty()) return null
         return ParsedResult("Sub-GHz Signal Captured", fields, hasActions = true, rawData = raw)
