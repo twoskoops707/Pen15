@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,7 +31,7 @@ class TerminalFragment : Fragment() {
             return binding.root
         } catch (e: Exception) {
             val tv = TextView(requireContext()).apply {
-                text = "TERMINAL INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                text = "TERMINAL ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
                 setTextColor(0xFFFF0000.toInt())
                 textSize = 10f
                 setPadding(16, 16, 16, 16)
@@ -49,7 +50,13 @@ class TerminalFragment : Fragment() {
         }
         binding.terminalRecycler.adapter = adapter
 
-        binding.btnSend.setOnClickListener { sendInput() }
+        binding.btnSend.setOnClickListener {
+            if (mainActivity()?.serial?.connected != true) {
+                Toast.makeText(context, "Connect device first (STATUS tab)", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            sendInput()
+        }
         binding.btnStop.setOnClickListener { mainActivity()?.serial?.sendCtrlC() }
         binding.btnClear.setOnClickListener {
             lines.clear()
@@ -81,12 +88,10 @@ class TerminalFragment : Fragment() {
         }
 
         appState.connected.observe(viewLifecycleOwner) { connected ->
-            binding.btnSend.isEnabled = connected
-            binding.btnStop.isEnabled = connected
-            binding.inputField.isEnabled = connected
             binding.statusDot.setBackgroundResource(
                 if (connected) R.drawable.dot_green else R.drawable.status_indicator
             )
+            binding.statusLabel.text = if (connected) "Connected" else "Terminal"
         }
     }
 
@@ -103,8 +108,11 @@ class TerminalFragment : Fragment() {
 
     private fun showHistory() {
         val history = appState.history
-        if (history.isEmpty()) return
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        if (history.isEmpty()) {
+            Toast.makeText(context, "No command history yet", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(requireContext())
             .setTitle("Command History")
             .setItems(history.take(20).toTypedArray()) { _, which ->
                 binding.inputField.setText(history[which])

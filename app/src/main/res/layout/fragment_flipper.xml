@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_void"
+    android:background="#080C14"
     android:clipToPadding="false"
     android:paddingBottom="16dp">
 
@@ -11,561 +10,429 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="14dp">
 
         <TextView
-            style="@style/SectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="WIRELESS" />
+            android:text="FLIPPER TOOLS"
+            android:textColor="#4A5B78"
+            android:textSize="12sp"
+            android:letterSpacing="0.15"
+            android:layout_marginBottom="10dp" />
 
-        <!-- RFID -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Clone Key Card -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CLONE KEY CARD"
+                android:textColor="#FF6E40"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Read and copy proximity badges, key fobs, and access cards (125kHz RFID)"
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnRfidRead"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="READ CARD"
+                    android:textSize="11sp"
+                    android:textColor="#FF6E40"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/orange" />
+                <Button
+                    android:id="@+id/btnRfidEmulate"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="REPLAY"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="RFID"
-                        android:textColor="@color/orange"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="125 kHz"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Read proximity cards, key fobs, and access badges. Hold card near Flipper to read."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRfidRead"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Read Card"
-                        android:textColor="@color/orange" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRfidEmulate"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Replay"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnRfidList"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Saved"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnRfidList"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="SAVED"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- Copy Remote -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="COPY REMOTE CONTROL"
+                android:textColor="#B388FF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Capture and replay garage openers, gate remotes, car fobs, doorbells (Sub-GHz radio)"
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSubghzRx"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="CAPTURE"
+                    android:textSize="11sp"
+                    android:textColor="#B388FF"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
+
+                <Button
+                    android:id="@+id/btnSubghzTxFile"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="REPLAY"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
+
+                <Button
+                    android:id="@+id/btnSubghzList"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="SAVED"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnSubghzBrute"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:text="BRUTE FORCE (try all codes)"
+                android:textSize="11sp"
+                android:textColor="#FF1744"
+                android:textStyle="bold"
+                android:background="#1E3050" />
+        </LinearLayout>
 
         <!-- NFC -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NFC TAGS"
+                android:textColor="#00FF41"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Detect and read NFC cards, tags, and payment systems (13.56 MHz)"
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnNfcFieldOn"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="SCAN ON"
+                    android:textSize="11sp"
+                    android:textColor="#00FF41"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/green" />
+                <Button
+                    android:id="@+id/btnNfcFieldOff"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="SCAN OFF"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="NFC"
-                        android:textColor="@color/green"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="13.56 MHz"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Detect NFC tags and cards. Toggle the NFC field to scan nearby tags."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNfcFieldOn"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Field ON"
-                        android:textColor="@color/green" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNfcFieldOff"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Field OFF"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNfcList"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Saved"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnNfcList"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="SAVED"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="RADIO" />
-
-        <!-- Sub-GHz -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- IR Remote -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TV / AC REMOTE"
+                android:textColor="#FF1744"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Learn and send infrared signals. Point any remote at Flipper to capture it."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnIrRx"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="LEARN"
+                    android:textSize="11sp"
+                    android:textColor="#FF1744"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/purple" />
+                <Button
+                    android:id="@+id/btnIrTx"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="SEND"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Sub-GHz"
-                        android:textColor="@color/purple"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Capture and replay garage doors, gates, car remotes, doorbells. Listen on a frequency to capture signals, then replay them."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSubghzRx"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Listen"
-                        android:textColor="@color/purple" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSubghzTxFile"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Replay File"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSubghzList"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Saved"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSubghzBrute"
-                    style="@style/ToolCardButton"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="6dp"
-                    android:text="Brute Force (try all codes)"
-                    android:textColor="@color/red" />
+                <Button
+                    android:id="@+id/btnIrList"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="SAVED"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- IR -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/red" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Infrared"
-                        android:textColor="@color/red"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Learn and send TV/AC remote signals. Point a remote at Flipper to capture, then replay it at any TV."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIrRx"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Capture"
-                        android:textColor="@color/red" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIrTx"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Send"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIrList"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Saved"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="OTHER" />
+        </LinearLayout>
 
         <!-- iButton -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="INTERCOM KEYS"
+                android:textColor="#00B8D4"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Read and clone Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnIkeyRead"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="READ KEY"
+                    android:textSize="11sp"
+                    android:textColor="#00B8D4"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/cyan_dim" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="iButton"
-                        android:textColor="@color/cyan_dim"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Read and emulate Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper contact pad."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIkeyRead"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Read Key"
-                        android:textColor="@color/cyan_dim" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIkeyEmulate"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Emulate"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnIkeyEmulate"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="CLONE"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-        <!-- BadUSB + Storage combined row -->
+        <!-- BadUSB + Storage -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="8dp">
 
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="5dp"
-                app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:strokeColor="@color/border_subtle"
-                app:strokeWidth="1dp"
-                app:cardElevation="0dp">
+                android:orientation="vertical"
+                android:background="#111B2E"
+                android:padding="14dp"
+                android:layout_marginEnd="4dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
+                    android:text="BAD USB"
+                    android:textColor="#FF1744"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BadUSB"
-                        android:textColor="@color/red"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnBadusbList"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:text="PAYLOADS"
+                    android:textSize="10sp"
+                    android:textColor="#FF1744"
+                    android:background="#1E3050" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Run keystroke scripts"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="11sp" />
+                <Button
+                    android:id="@+id/btnBadusbDemo"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:text="DEMO"
+                    android:textSize="10sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
+            </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBadusbList"
-                        style="@style/ToolCardButton"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="8dp"
-                        android:text="Payloads"
-                        android:textColor="@color/red" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBadusbDemo"
-                        style="@style/ToolCardButton"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="4dp"
-                        android:text="Demo"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="5dp"
-                app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:strokeColor="@color/border_subtle"
-                app:strokeWidth="1dp"
-                app:cardElevation="0dp">
+                android:orientation="vertical"
+                android:background="#111B2E"
+                android:padding="14dp"
+                android:layout_marginStart="4dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
+                    android:text="FILES"
+                    android:textColor="#7A8BA8"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Storage"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnStorageRoot"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="8dp"
+                    android:text="BROWSE SD"
+                    android:textSize="10sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#1E3050" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Browse SD card files"
-                        android:textColor="@color/text_tertiary"
-                        android:textSize="11sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStorageRoot"
-                        style="@style/ToolCardButton"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="8dp"
-                        android:text="Browse"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStorageInfo"
-                        style="@style/ToolCardButton"
-                        android:layout_width="match_parent"
-                        android:layout_marginTop="4dp"
-                        android:text="Free Space"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <Button
+                    android:id="@+id/btnStorageInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:text="SPACE"
+                    android:textSize="10sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

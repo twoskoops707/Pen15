@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg_void">
+    android:background="#080C14">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
-        android:background="@color/bg_terminal">
+        android:background="#0A0A0F">
 
         <View
             android:id="@+id/statusDot"
@@ -27,30 +26,28 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="Terminal"
-            android:textSize="12sp"
-            android:textColor="@color/text_tertiary" />
+            android:textSize="13sp"
+            android:textColor="#4A5B78" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btnStop"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
+            android:layout_height="32dp"
             android:text="STOP"
-            android:textSize="10sp"
-            android:textColor="@color/red"
-            android:minWidth="0dp"
-            android:paddingHorizontal="8dp" />
+            android:textSize="11sp"
+            android:textColor="#FF1744"
+            android:background="@android:color/transparent"
+            android:minWidth="48dp" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btnClear"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
-            android:layout_height="28dp"
+            android:layout_height="32dp"
             android:text="CLR"
-            android:textSize="10sp"
-            android:textColor="@color/text_tertiary"
-            android:minWidth="0dp"
-            android:paddingHorizontal="8dp" />
+            android:textSize="11sp"
+            android:textColor="#4A5B78"
+            android:background="@android:color/transparent"
+            android:minWidth="48dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -60,58 +57,52 @@
         android:layout_weight="1"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:background="@color/bg_terminal"
-        android:scrollbarStyle="outsideOverlay"
-        android:scrollbars="vertical"
-        android:scrollbarThumbVertical="@drawable/scrollbar_thumb" />
+        android:background="#0A0A0F"
+        android:scrollbars="vertical" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="52dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="8dp"
-        android:background="@color/bg_surface">
+        android:background="#0D1526">
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btnHistory"
-            style="@style/ToolCardButton"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:text="H"
-            android:textSize="12sp"
-            android:textColor="@color/text_secondary"
-            app:backgroundTint="@color/bg_elevated"
-            app:cornerRadius="8dp"
-            android:minWidth="0dp"
-            android:paddingHorizontal="0dp"
+            android:textSize="13sp"
+            android:textColor="#7A8BA8"
+            android:background="#152238"
             android:layout_marginEnd="6dp" />
 
         <EditText
             android:id="@+id/inputField"
             android:layout_width="0dp"
-            android:layout_height="36dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/input_bg"
-            android:hint="@string/command_hint"
-            android:textColorHint="@color/text_tertiary"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"
-            android:paddingHorizontal="10dp"
+            android:hint="Type a command..."
+            android:textColorHint="#4A5B78"
+            android:textColor="#E8F0FF"
+            android:textSize="13sp"
+            android:paddingHorizontal="12dp"
             android:fontFamily="monospace"
             android:inputType="text"
             android:imeOptions="actionSend" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btnSend"
-            android:layout_width="56dp"
-            android:layout_height="36dp"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
             android:layout_marginStart="6dp"
-            android:text="GO"
-            android:textSize="11sp"
-            android:textColor="@color/bg_void"
-            app:backgroundTint="@color/cyan"
-            app:cornerRadius="8dp" />
+            android:text="SEND"
+            android:textSize="12sp"
+            android:textColor="#080C14"
+            android:textStyle="bold"
+            android:background="#00E5FF" />
     </LinearLayout>
 
 </LinearLayout>

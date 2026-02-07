@@ -11,8 +11,8 @@ android {
         applicationId "com.android.pen15"
         minSdk 30
         targetSdk 34
-        versionCode 225
-        versionName "2.0.2"
+        versionCode 226
+        versionName "2.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

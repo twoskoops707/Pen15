@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.android.pen15.MainActivity
-import com.android.pen15.R
 import com.android.pen15.databinding.FragmentWifiBinding
 import com.android.pen15.model.AppState
 import com.android.pen15.tools.TermuxHelper
-import com.android.pen15.tools.WpaCracker
 
 class WifiFragment : Fragment() {
 
@@ -55,29 +54,22 @@ class WifiFragment : Fragment() {
         binding.btnSniffBeacon.setOnClickListener { send("sniffbeacon") }
         binding.btnSniffDeauth.setOnClickListener { send("sniffdeauth") }
         binding.btnSniffRaw.setOnClickListener { send("sniffraw") }
+        binding.btnSniffProbe.setOnClickListener { send("sniffprobe") }
+
+        binding.btnEvilPortalStart.setOnClickListener { send("evilportal -c start") }
+        binding.btnEvilPortalStop.setOnClickListener { send("evilportal -c stop") }
 
         binding.btnCrackInApp.setOnClickListener { showInAppCrackDialog() }
         binding.btnCrackTermux.setOnClickListener { showTermuxCrackDialog() }
         binding.btnDownloadWordlist.setOnClickListener { downloadWordlist() }
 
-        binding.btnEvilPortalStart.setOnClickListener { send("evilportal -c start") }
-        binding.btnEvilPortalStop.setOnClickListener { send("evilportal -c stop") }
-
-        binding.btnSniffProbe.setOnClickListener { send("sniffprobe") }
-
         binding.btnBleSpam.setOnClickListener { showBleSpamMenu() }
         binding.btnSniffBt.setOnClickListener { send("sniffbt") }
         binding.btnSniffAirtag.setOnClickListener { send("sniffbt -t airtag") }
-
-        appState.connected.observe(viewLifecycleOwner) { connected ->
-            setAllEnabled(binding.root, connected)
-            binding.btnCrackInApp.isEnabled = true
-            binding.btnCrackTermux.isEnabled = true
-            binding.btnDownloadWordlist.isEnabled = true
-        }
     }
 
     private fun showSelectApDialog() {
+        if (!checkConnected()) return
         val input = EditText(requireContext()).apply {
             hint = "AP index (0-based)"
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
@@ -85,7 +77,7 @@ class WifiFragment : Fragment() {
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("Select AP")
             .setMessage("Run 'Scan APs' first, then enter index:")
             .setView(input)
@@ -98,8 +90,9 @@ class WifiFragment : Fragment() {
     }
 
     private fun showBeaconMenu() {
+        if (!checkConnected()) return
         val options = arrayOf("Random SSIDs", "Rickroll SSIDs", "AP List SSIDs")
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("Beacon Spam Type")
             .setItems(options) { _, which ->
                 when (which) {
@@ -111,9 +104,10 @@ class WifiFragment : Fragment() {
     }
 
     private fun showBleSpamMenu() {
+        if (!checkConnected()) return
         val types = arrayOf("All", "Apple", "Samsung", "Google", "Microsoft", "Flipper")
         val cmds = arrayOf("blespam -t all", "blespam -t apple", "blespam -t samsung", "blespam -t google", "blespam -t microsoft", "sniffbt -t flipper")
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("BLE Spam Type")
             .setItems(types) { _, which ->
                 send(cmds[which])
@@ -127,7 +121,7 @@ class WifiFragment : Fragment() {
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("In-App WPA Crack")
             .setMessage("Enter path to PCAP/PMKID file:")
             .setView(input)
@@ -150,7 +144,7 @@ class WifiFragment : Fragment() {
             "Run aircrack-ng on PCAP",
             "Run hashcat on PMKID"
         )
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("Termux WiFi Cracking")
             .setItems(options) { _, which ->
                 val ctx = requireContext()
@@ -170,7 +164,7 @@ class WifiFragment : Fragment() {
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("aircrack-ng")
             .setMessage("Enter PCAP path:")
             .setView(input)
@@ -192,7 +186,7 @@ class WifiFragment : Fragment() {
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("hashcat")
             .setMessage("Enter PMKID hash file path:")
             .setView(input)
@@ -208,7 +202,7 @@ class WifiFragment : Fragment() {
     }
 
     private fun downloadWordlist() {
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("Download rockyou.txt")
             .setMessage("This will download rockyou.txt (~133MB) to Termux home directory via wget.")
             .setPositiveButton("Download") { _, _ ->
@@ -222,18 +216,20 @@ class WifiFragment : Fragment() {
             .show()
     }
 
+    private fun checkConnected(): Boolean {
+        if (mainActivity()?.serial?.connected != true) {
+            Toast.makeText(context, "Connect device first (STATUS tab)", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
     private fun send(cmd: String) {
+        if (!checkConnected()) return
         mainActivity()?.sendCommand(cmd)
     }
 
     private fun mainActivity(): MainActivity? = activity as? MainActivity
-
-    private fun setAllEnabled(view: View, enabled: Boolean) {
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) setAllEnabled(view.getChildAt(i), enabled)
-        }
-        if (view is com.google.android.material.button.MaterialButton) view.isEnabled = enabled
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

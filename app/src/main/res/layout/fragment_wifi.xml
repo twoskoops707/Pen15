@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_void"
+    android:background="#080C14"
     android:clipToPadding="false"
     android:paddingBottom="16dp">
 
@@ -11,579 +10,441 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="14dp">
 
         <TextView
-            style="@style/SectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="RECON" />
+            android:text="WIFI / BLUETOOTH ATTACKS"
+            android:textColor="#4A5B78"
+            android:textSize="12sp"
+            android:letterSpacing="0.15"
+            android:layout_marginBottom="10dp" />
 
-        <!-- Scan -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Scan Networks -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FIND NETWORKS"
+                android:textColor="#00E5FF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Scan for nearby WiFi networks and connected devices. Scan first, then pick a target."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnScanAp"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="SCAN"
+                    android:textSize="11sp"
+                    android:textColor="#00E5FF"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/cyan" />
+                <Button
+                    android:id="@+id/btnScanSta"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="CLIENTS"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="WiFi Scanner"
-                        android:textColor="@color/cyan"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Find nearby WiFi networks and connected devices. Scan first, then select a target for attacks or captures."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnScanAp"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Scan APs"
-                        android:textColor="@color/cyan" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnScanSta"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Scan STAs"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnListAp"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Results"
-                        android:textColor="@color/text_tertiary" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSelectAp"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Select Target"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStopScan"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Stop"
-                        android:textColor="@color/red" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnListAp"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="RESULTS"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="ATTACK" />
-
-        <!-- Deauth / Spam -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnSelectAp"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="PICK TARGET"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/red" />
+                <Button
+                    android:id="@+id/btnStopScan"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="STOP"
+                    android:textSize="11sp"
+                    android:textColor="#FF1744"
+                    android:background="#152238" />
+            </LinearLayout>
+        </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="WiFi Attacks"
-                        android:textColor="@color/red"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+        <!-- Attacks -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Kick devices off networks, flood with fake APs, or probe nearby clients. Select a target AP first for directed attacks."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WIFI ATTACKS"
+                android:textColor="#FF1744"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Kick devices off WiFi, flood with fake networks, or create fake login pages to capture passwords."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDeauth"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Deauth"
-                        android:textColor="@color/red" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBeacon"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Beacon Spam"
-                        android:textColor="@color/amber" />
+                <Button
+                    android:id="@+id/btnDeauth"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="KICK OFF"
+                    android:textSize="11sp"
+                    android:textColor="#FF1744"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnProbe"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Probe"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnBeacon"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="FAKE APs"
+                    android:textSize="11sp"
+                    android:textColor="#FFD600"
+                    android:background="#1E3050" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/btnRickroll"
-                    style="@style/ToolCardButton"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="4dp"
-                    android:text="Rickroll (broadcast fake SSIDs)"
-                    android:textColor="@color/amber" />
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="RICKROLL"
+                    android:textSize="11sp"
+                    android:textColor="#FFD600"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Evil Portal -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnProbe"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="PROBE"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/orange" />
+                <Button
+                    android:id="@+id/btnEvilPortalStart"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="EVIL PORTAL"
+                    android:textSize="11sp"
+                    android:textColor="#FF6E40"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Evil Portal"
-                        android:textColor="@color/orange"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Create a fake WiFi login page. When targets connect, they see a captive portal that captures credentials."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEvilPortalStart"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Start Portal"
-                        android:textColor="@color/orange" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEvilPortalStop"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Stop Portal"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnEvilPortalStop"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="STOP"
+                    android:textSize="11sp"
+                    android:textColor="#FF1744"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="CAPTURE" />
-
-        <!-- Sniff / Capture -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Capture -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CAPTURE PASSWORDS"
+                android:textColor="#00FF41"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Capture WiFi handshakes for offline password cracking. PMKID is fastest - no client needed."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnSniffPmkid"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="PMKID"
+                    android:textSize="11sp"
+                    android:textColor="#00FF41"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/green" />
+                <Button
+                    android:id="@+id/btnSniffBeacon"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="BEACONS"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Packet Capture"
-                        android:textColor="@color/green"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Capture WiFi handshakes and PMKID hashes for cracking. PMKID is fastest - no client needed. Saves PCAP to SD card."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffPmkid"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="PMKID"
-                        android:textColor="@color/green" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffBeacon"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Beacons"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffDeauth"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Deauths"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffRaw"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Raw Packets"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffProbe"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Probes"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnSniffDeauth"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="DEAUTHS"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="CRACK" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSniffRaw"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="RAW"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
+
+                <Button
+                    android:id="@+id/btnSniffProbe"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="PROBES"
+                    android:textSize="11sp"
+                    android:textColor="#4A5B78"
+                    android:background="#152238" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Crack -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CRACK WIFI PASSWORD"
+                android:textColor="#FFD600"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Crack captured handshakes. Quick = built-in dictionary. Termux = aircrack-ng with rockyou.txt (133MB)."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnCrackInApp"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="QUICK CRACK"
+                    android:textSize="11sp"
+                    android:textColor="#FFD600"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/amber" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Handshake Cracker"
-                        android:textColor="@color/amber"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Crack captured WPA2 handshakes. In-App uses built-in dictionary. Termux uses aircrack-ng or hashcat with rockyou.txt (133MB) for full-power cracking."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCrackInApp"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Quick Crack"
-                        android:textColor="@color/amber" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCrackTermux"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="Termux Crack"
-                        android:textColor="@color/purple" />
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnDownloadWordlist"
-                    style="@style/ToolCardButton"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="4dp"
-                    android:text="Download rockyou.txt Wordlist"
-                    android:textColor="@color/text_secondary" />
+                <Button
+                    android:id="@+id/btnCrackTermux"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="TERMUX"
+                    android:textSize="11sp"
+                    android:textColor="#B388FF"
+                    android:background="#1E3050" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            style="@style/SectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="BLUETOOTH" />
+            <Button
+                android:id="@+id/btnDownloadWordlist"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:text="DOWNLOAD WORDLIST (rockyou.txt)"
+                android:textSize="10sp"
+                android:textColor="#4A5B78"
+                android:background="#152238" />
+        </LinearLayout>
 
         <!-- BLE -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="14dp"
-            app:strokeColor="@color/border_subtle"
-            app:strokeWidth="1dp"
-            app:cardElevation="0dp">
+            android:orientation="vertical"
+            android:background="#111B2E"
+            android:padding="14dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BLUETOOTH SPAM"
+                android:textColor="#00B8D4"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Flood nearby phones with fake Bluetooth pairing popups. Sniff BT traffic and track AirTags."
+                android:textColor="#4A5B78"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/btnBleSpam"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="BLE SPAM"
+                    android:textSize="11sp"
+                    android:textColor="#00B8D4"
+                    android:textStyle="bold"
+                    android:background="#1E3050" />
 
-                    <View
-                        android:layout_width="4dp"
-                        android:layout_height="20dp"
-                        android:background="@color/cyan_dim" />
+                <Button
+                    android:id="@+id/btnSniffBt"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="SNIFF BT"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Bluetooth / BLE"
-                        android:textColor="@color/cyan_dim"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Flood nearby phones with fake BLE pairing popups (Apple, Samsung, Google). Sniff Bluetooth traffic and track devices."
-                    android:textColor="@color/text_tertiary"
-                    android:textSize="12sp"
-                    android:lineSpacingExtra="2dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBleSpam"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="BLE Spam"
-                        android:textColor="@color/cyan_dim" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffBt"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        android:text="Sniff BT"
-                        android:textColor="@color/text_secondary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSniffAirtag"
-                        style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:text="AirTags"
-                        android:textColor="@color/text_secondary" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btnSniffAirtag"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="AIRTAGS"
+                    android:textSize="11sp"
+                    android:textColor="#7A8BA8"
+                    android:background="#152238" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

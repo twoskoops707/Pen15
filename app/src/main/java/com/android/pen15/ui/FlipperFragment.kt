@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.android.pen15.MainActivity
-import com.android.pen15.R
 import com.android.pen15.databinding.FragmentFlipperBinding
 import com.android.pen15.model.AppState
 import com.android.pen15.tools.SubGhzBruteForce
@@ -33,7 +34,7 @@ class FlipperFragment : Fragment() {
             return binding.root
         } catch (e: Exception) {
             val tv = android.widget.TextView(requireContext()).apply {
-                text = "FLIPPER INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                text = "FLIPPER ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
                 setTextColor(0xFFFF0000.toInt())
                 textSize = 10f
                 setPadding(16, 16, 16, 16)
@@ -71,32 +72,30 @@ class FlipperFragment : Fragment() {
 
         binding.btnStorageRoot.setOnClickListener { send("storage list /ext") }
         binding.btnStorageInfo.setOnClickListener { send("storage info /ext") }
-
-        appState.connected.observe(viewLifecycleOwner) { connected ->
-            setAllEnabled(binding.root, connected)
-        }
     }
 
     private fun showFrequencyPicker() {
+        if (!checkConnected()) return
         val names = subghzFrequencies.map { it.first }.toTypedArray()
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
-            .setTitle("RX Frequency")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pick Frequency")
             .setItems(names) { _, which ->
                 send("subghz rx ${subghzFrequencies[which].second}")
             }.show()
     }
 
     private fun showTxFilePicker() {
+        if (!checkConnected()) return
         val input = EditText(requireContext()).apply {
             hint = "/ext/subghz/filename.sub"
             setPadding(48, 24, 48, 24)
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
-            .setTitle("TX from File")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Replay File")
             .setView(input)
-            .setPositiveButton("Transmit") { _, _ ->
+            .setPositiveButton("Send") { _, _ ->
                 val path = input.text.toString().trim()
                 if (path.isNotEmpty()) send("subghz tx_from_file $path")
             }
@@ -105,9 +104,10 @@ class FlipperFragment : Fragment() {
     }
 
     private fun showBruteForceMenu() {
+        if (!checkConnected()) return
         val protocols = SubGhzBruteForce.PROTOCOLS.map { "${it.name} (${it.bits}bit)" }.toTypedArray()
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
-            .setTitle("Brute Force Protocol")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pick Protocol")
             .setItems(protocols) { _, which ->
                 showBruteForceFreq(which)
             }.show()
@@ -116,7 +116,7 @@ class FlipperFragment : Fragment() {
     private fun showBruteForceFreq(protocolIdx: Int) {
         val protocol = SubGhzBruteForce.PROTOCOLS[protocolIdx]
         val freqs = protocol.frequencies.map { "${it / 1_000_000.0} MHz" }.toTypedArray()
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
+        AlertDialog.Builder(requireContext())
             .setTitle("${protocol.name} - Frequency")
             .setItems(freqs) { _, which ->
                 startBruteForce(protocolIdx, which)
@@ -158,9 +158,10 @@ class FlipperFragment : Fragment() {
     }
 
     private fun showIrTxDialog() {
+        if (!checkConnected()) return
         val options = arrayOf("TV Power (NEC)", "TV Vol Up (NEC)", "TV Vol Down (NEC)", "Custom...")
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
-            .setTitle("IR Transmit")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Send IR Signal")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> send("ir tx NEC 0x04 0x08")
@@ -178,8 +179,8 @@ class FlipperFragment : Fragment() {
             setTextColor(0xFFE8F0FF.toInt())
             setHintTextColor(0xFF4A5B78.toInt())
         }
-        AlertDialog.Builder(requireContext(), R.style.DarkDialog)
-            .setTitle("IR TX: protocol address command")
+        AlertDialog.Builder(requireContext())
+            .setTitle("IR: protocol address command")
             .setView(input)
             .setPositiveButton("Send") { _, _ ->
                 val args = input.text.toString().trim()
@@ -189,18 +190,20 @@ class FlipperFragment : Fragment() {
             .show()
     }
 
+    private fun checkConnected(): Boolean {
+        if (mainActivity()?.serial?.connected != true) {
+            Toast.makeText(context, "Connect device first (STATUS tab)", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
     private fun send(cmd: String) {
+        if (!checkConnected()) return
         mainActivity()?.sendCommand(cmd)
     }
 
     private fun mainActivity(): MainActivity? = activity as? MainActivity
-
-    private fun setAllEnabled(view: View, enabled: Boolean) {
-        if (view is ViewGroup) {
-            for (i in 0 until view.childCount) setAllEnabled(view.getChildAt(i), enabled)
-        }
-        if (view is com.google.android.material.button.MaterialButton) view.isEnabled = enabled
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

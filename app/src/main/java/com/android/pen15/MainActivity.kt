@@ -62,11 +62,10 @@ class MainActivity : AppCompatActivity(), SerialListener {
             it.register()
         }
 
-        appendToTerminal("=== PEN15 v2.0.2 BUILD 225 ===")
-        appendToTerminal("If you see this, the new APK is installed")
+        appendToTerminal("=== PEN15 v2.0.3 BUILD 226 ===")
         appendToTerminal("Tap STATUS tab to connect your device")
 
-        Toast.makeText(this, "PEN15 v2.0.2 Build 225", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "PEN15 v2.0.3 Build 226", Toast.LENGTH_LONG).show()
     }
 
     fun sendCommand(cmd: String) {
