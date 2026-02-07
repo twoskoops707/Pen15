@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Pen15" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Pen15" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/cyan</item>
         <item name="colorOnPrimary">@color/bg_void</item>
-        <item name="colorPrimaryContainer">@color/bg_elevated</item>
-        <item name="colorOnPrimaryContainer">@color/cyan</item>
         <item name="colorSecondary">@color/green</item>
         <item name="colorOnSecondary">@color/bg_void</item>
-        <item name="colorSecondaryContainer">@color/bg_elevated</item>
-        <item name="colorOnSecondaryContainer">@color/green</item>
-        <item name="colorTertiary">@color/purple</item>
         <item name="colorError">@color/red</item>
         <item name="colorSurface">@color/bg_surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
-        <item name="colorSurfaceVariant">@color/bg_card</item>
-        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
-        <item name="colorOutline">@color/border_default</item>
         <item name="android:colorBackground">@color/bg_void</item>
         <item name="colorOnBackground">@color/text_primary</item>
         <item name="android:statusBarColor">@color/bg_void</item>

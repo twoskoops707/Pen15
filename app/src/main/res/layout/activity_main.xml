@@ -22,7 +22,6 @@
         android:background="@color/bg_surface"
         app:itemIconTint="@color/text_secondary"
         app:itemTextColor="@color/text_secondary"
-        app:itemActiveIndicatorStyle="@null"
         app:menu="@menu/bottom_nav" />
 
 </LinearLayout>

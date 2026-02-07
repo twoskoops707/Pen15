@@ -22,12 +22,23 @@ class WifiFragment : Fragment() {
     private val appState: AppState by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentWifiBinding.inflate(inflater, container, false)
-        return binding.root
+        try {
+            _binding = FragmentWifiBinding.inflate(inflater, container, false)
+            return binding.root
+        } catch (e: Exception) {
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = "WIFI INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                setTextColor(0xFFFF0000.toInt())
+                textSize = 10f
+                setPadding(16, 16, 16, 16)
+            }
+            return tv
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (_binding == null) return
 
         binding.btnScanAp.setOnClickListener { send("scanap") }
         binding.btnScanSta.setOnClickListener { send("scansta") }

@@ -25,12 +25,23 @@ class TerminalFragment : Fragment() {
     private lateinit var adapter: TerminalAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentTerminalBinding.inflate(inflater, container, false)
-        return binding.root
+        try {
+            _binding = FragmentTerminalBinding.inflate(inflater, container, false)
+            return binding.root
+        } catch (e: Exception) {
+            val tv = TextView(requireContext()).apply {
+                text = "TERMINAL INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                setTextColor(0xFFFF0000.toInt())
+                textSize = 10f
+                setPadding(16, 16, 16, 16)
+            }
+            return tv
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (_binding == null) return
 
         adapter = TerminalAdapter(lines)
         binding.terminalRecycler.layoutManager = LinearLayoutManager(context).apply {

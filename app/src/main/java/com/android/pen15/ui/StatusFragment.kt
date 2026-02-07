@@ -19,12 +19,23 @@ class StatusFragment : Fragment() {
     private val appState: AppState by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentStatusBinding.inflate(inflater, container, false)
-        return binding.root
+        try {
+            _binding = FragmentStatusBinding.inflate(inflater, container, false)
+            return binding.root
+        } catch (e: Exception) {
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = "STATUS INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                setTextColor(0xFFFF0000.toInt())
+                textSize = 10f
+                setPadding(16, 16, 16, 16)
+            }
+            return tv
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (_binding == null) return
 
         binding.btnConnect.setOnClickListener { mainActivity()?.serial?.scanAndConnect() }
         binding.btnConnectFlipper.setOnClickListener { mainActivity()?.serial?.scanAndConnect(FlipperSerial.FLIPPER_VID) }

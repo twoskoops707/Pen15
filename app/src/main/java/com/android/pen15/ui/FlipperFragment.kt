@@ -28,12 +28,23 @@ class FlipperFragment : Fragment() {
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentFlipperBinding.inflate(inflater, container, false)
-        return binding.root
+        try {
+            _binding = FragmentFlipperBinding.inflate(inflater, container, false)
+            return binding.root
+        } catch (e: Exception) {
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = "FLIPPER INFLATE ERROR:\n${e.message}\n\n${e.stackTraceToString()}"
+                setTextColor(0xFFFF0000.toInt())
+                textSize = 10f
+                setPadding(16, 16, 16, 16)
+            }
+            return tv
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (_binding == null) return
 
         binding.btnRfidRead.setOnClickListener { send("rfid read") }
         binding.btnRfidEmulate.setOnClickListener { send("rfid emulate") }
