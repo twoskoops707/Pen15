@@ -4,7 +4,7 @@
 
 ### Flipper Zero USB CDC Serial
 ```
-Baud Rate:  230400
+Baud Rate:  115200
 Data Bits:  8
 Stop Bits:  1
 Parity:     None

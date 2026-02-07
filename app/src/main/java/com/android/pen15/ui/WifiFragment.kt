@@ -49,8 +49,14 @@ class WifiFragment : Fragment() {
         binding.btnCrackTermux.setOnClickListener { showTermuxCrackDialog() }
         binding.btnDownloadWordlist.setOnClickListener { downloadWordlist() }
 
+        binding.btnEvilPortalStart.setOnClickListener { send("evilportal -c start") }
+        binding.btnEvilPortalStop.setOnClickListener { send("evilportal -c stop") }
+
+        binding.btnSniffProbe.setOnClickListener { send("sniffprobe") }
+
         binding.btnBleSpam.setOnClickListener { showBleSpamMenu() }
         binding.btnSniffBt.setOnClickListener { send("sniffbt") }
+        binding.btnSniffAirtag.setOnClickListener { send("sniffbt -t airtag") }
 
         appState.connected.observe(viewLifecycleOwner) { connected ->
             setAllEnabled(binding.root, connected)

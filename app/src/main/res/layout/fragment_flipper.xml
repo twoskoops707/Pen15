@@ -4,39 +4,80 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_void"
-    android:padding="12dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- RFID Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WIRELESS" />
+
+        <!-- RFID -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="RFID (125kHz)"
-                    android:textColor="@color/orange"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/orange" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="RFID"
+                        android:textColor="@color/orange"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="125 kHz"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Read proximity cards, key fobs, and access badges. Hold card near Flipper to read."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -44,8 +85,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="Read"
+                        android:layout_marginEnd="6dp"
+                        android:text="Read Card"
                         android:textColor="@color/orange" />
 
                     <com.google.android.material.button.MaterialButton
@@ -53,8 +94,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
-                        android:text="Emulate"
+                        android:layout_marginEnd="6dp"
+                        android:text="Replay"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton
@@ -62,38 +103,71 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Saved"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- NFC Card -->
+        <!-- NFC -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NFC (13.56MHz)"
-                    android:textColor="@color/green"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/green" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="NFC"
+                        android:textColor="@color/green"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="13.56 MHz"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Detect NFC tags and cards. Toggle the NFC field to scan nearby tags."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -101,7 +175,7 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="6dp"
                         android:text="Field ON"
                         android:textColor="@color/green" />
 
@@ -110,7 +184,7 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_marginEnd="6dp"
                         android:text="Field OFF"
                         android:textColor="@color/text_secondary" />
 
@@ -119,38 +193,70 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Saved"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sub-GHz Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="RADIO" />
+
+        <!-- Sub-GHz -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sub-GHz"
-                    android:textColor="@color/purple"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/purple" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Sub-GHz"
+                        android:textColor="@color/purple"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Capture and replay garage doors, gates, car remotes, doorbells. Listen on a frequency to capture signals, then replay them."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -158,8 +264,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="RX"
+                        android:layout_marginEnd="6dp"
+                        android:text="Listen"
                         android:textColor="@color/purple" />
 
                     <com.google.android.material.button.MaterialButton
@@ -167,8 +273,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
-                        android:text="TX File"
+                        android:layout_marginEnd="6dp"
+                        android:text="Replay File"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton
@@ -176,46 +282,71 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Saved"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSubghzBrute"
                     style="@style/ToolCardButton"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="4dp"
-                    android:text="Brute Force"
+                    android:layout_marginTop="6dp"
+                    android:text="Brute Force (try all codes)"
                     android:textColor="@color/red" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- IR Card -->
+        <!-- IR -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Infrared"
-                    android:textColor="@color/red"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/red" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Infrared"
+                        android:textColor="@color/red"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Learn and send TV/AC remote signals. Point a remote at Flipper to capture, then replay it at any TV."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -223,8 +354,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="Receive"
+                        android:layout_marginEnd="6dp"
+                        android:text="Capture"
                         android:textColor="@color/red" />
 
                     <com.google.android.material.button.MaterialButton
@@ -232,8 +363,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
-                        android:text="Transmit"
+                        android:layout_marginEnd="6dp"
+                        android:text="Send"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton
@@ -241,38 +372,70 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Saved"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- iButton Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="OTHER" />
+
+        <!-- iButton -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="iButton"
-                    android:textColor="@color/cyan_dim"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/cyan_dim" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="iButton"
+                        android:textColor="@color/cyan_dim"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Read and emulate Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper contact pad."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -280,8 +443,8 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="Read"
+                        android:layout_marginEnd="6dp"
+                        android:text="Read Key"
                         android:textColor="@color/cyan_dim" />
 
                     <com.google.android.material.button.MaterialButton
@@ -289,108 +452,121 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Emulate"
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- BadUSB Card -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
+        <!-- BadUSB + Storage combined row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BadUSB"
-                    android:textColor="@color/red"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="14dp"
+                app:strokeColor="@color/border_subtle"
+                app:strokeWidth="1dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BadUSB"
+                        android:textColor="@color/red"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Run keystroke scripts"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="11sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBadusbList"
                         style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
                         android:text="Payloads"
                         android:textColor="@color/red" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBadusbDemo"
                         style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="4dp"
                         android:text="Demo"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
 
-        <!-- Storage Card -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Storage"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="14dp"
+                app:strokeColor="@color/border_subtle"
+                app:strokeWidth="1dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Storage"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Browse SD card files"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="11sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStorageRoot"
                         style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="SD Root"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:text="Browse"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnStorageInfo"
                         style="@style/ToolCardButton"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="4dp"
                         android:text="Free Space"
-                        android:textColor="@color/text_secondary" />
+                        android:textColor="@color/text_tertiary" />
                 </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

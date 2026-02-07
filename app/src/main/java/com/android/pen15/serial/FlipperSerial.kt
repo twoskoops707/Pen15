@@ -23,9 +23,9 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         const val FLIPPER_PID = 0x5740
         const val ESP32_CP210X_VID = 0x10C4
         const val ESP32_CH340_VID = 0x1A86
-        const val BAUD_RATE = 230400
+        const val BAUD_RATE = 115200
         const val WRITE_TIMEOUT = 200
-        private val PROMPT_REGEX = Regex("(>:\\s*$|\\]\\s*>:\\s*$)")
+        private val PROMPT_REGEX = Regex(">:\\s")
         private val SUBSHELL_REGEX = Regex("\\[(nfc|subghz|ir|rfid)\\]>")
     }
 
@@ -239,7 +239,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
                 return@post
             }
 
-            if (PROMPT_REGEX.containsMatchIn(clean)) {
+            if (PROMPT_REGEX.containsMatchIn(clean) || clean.contains(">:")) {
                 val wasBusy = cliState == CliState.BUSY
                 cliState = CliState.READY
 

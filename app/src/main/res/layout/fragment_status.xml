@@ -4,39 +4,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_void"
-    android:padding="12dp"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Connection Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CONNECTION" />
+
+        <!-- Connection -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Connection"
-                    android:textColor="@color/cyan"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
@@ -54,17 +56,19 @@
                         android:layout_marginStart="10dp"
                         android:text="OFFLINE"
                         android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/deviceNameText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="No device connected"
+                    android:layout_marginTop="6dp"
+                    android:text="Plug in your Flipper Zero or ESP32 via USB OTG, then tap a connect button below."
                     android:textColor="@color/text_tertiary"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -77,30 +81,26 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:text="USB Auto"
-                        android:textColor="@color/cyan"
-                        app:backgroundTint="@color/bg_elevated" />
+                        android:layout_marginEnd="6dp"
+                        android:text="Auto Detect"
+                        android:textColor="@color/cyan" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnConnectFlipper"
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_marginEnd="6dp"
                         android:text="Flipper"
-                        android:textColor="@color/text_secondary"
-                        app:backgroundTint="@color/bg_elevated" />
+                        android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnConnectEsp"
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="ESP32"
-                        android:textColor="@color/text_secondary"
-                        app:backgroundTint="@color/bg_elevated" />
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -110,31 +110,54 @@
                     android:layout_marginTop="4dp"
                     android:text="Disconnect"
                     android:textColor="@color/red"
-                    android:visibility="gone"
-                    app:backgroundTint="@color/bg_elevated" />
+                    android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Device Info Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="DEVICE" />
+
+        <!-- Device Info -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Device Info"
-                    android:textColor="@color/green"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/green" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Device Info"
+                        android:textColor="@color/green"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/deviceInfoText"
@@ -145,44 +168,76 @@
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:lineSpacingExtra="4dp"
-                    android:text="Connect a device to view info"
-                    android:textIsSelectable="true" />
+                    android:text="Connect a device to view info" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRefreshInfo"
                     style="@style/ToolCardButton"
                     android:layout_width="match_parent"
                     android:layout_marginTop="8dp"
-                    android:text="Refresh Device Info"
+                    android:text="Refresh Info"
                     android:textColor="@color/green" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Power Card -->
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="POWER" />
+
+        <!-- Power -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Power / GPIO"
-                    android:textColor="@color/amber"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                android:padding="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="20dp"
+                        android:background="@color/amber" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Power / GPIO"
+                        android:textColor="@color/amber"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Control 5V power rail (for AWOK board), reboot, or shut down your Flipper."
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
@@ -190,7 +245,7 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="6dp"
                         android:text="5V ON"
                         android:textColor="@color/green" />
 
@@ -199,7 +254,6 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="5V OFF"
                         android:textColor="@color/red" />
                 </LinearLayout>
@@ -215,7 +269,7 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="6dp"
                         android:text="Reboot"
                         android:textColor="@color/amber" />
 
@@ -224,7 +278,6 @@
                         style="@style/ToolCardButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Shutdown"
                         android:textColor="@color/red" />
                 </LinearLayout>
@@ -233,16 +286,20 @@
 
         <!-- App Info -->
         <com.google.android.material.card.MaterialCardView
-            style="@style/ToolCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="14dp"
+            app:strokeColor="@color/border_subtle"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="14dp">
 
                 <TextView
                     android:layout_width="wrap_content"

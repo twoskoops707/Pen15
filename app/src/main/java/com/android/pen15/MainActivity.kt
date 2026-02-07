@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity(), SerialListener {
     }
 
     fun sendCommand(cmd: String) {
-        appendToTerminal("> $cmd")
         serial?.sendCommand(cmd)
     }
 

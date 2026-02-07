@@ -55,20 +55,18 @@ class TerminalFragment : Fragment() {
         }
 
         appState.terminalOutput.observe(viewLifecycleOwner) { text ->
-            val newLines = text.split("\n")
-            for (line in newLines) {
-                if (lines.isNotEmpty() && !lines.last().endsWith("\n") && newLines.indexOf(line) == 0) {
-                    lines[lines.size - 1] = lines.last() + line
-                } else {
-                    lines.add(line)
-                }
+            if (text.isNullOrEmpty()) return@observe
+            for (line in text.split("\n")) {
+                if (line.isNotEmpty()) lines.add(line)
             }
             if (lines.size > 500) {
                 val excess = lines.size - 500
                 lines.subList(0, excess).clear()
             }
             adapter.notifyDataSetChanged()
-            binding.terminalRecycler.scrollToPosition(lines.size - 1)
+            if (lines.isNotEmpty()) {
+                binding.terminalRecycler.scrollToPosition(lines.size - 1)
+            }
         }
 
         appState.connected.observe(viewLifecycleOwner) { connected ->
@@ -84,17 +82,12 @@ class TerminalFragment : Fragment() {
     private fun sendInput() {
         val cmd = binding.inputField.text.toString().trim()
         if (cmd.isEmpty()) return
-        appendLine("> $cmd")
+        lines.add("> $cmd")
+        adapter.notifyDataSetChanged()
+        if (lines.isNotEmpty()) binding.terminalRecycler.scrollToPosition(lines.size - 1)
         mainActivity()?.sendCommand(cmd)
         appState.addToHistory(cmd)
         binding.inputField.text.clear()
-    }
-
-    fun appendLine(text: String) {
-        lines.add(text)
-        if (lines.size > 500) lines.removeAt(0)
-        adapter.notifyDataSetChanged()
-        binding.terminalRecycler.scrollToPosition(lines.size - 1)
     }
 
     private fun showHistory() {
@@ -126,8 +119,7 @@ class TerminalFragment : Fragment() {
                 setTextColor(0xFF9CA3AF.toInt())
                 textSize = 11f
                 typeface = android.graphics.Typeface.MONOSPACE
-                setPadding(0, 1, 0, 1)
-                setTextIsSelectable(true)
+                setPadding(4, 2, 4, 2)
             }
             return VH(tv)
         }
@@ -139,8 +131,8 @@ class TerminalFragment : Fragment() {
                 when {
                     line.startsWith("> ") -> 0xFF00E5FF.toInt()
                     line.startsWith("[") -> 0xFF00FF41.toInt()
-                    line.contains("ERROR", ignoreCase = true) -> 0xFFFF1744.toInt()
-                    else -> 0xFF9CA3AF.toInt()
+                    line.contains("error", ignoreCase = true) -> 0xFFFF1744.toInt()
+                    else -> 0xFF7A8BA8.toInt()
                 }
             )
         }
