@@ -22,6 +22,23 @@ class AppState : ViewModel() {
     private val _deviceType = MutableLiveData(FlipperSerial.DeviceType.NONE)
     val deviceType: LiveData<FlipperSerial.DeviceType> = _deviceType
 
+    private val _activeCommand = MutableLiveData<String?>(null)
+    val activeCommand: LiveData<String?> = _activeCommand
+
+    data class CommandResult(val cmd: String, val response: String)
+
+    private val _lastResponse = MutableLiveData<CommandResult?>(null)
+    val lastResponse: LiveData<CommandResult?> = _lastResponse
+
+    fun setCommandStarted(cmd: String) {
+        _activeCommand.postValue(cmd)
+    }
+
+    fun setCommandFinished(cmd: String, response: String) {
+        _activeCommand.postValue(null)
+        _lastResponse.postValue(CommandResult(cmd, response))
+    }
+
     private val terminalLines = mutableListOf<String>()
     private val commandHistory = mutableListOf<String>()
     val history: List<String> get() = commandHistory

@@ -62,10 +62,10 @@ class MainActivity : AppCompatActivity(), SerialListener {
             it.register()
         }
 
-        appendToTerminal("=== PEN15 v2.0.3 BUILD 226 ===")
+        appendToTerminal("=== PEN15 v2.0.4 BUILD 227 ===")
         appendToTerminal("Tap STATUS tab to connect your device")
 
-        Toast.makeText(this, "PEN15 v2.0.3 Build 226", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "PEN15 v2.0.4 Build 227", Toast.LENGTH_LONG).show()
     }
 
     fun sendCommand(cmd: String) {
@@ -101,6 +101,14 @@ class MainActivity : AppCompatActivity(), SerialListener {
             appState.setDisconnected()
             appendToTerminal("[Disconnected]")
         }
+    }
+
+    override fun onCommandStarted(cmd: String) {
+        handler.post { appState.setCommandStarted(cmd) }
+    }
+
+    override fun onCommandFinished(cmd: String, response: String) {
+        handler.post { appState.setCommandFinished(cmd, response) }
     }
 
     override fun onDestroy() {

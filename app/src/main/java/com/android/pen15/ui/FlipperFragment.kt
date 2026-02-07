@@ -1,12 +1,17 @@
 package com.android.pen15.ui
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,6 +25,9 @@ class FlipperFragment : Fragment() {
     private var _binding: FragmentFlipperBinding? = null
     private val binding get() = _binding!!
     private val appState: AppState by activityViewModels()
+    private val handler = Handler(Looper.getMainLooper())
+    private var pulseAnimator: ObjectAnimator? = null
+    private val autoHideRunnables = mutableMapOf<TextView, Runnable>()
 
     private val subghzFrequencies = arrayOf(
         "433.92 MHz" to "433920000",
@@ -72,6 +80,89 @@ class FlipperFragment : Fragment() {
 
         binding.btnStorageRoot.setOnClickListener { send("storage list /ext") }
         binding.btnStorageInfo.setOnClickListener { send("storage info /ext") }
+
+        appState.activeCommand.observe(viewLifecycleOwner) { cmd ->
+            if (cmd != null) {
+                val tv = statusViewForCommand(cmd) ?: return@observe
+                showRunning(tv, cmd)
+            }
+        }
+
+        appState.lastResponse.observe(viewLifecycleOwner) { result ->
+            if (result != null) {
+                val tv = statusViewForCommand(result.cmd) ?: return@observe
+                showResult(tv, result.response)
+            }
+        }
+    }
+
+    private fun statusViewForCommand(cmd: String): TextView? {
+        if (_binding == null) return null
+        return when {
+            cmd.startsWith("rfid") -> binding.statusRfid
+            cmd.startsWith("subghz") || cmd.startsWith("storage list /ext/subghz") || cmd.startsWith("storage write") -> binding.statusSubghz
+            cmd.startsWith("nfc") || cmd.startsWith("storage list /ext/nfc") -> binding.statusNfc
+            cmd.startsWith("ir ") || cmd.startsWith("storage list /ext/infrared") -> binding.statusIr
+            cmd.startsWith("ikey") -> binding.statusIkey
+            cmd.startsWith("storage list /ext/lfrfid") -> binding.statusRfid
+            else -> null
+        }
+    }
+
+    private fun showRunning(tv: TextView, cmd: String) {
+        cancelAutoHide(tv)
+        tv.visibility = View.VISIBLE
+        tv.text = "RUNNING: $cmd"
+        tv.alpha = 1.0f
+        startPulse(tv)
+    }
+
+    private fun showResult(tv: TextView, response: String) {
+        stopPulse(tv)
+        tv.alpha = 1.0f
+        val clean = response.replace(Regex(">\u001B\\[[0-9;]*m"), "")
+            .replace(Regex("\u001B\\[[0-9;]*m"), "")
+            .trim()
+        val lines = clean.lines().filter { it.isNotBlank() }
+        val display = if (lines.size > 6) {
+            lines.take(6).joinToString("\n") + "\n... (${lines.size - 6} more)"
+        } else {
+            lines.joinToString("\n")
+        }
+        tv.text = if (display.isBlank()) "DONE (no output)" else display
+        tv.visibility = View.VISIBLE
+        scheduleAutoHide(tv, 10_000)
+    }
+
+    private fun startPulse(tv: TextView) {
+        stopPulse(tv)
+        pulseAnimator = ObjectAnimator.ofFloat(tv, "alpha", 1.0f, 0.3f).apply {
+            duration = 600
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+    }
+
+    private fun stopPulse(tv: TextView) {
+        pulseAnimator?.let {
+            if (it.target == tv) {
+                it.cancel()
+                pulseAnimator = null
+            }
+        }
+        tv.alpha = 1.0f
+    }
+
+    private fun scheduleAutoHide(tv: TextView, delayMs: Long) {
+        cancelAutoHide(tv)
+        val runnable = Runnable { tv.visibility = View.GONE }
+        autoHideRunnables[tv] = runnable
+        handler.postDelayed(runnable, delayMs)
+    }
+
+    private fun cancelAutoHide(tv: TextView) {
+        autoHideRunnables.remove(tv)?.let { handler.removeCallbacks(it) }
     }
 
     private fun showFrequencyPicker() {
@@ -207,6 +298,10 @@ class FlipperFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        pulseAnimator?.cancel()
+        pulseAnimator = null
+        autoHideRunnables.values.forEach { handler.removeCallbacks(it) }
+        autoHideRunnables.clear()
         _binding = null
     }
 }

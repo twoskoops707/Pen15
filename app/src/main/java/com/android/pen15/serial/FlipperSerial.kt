@@ -50,6 +50,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
     private var pendingCallback: ((String) -> Unit)? = null
     private val responseBuffer = StringBuilder()
     private var responseTimeoutRunnable: Runnable? = null
+    private var currentCommand: String? = null
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -203,6 +204,8 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         pendingCallback = callback
         responseBuffer.clear()
         cliState = CliState.BUSY
+        currentCommand = cmd
+        listener?.onCommandStarted(cmd)
         writeRaw("$cmd\r".toByteArray())
         startResponseTimeout()
     }
@@ -245,9 +248,12 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
 
                 if (wasBusy) {
                     cancelResponseTimeout()
-                    pendingCallback?.invoke(responseBuffer.toString())
+                    val response = responseBuffer.toString()
+                    currentCommand?.let { listener?.onCommandFinished(it, response) }
+                    pendingCallback?.invoke(response)
                     pendingCallback = null
                     responseBuffer.clear()
+                    currentCommand = null
                 }
 
                 processQueue()
@@ -285,9 +291,12 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         cancelResponseTimeout()
         responseTimeoutRunnable = Runnable {
             if (cliState == CliState.BUSY) {
-                pendingCallback?.invoke(responseBuffer.toString())
+                val response = responseBuffer.toString()
+                currentCommand?.let { listener?.onCommandFinished(it, response) }
+                pendingCallback?.invoke(response)
                 pendingCallback = null
                 responseBuffer.clear()
+                currentCommand = null
                 cliState = CliState.READY
                 processQueue()
             }

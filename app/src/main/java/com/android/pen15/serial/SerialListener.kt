@@ -5,4 +5,6 @@ interface SerialListener {
     fun onSerialData(data: String)
     fun onSerialError(error: String)
     fun onSerialDisconnect()
+    fun onCommandStarted(cmd: String) {}
+    fun onCommandFinished(cmd: String, response: String) {}
 }
