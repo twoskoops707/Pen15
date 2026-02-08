@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import com.android.pen15.MainActivity
 import com.android.pen15.databinding.FragmentWifiBinding
 import com.android.pen15.model.AppState
+import com.android.pen15.serial.FlipperSerial
 import com.android.pen15.tools.TermuxHelper
 
 class WifiFragment : Fragment() {
@@ -88,6 +89,30 @@ class WifiFragment : Fragment() {
                 showResult(tv, result.response)
             }
         }
+
+        appState.terminalOutput.observe(viewLifecycleOwner) { data ->
+            if (data != null && appState.activeCommand.value != null) {
+                val tv = statusViewForCommand(appState.activeCommand.value!!) ?: return@observe
+                appendStreaming(tv, data)
+            }
+        }
+    }
+
+    private val streamBuffers = mutableMapOf<TextView, StringBuilder>()
+
+    private fun appendStreaming(tv: TextView, data: String) {
+        val buf = streamBuffers.getOrPut(tv) { StringBuilder() }
+        buf.append(data)
+        val clean = buf.toString()
+            .replace(Regex("\u001B\\[[0-9;]*m"), "")
+            .trim()
+        val lines = clean.lines().filter { it.isNotBlank() }
+        val display = if (lines.size > 8) {
+            lines.takeLast(8).joinToString("\n")
+        } else {
+            lines.joinToString("\n")
+        }
+        if (display.isNotBlank()) tv.text = display
     }
 
     private fun statusViewForCommand(cmd: String): TextView? {
@@ -103,6 +128,7 @@ class WifiFragment : Fragment() {
 
     private fun showRunning(tv: TextView, cmd: String) {
         cancelAutoHide(tv)
+        streamBuffers.remove(tv)
         tv.visibility = View.VISIBLE
         tv.text = "RUNNING: $cmd"
         tv.alpha = 1.0f
@@ -315,7 +341,15 @@ class WifiFragment : Fragment() {
 
     private fun send(cmd: String) {
         if (!checkConnected()) return
-        mainActivity()?.sendCommand(cmd)
+        val main = mainActivity() ?: return
+        val serial = main.serial ?: return
+        if (serial.deviceType == FlipperSerial.DeviceType.FLIPPER && !serial.bridgeMode) {
+            serial.startBridge {
+                main.sendCommand(cmd)
+            }
+            return
+        }
+        main.sendCommand(cmd)
     }
 
     private fun mainActivity(): MainActivity? = activity as? MainActivity

@@ -39,6 +39,8 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         private set
     var cliState = CliState.IDLE
         private set
+    var bridgeMode = false
+        private set
 
     private val handler = Handler(Looper.getMainLooper())
     private var usbManager: UsbManager? = null
@@ -51,6 +53,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
     private val responseBuffer = StringBuilder()
     private var responseTimeoutRunnable: Runnable? = null
     private var currentCommand: String? = null
+    private var ignorePromptUntil = 0L
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -147,6 +150,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
             }
 
             connected = true
+            bridgeMode = false
             cliState = CliState.WAKING
             commandQueue.clear()
 
@@ -167,6 +171,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         connected = false
         deviceType = DeviceType.NONE
         cliState = CliState.IDLE
+        bridgeMode = false
         commandQueue.clear()
         cancelResponseTimeout()
 
@@ -193,6 +198,16 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
             return
         }
 
+        if (bridgeMode) {
+            currentCommand = cmd
+            listener?.onCommandStarted(cmd)
+            responseBuffer.clear()
+            writeRaw("$cmd\r\n".toByteArray())
+            startResponseTimeout(getTimeoutForCommand(cmd))
+            cliState = CliState.BUSY
+            return
+        }
+
         if (cliState == CliState.READY) {
             executeDirect(cmd, callback)
         } else {
@@ -200,21 +215,78 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         }
     }
 
+    private fun getTimeoutForCommand(cmd: String): Long = when {
+        cmd.startsWith("rfid") || cmd.startsWith("ikey") -> 30_000L
+        cmd.startsWith("nfc field") -> 5_000L
+        cmd.startsWith("nfc") -> 15_000L
+        cmd.startsWith("subghz rx") -> 60_000L
+        cmd.startsWith("subghz") -> 10_000L
+        cmd.startsWith("ir rx") -> 60_000L
+        cmd.startsWith("ir ") -> 5_000L
+        cmd.startsWith("scan") || cmd.startsWith("sniff") -> 30_000L
+        cmd.startsWith("attack") -> 30_000L
+        cmd.startsWith("storage") -> 5_000L
+        cmd.startsWith("loader") -> 3_000L
+        else -> 10_000L
+    }
+
     private fun executeDirect(cmd: String, callback: ((String) -> Unit)? = null) {
         pendingCallback = callback
         responseBuffer.clear()
         cliState = CliState.BUSY
         currentCommand = cmd
+        ignorePromptUntil = System.currentTimeMillis() + 500
         listener?.onCommandStarted(cmd)
         writeRaw("$cmd\r".toByteArray())
-        startResponseTimeout()
+        startResponseTimeout(getTimeoutForCommand(cmd))
     }
 
     fun sendCtrlC() {
         if (!connected) return
-        writeRaw(byteArrayOf(0x03))
-        cliState = CliState.READY
         cancelResponseTimeout()
+        writeRaw(byteArrayOf(0x03))
+        if (cliState == CliState.BUSY) {
+            val response = responseBuffer.toString()
+            currentCommand?.let { listener?.onCommandFinished(it, response) }
+            pendingCallback = null
+            responseBuffer.clear()
+            currentCommand = null
+        }
+        cliState = CliState.READY
+    }
+
+    fun startBridge(callback: (() -> Unit)? = null) {
+        if (!connected || deviceType != DeviceType.FLIPPER) return
+        listener?.onCommandStarted("Starting ESP32 bridge...")
+        writeRaw("loader open GPIO/USB-UART Bridge\r".toByteArray())
+        handler.postDelayed({
+            bridgeMode = true
+            cliState = CliState.READY
+            listener?.onCommandFinished("bridge", "ESP32 UART bridge active")
+            listener?.onSerialConnect("ESP32/Marauder (via Flipper GPIO bridge)")
+            callback?.invoke()
+        }, 2000)
+    }
+
+    fun stopBridge() {
+        if (!connected || !bridgeMode) return
+        bridgeMode = false
+        writeRaw(byteArrayOf(0x03))
+        handler.postDelayed({
+            writeRaw(byteArrayOf(0x1B))
+            handler.postDelayed({
+                cliState = CliState.WAKING
+                writeRaw(byteArrayOf(0x03))
+                handler.postDelayed({ writeRaw("\r".toByteArray()) }, 300)
+                handler.postDelayed({ writeRaw("\r".toByteArray()) }, 600)
+                listener?.onSerialConnect("Flipper Zero @ $BAUD_RATE baud")
+            }, 200)
+        }, 200)
+    }
+
+    fun sendRaw(data: String) {
+        if (!connected) return
+        writeRaw(data.toByteArray())
     }
 
     private fun writeRaw(data: ByteArray) {
@@ -233,16 +305,29 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
 
             listener?.onSerialData(clean)
 
+            if (bridgeMode) {
+                if (cliState == CliState.BUSY) {
+                    responseBuffer.append(clean)
+                }
+                return@post
+            }
+
             if (cliState == CliState.BUSY) {
                 responseBuffer.append(clean)
             }
 
             if (SUBSHELL_REGEX.containsMatchIn(clean)) {
-                handler.postDelayed({ writeRaw("exit\r".toByteArray()) }, 100)
+                if (cliState != CliState.BUSY) {
+                    handler.postDelayed({ writeRaw("exit\r".toByteArray()) }, 100)
+                }
                 return@post
             }
 
             if (PROMPT_REGEX.containsMatchIn(clean) || clean.contains(">:")) {
+                if (cliState == CliState.BUSY && System.currentTimeMillis() < ignorePromptUntil) {
+                    return@post
+                }
+
                 val wasBusy = cliState == CliState.BUSY
                 cliState = CliState.READY
 
@@ -287,7 +372,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         }
     }
 
-    private fun startResponseTimeout() {
+    private fun startResponseTimeout(timeoutMs: Long = 5000L) {
         cancelResponseTimeout()
         responseTimeoutRunnable = Runnable {
             if (cliState == CliState.BUSY) {
@@ -301,7 +386,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
                 processQueue()
             }
         }
-        handler.postDelayed(responseTimeoutRunnable!!, 5000)
+        handler.postDelayed(responseTimeoutRunnable!!, timeoutMs)
     }
 
     private fun cancelResponseTimeout() {

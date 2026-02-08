@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#080C14"
+    android:background="#0A0E17"
     android:clipToPadding="false"
     android:paddingBottom="16dp">
 
@@ -16,26 +16,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="WIFI / BLUETOOTH ATTACKS"
-            android:textColor="#4A5B78"
-            android:textSize="12sp"
+            android:textColor="#8899AA"
+            android:textSize="13sp"
             android:letterSpacing="0.15"
-            android:layout_marginBottom="10dp" />
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
 
         <!-- Scan Networks -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FIND NETWORKS"
-                android:textColor="#00E5FF"
-                android:textSize="14sp"
+                android:textColor="#18FFFF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Scan for nearby WiFi networks and connected devices. Scan first, then pick a target."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -55,63 +56,63 @@
                 <Button
                     android:id="@+id/btnScanAp"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="SCAN"
                     android:textSize="11sp"
-                    android:textColor="#00E5FF"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#00BCD4" />
 
                 <Button
                     android:id="@+id/btnScanSta"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="CLIENTS"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnListAp"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="RESULTS"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnSelectAp"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="PICK TARGET"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnStopScan"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="STOP"
                     android:textSize="11sp"
-                    android:textColor="#FF1744"
-                    android:background="#152238" />
+                    android:textColor="#FFFFFF"
+                    android:background="#C62828" />
             </LinearLayout>
 
             <TextView
@@ -120,11 +121,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#00E5FF"
+                android:textColor="#18FFFF"
                 android:textSize="10sp"
                 android:maxLines="8"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -133,16 +134,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="WIFI ATTACKS"
-                android:textColor="#FF1744"
-                android:textSize="14sp"
+                android:textColor="#FF5252"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -150,7 +151,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Kick devices off WiFi, flood with fake networks, or create fake login pages to capture passwords."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -162,75 +163,75 @@
                 <Button
                     android:id="@+id/btnDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="KICK OFF"
                     android:textSize="11sp"
-                    android:textColor="#FF1744"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#D50000" />
 
                 <Button
                     android:id="@+id/btnBeacon"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="FAKE APs"
                     android:textSize="11sp"
-                    android:textColor="#FFD600"
-                    android:background="#1E3050" />
+                    android:textColor="#FFFFFF"
+                    android:background="#F57F17" />
 
                 <Button
                     android:id="@+id/btnRickroll"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="RICKROLL"
                     android:textSize="11sp"
                     android:textColor="#FFD600"
-                    android:background="#152238" />
+                    android:background="#1E2D45" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnProbe"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="PROBE"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnEvilPortalStart"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="EVIL PORTAL"
                     android:textSize="11sp"
-                    android:textColor="#FF6E40"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#FF6E40" />
 
                 <Button
                     android:id="@+id/btnEvilPortalStop"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="STOP"
                     android:textSize="11sp"
-                    android:textColor="#FF1744"
-                    android:background="#152238" />
+                    android:textColor="#FF8A80"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <TextView
@@ -239,11 +240,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#FF1744"
+                android:textColor="#FF8A80"
                 android:textSize="10sp"
                 android:maxLines="8"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -252,16 +253,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="CAPTURE PASSWORDS"
-                android:textColor="#00FF41"
-                android:textSize="14sp"
+                android:textColor="#69F0AE"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -269,7 +270,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Capture WiFi handshakes for offline password cracking. PMKID is fastest - no client needed."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -281,63 +282,63 @@
                 <Button
                     android:id="@+id/btnSniffPmkid"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="PMKID"
                     android:textSize="11sp"
-                    android:textColor="#00FF41"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#00C853" />
 
                 <Button
                     android:id="@+id/btnSniffBeacon"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="BEACONS"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnSniffDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="DEAUTHS"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnSniffRaw"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="RAW"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
 
                 <Button
                     android:id="@+id/btnSniffProbe"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="PROBES"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <TextView
@@ -346,11 +347,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#00FF41"
+                android:textColor="#69F0AE"
                 android:textSize="10sp"
                 android:maxLines="8"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -359,16 +360,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="CRACK WIFI PASSWORD"
-                android:textColor="#FFD600"
-                android:textSize="14sp"
+                android:textColor="#FFD740"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -376,7 +377,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Crack captured handshakes. Quick = built-in dictionary. Termux = aircrack-ng with rockyou.txt (133MB)."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -388,35 +389,35 @@
                 <Button
                     android:id="@+id/btnCrackInApp"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="QUICK CRACK"
                     android:textSize="11sp"
-                    android:textColor="#FFD600"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#F57F17" />
 
                 <Button
                     android:id="@+id/btnCrackTermux"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="TERMUX"
                     android:textSize="11sp"
-                    android:textColor="#B388FF"
-                    android:background="#1E3050" />
+                    android:textColor="#FFFFFF"
+                    android:background="#7C4DFF" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnDownloadWordlist"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="4dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="6dp"
                 android:text="DOWNLOAD WORDLIST (rockyou.txt)"
                 android:textSize="10sp"
-                android:textColor="#4A5B78"
-                android:background="#152238" />
+                android:textColor="#8899AA"
+                android:background="#1A2538" />
         </LinearLayout>
 
         <!-- BLE -->
@@ -424,16 +425,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="BLUETOOTH SPAM"
-                android:textColor="#00B8D4"
-                android:textSize="14sp"
+                android:textColor="#40C4FF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -441,7 +442,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Flood nearby phones with fake Bluetooth pairing popups. Sniff BT traffic and track AirTags."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -453,35 +454,35 @@
                 <Button
                     android:id="@+id/btnBleSpam"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="BLE SPAM"
                     android:textSize="11sp"
-                    android:textColor="#00B8D4"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#0091EA" />
 
                 <Button
                     android:id="@+id/btnSniffBt"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="SNIFF BT"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnSniffAirtag"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="AIRTAGS"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
             </LinearLayout>
 
             <TextView
@@ -490,11 +491,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#00B8D4"
+                android:textColor="#40C4FF"
                 android:textSize="10sp"
                 android:maxLines="8"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 

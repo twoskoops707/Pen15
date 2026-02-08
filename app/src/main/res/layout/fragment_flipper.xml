@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#080C14"
+    android:background="#0A0E17"
     android:clipToPadding="false"
     android:paddingBottom="16dp">
 
@@ -16,26 +16,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="FLIPPER TOOLS"
-            android:textColor="#4A5B78"
-            android:textSize="12sp"
+            android:textColor="#8899AA"
+            android:textSize="13sp"
             android:letterSpacing="0.15"
-            android:layout_marginBottom="10dp" />
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
 
         <!-- Clone Key Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="CLONE KEY CARD"
                 android:textColor="#FF6E40"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Read and copy proximity badges, key fobs, and access cards (125kHz RFID)"
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -55,35 +56,35 @@
                 <Button
                     android:id="@+id/btnRfidRead"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="READ CARD"
                     android:textSize="11sp"
-                    android:textColor="#FF6E40"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#FF6E40" />
 
                 <Button
                     android:id="@+id/btnRfidEmulate"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="REPLAY"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnRfidList"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="SAVED"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <TextView
@@ -96,7 +97,7 @@
                 android:textSize="10sp"
                 android:maxLines="6"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -105,16 +106,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="COPY REMOTE CONTROL"
                 android:textColor="#B388FF"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -122,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Capture and replay garage openers, gate remotes, car fobs, doorbells (Sub-GHz radio)"
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -134,47 +135,47 @@
                 <Button
                     android:id="@+id/btnSubghzRx"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="CAPTURE"
                     android:textSize="11sp"
-                    android:textColor="#B388FF"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#7C4DFF" />
 
                 <Button
                     android:id="@+id/btnSubghzTxFile"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="REPLAY"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnSubghzList"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="SAVED"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnSubghzBrute"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="46dp"
                 android:layout_marginTop="6dp"
                 android:text="BRUTE FORCE (try all codes)"
                 android:textSize="11sp"
-                android:textColor="#FF1744"
+                android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                android:background="#1E3050" />
+                android:background="#D50000" />
 
             <TextView
                 android:id="@+id/statusSubghz"
@@ -182,11 +183,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#B388FF"
+                android:textColor="#CE93D8"
                 android:textSize="10sp"
                 android:maxLines="6"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -195,16 +196,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="NFC TAGS"
-                android:textColor="#00FF41"
-                android:textSize="14sp"
+                android:textColor="#69F0AE"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -212,7 +213,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Detect and read NFC cards, tags, and payment systems (13.56 MHz)"
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -224,35 +225,35 @@
                 <Button
                     android:id="@+id/btnNfcFieldOn"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="SCAN ON"
                     android:textSize="11sp"
-                    android:textColor="#00FF41"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#00C853" />
 
                 <Button
                     android:id="@+id/btnNfcFieldOff"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="SCAN OFF"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnNfcList"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="SAVED"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <TextView
@@ -261,11 +262,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#00FF41"
+                android:textColor="#69F0AE"
                 android:textSize="10sp"
                 android:maxLines="6"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -274,16 +275,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TV / AC REMOTE"
-                android:textColor="#FF1744"
-                android:textSize="14sp"
+                android:textColor="#FF5252"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -291,7 +292,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Learn and send infrared signals. Point any remote at Flipper to capture it."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -303,35 +304,35 @@
                 <Button
                     android:id="@+id/btnIrRx"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="LEARN"
                     android:textSize="11sp"
-                    android:textColor="#FF1744"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#FF1744" />
 
                 <Button
                     android:id="@+id/btnIrTx"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="SEND"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnIrList"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="SAVED"
                     android:textSize="11sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <TextView
@@ -340,11 +341,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#FF1744"
+                android:textColor="#FF8A80"
                 android:textSize="10sp"
                 android:maxLines="6"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -353,16 +354,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#111B2E"
+            android:background="#141C2B"
             android:padding="14dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="INTERCOM KEYS"
-                android:textColor="#00B8D4"
-                android:textSize="14sp"
+                android:textColor="#40C4FF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -370,7 +371,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Read and clone Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper."
-                android:textColor="#4A5B78"
+                android:textColor="#7888A0"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -382,24 +383,24 @@
                 <Button
                     android:id="@+id/btnIkeyRead"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="6dp"
                     android:text="READ KEY"
                     android:textSize="11sp"
-                    android:textColor="#00B8D4"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:background="#1E3050" />
+                    android:background="#0091EA" />
 
                 <Button
                     android:id="@+id/btnIkeyEmulate"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="46dp"
                     android:layout_weight="1"
                     android:text="CLONE"
                     android:textSize="11sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#152238" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
             </LinearLayout>
 
             <TextView
@@ -408,11 +409,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="monospace"
-                android:textColor="#00B8D4"
+                android:textColor="#40C4FF"
                 android:textSize="10sp"
                 android:maxLines="6"
                 android:visibility="gone"
-                android:background="#0A1520"
+                android:background="#060D15"
                 android:padding="8dp" />
         </LinearLayout>
 
@@ -421,44 +422,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="#111B2E"
+                android:background="#141C2B"
                 android:padding="14dp"
-                android:layout_marginEnd="4dp">
+                android:layout_marginEnd="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="BAD USB"
-                    android:textColor="#FF1744"
-                    android:textSize="13sp"
+                    android:textColor="#FF5252"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnBadusbList"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="42dp"
                     android:layout_marginTop="8dp"
                     android:text="PAYLOADS"
                     android:textSize="10sp"
-                    android:textColor="#FF1744"
-                    android:background="#1E3050" />
+                    android:textColor="#FFFFFF"
+                    android:background="#C62828" />
 
                 <Button
                     android:id="@+id/btnBadusbDemo"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="42dp"
                     android:layout_marginTop="4dp"
                     android:text="DEMO"
                     android:textSize="10sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
 
             <LinearLayout
@@ -466,37 +467,37 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:background="#111B2E"
+                android:background="#141C2B"
                 android:padding="14dp"
-                android:layout_marginStart="4dp">
+                android:layout_marginStart="5dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FILES"
-                    android:textColor="#7A8BA8"
-                    android:textSize="13sp"
+                    android:textColor="#B0BEC5"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnStorageRoot"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="42dp"
                     android:layout_marginTop="8dp"
                     android:text="BROWSE SD"
                     android:textSize="10sp"
-                    android:textColor="#7A8BA8"
-                    android:background="#1E3050" />
+                    android:textColor="#E0E8F0"
+                    android:background="#1E2D45" />
 
                 <Button
                     android:id="@+id/btnStorageInfo"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="42dp"
                     android:layout_marginTop="4dp"
                     android:text="SPACE"
                     android:textSize="10sp"
-                    android:textColor="#4A5B78"
-                    android:background="#152238" />
+                    android:textColor="#8899AA"
+                    android:background="#1A2538" />
             </LinearLayout>
         </LinearLayout>
 
