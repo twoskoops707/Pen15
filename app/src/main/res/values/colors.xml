@@ -26,6 +26,22 @@
     <color name="border_subtle">#152238</color>
     <color name="border_default">#1E3050</color>
 
+    <color name="section_subghz">#7C4DFF</color>
+    <color name="section_rfid">#FF6E40</color>
+    <color name="section_nfc">#00C853</color>
+    <color name="section_ir">#FF1744</color>
+    <color name="section_ibutton">#0091EA</color>
+    <color name="section_badusb">#D50000</color>
+    <color name="section_gpio">#F57F17</color>
+    <color name="section_scan">#00BCD4</color>
+    <color name="section_attack">#D50000</color>
+    <color name="section_capture">#00C853</color>
+    <color name="section_crack">#F57F17</color>
+    <color name="section_recon">#7C4DFF</color>
+    <color name="section_bluetooth">#0091EA</color>
+    <color name="section_header_bg">#1A2235</color>
+    <color name="section_content_bg">#111A2A</color>
+
     <color name="status_connected">#00FF41</color>
     <color name="status_disconnected">#4A5B78</color>
 

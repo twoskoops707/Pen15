@@ -10,495 +10,273 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="FLIPPER TOOLS"
-            android:textColor="#8899AA"
-            android:textSize="13sp"
-            android:letterSpacing="0.15"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Clone Key Card -->
+        <!-- 1. SUB-GHZ RADIO -->
         <LinearLayout
+            android:id="@+id/headerSubghz"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141C2B"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CLONE KEY CARD"
-                android:textColor="#FF6E40"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Read and copy proximity badges, key fobs, and access cards (125kHz RFID)"
-                android:textColor="#7888A0"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnRfidRead"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="READ CARD"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="#FF6E40" />
-
-                <Button
-                    android:id="@+id/btnRfidEmulate"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="REPLAY"
-                    android:textSize="11sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-
-                <Button
-                    android:id="@+id/btnRfidList"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:text="SAVED"
-                    android:textSize="11sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/statusRfid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:textColor="#00FF41"
-                android:textSize="10sp"
-                android:maxLines="6"
-                android:visibility="gone"
-                android:background="#060D15"
-                android:padding="8dp" />
-        </LinearLayout>
-
-        <!-- Copy Remote -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141C2B"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="COPY REMOTE CONTROL"
-                android:textColor="#B388FF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Capture and replay garage openers, gate remotes, car fobs, doorbells (Sub-GHz radio)"
-                android:textColor="#7888A0"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnSubghzRx"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="CAPTURE"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="#7C4DFF" />
-
-                <Button
-                    android:id="@+id/btnSubghzTxFile"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="REPLAY"
-                    android:textSize="11sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-
-                <Button
-                    android:id="@+id/btnSubghzList"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:text="SAVED"
-                    android:textSize="11sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnSubghzBrute"
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="6dp"
-                android:text="BRUTE FORCE (try all codes)"
-                android:textSize="11sp"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:background="#D50000" />
-
-            <TextView
-                android:id="@+id/statusSubghz"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:textColor="#CE93D8"
-                android:textSize="10sp"
-                android:maxLines="6"
-                android:visibility="gone"
-                android:background="#060D15"
-                android:padding="8dp" />
-        </LinearLayout>
-
-        <!-- NFC -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141C2B"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="NFC TAGS"
-                android:textColor="#69F0AE"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Detect and read NFC cards, tags, and payment systems (13.56 MHz)"
-                android:textColor="#7888A0"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnNfcFieldOn"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="SCAN ON"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="#00C853" />
-
-                <Button
-                    android:id="@+id/btnNfcFieldOff"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="SCAN OFF"
-                    android:textSize="11sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-
-                <Button
-                    android:id="@+id/btnNfcList"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:text="SAVED"
-                    android:textSize="11sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/statusNfc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:textColor="#69F0AE"
-                android:textSize="10sp"
-                android:maxLines="6"
-                android:visibility="gone"
-                android:background="#060D15"
-                android:padding="8dp" />
-        </LinearLayout>
-
-        <!-- IR Remote -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141C2B"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TV / AC REMOTE"
-                android:textColor="#FF5252"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Learn and send infrared signals. Point any remote at Flipper to capture it."
-                android:textColor="#7888A0"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnIrRx"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="LEARN"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="#FF1744" />
-
-                <Button
-                    android:id="@+id/btnIrTx"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="SEND"
-                    android:textSize="11sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-
-                <Button
-                    android:id="@+id/btnIrList"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:text="SAVED"
-                    android:textSize="11sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/statusIr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:textColor="#FF8A80"
-                android:textSize="10sp"
-                android:maxLines="6"
-                android:visibility="gone"
-                android:background="#060D15"
-                android:padding="8dp" />
-        </LinearLayout>
-
-        <!-- iButton -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#141C2B"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="INTERCOM KEYS"
-                android:textColor="#40C4FF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Read and clone Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper."
-                android:textColor="#7888A0"
-                android:textSize="11sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnIkeyRead"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:text="READ KEY"
-                    android:textSize="11sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="#0091EA" />
-
-                <Button
-                    android:id="@+id/btnIkeyEmulate"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_weight="1"
-                    android:text="CLONE"
-                    android:textSize="11sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/statusIkey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="monospace"
-                android:textColor="#40C4FF"
-                android:textSize="10sp"
-                android:maxLines="6"
-                android:visibility="gone"
-                android:background="#060D15"
-                android:padding="8dp" />
-        </LinearLayout>
-
-        <!-- BadUSB + Storage -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp">
-
-            <LinearLayout
+            android:gravity="center_vertical"
+            android:background="@color/section_subghz"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp"
+            android:layout_marginTop="6dp">
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="#141C2B"
-                android:padding="14dp"
-                android:layout_marginEnd="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BAD USB"
-                    android:textColor="#FF5252"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnBadusbList"
-                    android:layout_width="match_parent"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="8dp"
-                    android:text="PAYLOADS"
-                    android:textSize="10sp"
-                    android:textColor="#FFFFFF"
-                    android:background="#C62828" />
-
-                <Button
-                    android:id="@+id/btnBadusbDemo"
-                    android:layout_width="match_parent"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="4dp"
-                    android:text="DEMO"
-                    android:textSize="10sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
+                android:text="SUB-GHZ RADIO"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+            <TextView
+                android:id="@+id/arrowSubghz"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:background="#141C2B"
-                android:padding="14dp"
-                android:layout_marginStart="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FILES"
-                    android:textColor="#B0BEC5"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnStorageRoot"
-                    android:layout_width="match_parent"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="8dp"
-                    android:text="BROWSE SD"
-                    android:textSize="10sp"
-                    android:textColor="#E0E8F0"
-                    android:background="#1E2D45" />
-
-                <Button
-                    android:id="@+id/btnStorageInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="4dp"
-                    android:text="SPACE"
-                    android:textSize="10sp"
-                    android:textColor="#8899AA"
-                    android:background="#1A2538" />
+                android:text="&#9660;"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentSubghz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capture, replay, and brute force garage doors, gates, car barriers, and doorbells (300-915 MHz)"
+                android:textColor="#8899AA"
+                android:textSize="11sp"
+                android:layout_marginBottom="10dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnSubghzCapture" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="CAPTURE" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_subghz" />
+                <Button android:id="@+id/btnSubghzReplay" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="REPLAY" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnSubghzSaved" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="SAVED" android:textSize="10sp" android:textColor="#8899AA" android:background="#1A2538" />
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnSubghzBrute" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="BRUTE FORCE" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="#D50000" />
+                <Button android:id="@+id/btnSubghzAnalyzer" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="FREQ ANALYZER" android:textSize="10sp" android:textColor="#CE93D8" android:background="#1E2D45" />
+            </LinearLayout>
+            <TextView android:id="@+id/statusSubghz" android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="monospace" android:textColor="#CE93D8" android:textSize="10sp" android:maxLines="8" android:visibility="gone" android:background="#060D15" android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- 2. RFID / KEY CARDS -->
+        <LinearLayout
+            android:id="@+id/headerRfid"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_rfid"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="RFID / KEY CARDS" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowRfid" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentRfid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Read, clone, and emulate proximity badges, key fobs, and access cards (125kHz)" android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnRfidRead" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="READ CARD" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_rfid" />
+                <Button android:id="@+id/btnRfidWrite" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="WRITE" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnRfidEmulate" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="EMULATE" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+            </LinearLayout>
+            <Button android:id="@+id/btnRfidSaved" android:layout_width="match_parent" android:layout_height="40dp" android:text="SAVED FILES" android:textSize="10sp" android:textColor="#8899AA" android:background="#1A2538" />
+            <TextView android:id="@+id/statusRfid" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="monospace" android:textColor="#FFAB91" android:textSize="10sp" android:maxLines="8" android:visibility="gone" android:background="#060D15" android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- 3. NFC -->
+        <LinearLayout
+            android:id="@+id/headerNfc"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_nfc"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="NFC" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowNfc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentNfc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Read, emulate, and detect NFC cards, tags, payment systems, transit cards (13.56 MHz)" android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnNfcRead" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="READ TAG" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_nfc" />
+                <Button android:id="@+id/btnNfcDetect" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="DETECT" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnNfcEmulate" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="EMULATE" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <Button android:id="@+id/btnNfcFieldOn" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="FIELD ON" android:textSize="10sp" android:textColor="#69F0AE" android:background="#1A2538" />
+                <Button android:id="@+id/btnNfcFieldOff" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="FIELD OFF" android:textSize="10sp" android:textColor="#FF8A80" android:background="#1A2538" />
+                <Button android:id="@+id/btnNfcSaved" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="SAVED" android:textSize="10sp" android:textColor="#8899AA" android:background="#1A2538" />
+            </LinearLayout>
+            <TextView android:id="@+id/statusNfc" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="monospace" android:textColor="#69F0AE" android:textSize="10sp" android:maxLines="8" android:visibility="gone" android:background="#060D15" android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- 4. INFRARED -->
+        <LinearLayout
+            android:id="@+id/headerIr"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_ir"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="INFRARED" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowIr" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentIr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Learn and send IR signals. Control TVs, AC units, projectors. Point any remote at Flipper to capture." android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnIrControl" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="CONTROL" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_ir" />
+                <Button android:id="@+id/btnIrLearn" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="LEARN" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnIrSend" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="SEND" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+            </LinearLayout>
+            <Button android:id="@+id/btnIrSaved" android:layout_width="match_parent" android:layout_height="40dp" android:text="SAVED FILES" android:textSize="10sp" android:textColor="#8899AA" android:background="#1A2538" />
+            <TextView android:id="@+id/statusIr" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="monospace" android:textColor="#FF8A80" android:textSize="10sp" android:maxLines="8" android:visibility="gone" android:background="#060D15" android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- 5. iBUTTON -->
+        <LinearLayout
+            android:id="@+id/headerIkey"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_ibutton"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="iBUTTON" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowIkey" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentIkey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Read and clone Dallas/Cyfral/Metakom intercom keys. Touch key to Flipper contact pad." android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <Button android:id="@+id/btnIkeyRead" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="READ" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_ibutton" />
+                <Button android:id="@+id/btnIkeyWrite" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="WRITE" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnIkeyEmulate" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="EMULATE" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+            </LinearLayout>
+            <TextView android:id="@+id/statusIkey" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="monospace" android:textColor="#40C4FF" android:textSize="10sp" android:maxLines="8" android:visibility="gone" android:background="#060D15" android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- 6. BAD USB -->
+        <LinearLayout
+            android:id="@+id/headerBadusb"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_badusb"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="BAD USB" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowBadusb" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentBadusb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Run keystroke injection payloads. Flipper acts as a USB keyboard and types commands automatically." android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <Button android:id="@+id/btnBadusbPayloads" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="PAYLOADS" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_badusb" />
+                <Button android:id="@+id/btnBadusbDemo" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="VIEW DEMO" android:textSize="10sp" android:textColor="#E0E8F0" android:background="#1E2D45" />
+                <Button android:id="@+id/btnBadusbRun" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="RUN" android:textSize="10sp" android:textColor="#FF8A80" android:background="#1E2D45" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 7. GPIO / POWER -->
+        <LinearLayout
+            android:id="@+id/headerGpio"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@color/section_gpio"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="1dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="GPIO / POWER" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:letterSpacing="0.05" />
+            <TextView android:id="@+id/arrowGpio" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&#9660;" android:textColor="#FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/contentGpio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/section_content_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="UART bridge for ESP32/Marauder, 5V power rail for AWOK board, device reboot/shutdown." android:textColor="#8899AA" android:textSize="11sp" android:layout_marginBottom="10dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnGpioBridge" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="UART BRIDGE" android:textSize="10sp" android:textColor="#FFFFFF" android:textStyle="bold" android:background="@color/section_gpio" />
+                <Button android:id="@+id/btnGpioStopBridge" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="1" android:text="STOP BRIDGE" android:textSize="10sp" android:textColor="#FF8A80" android:background="#1E2D45" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="6dp">
+                <Button android:id="@+id/btnGpio5vOn" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="5V ON" android:textSize="10sp" android:textColor="#69F0AE" android:background="#1A2538" />
+                <Button android:id="@+id/btnGpio5vOff" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="5V OFF" android:textSize="10sp" android:textColor="#FF8A80" android:background="#1A2538" />
+                <Button android:id="@+id/btnGpioReboot" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1" android:text="REBOOT" android:textSize="10sp" android:textColor="#FFD740" android:background="#1A2538" />
+            </LinearLayout>
+            <Button android:id="@+id/btnGpioInfo" android:layout_width="match_parent" android:layout_height="40dp" android:text="DEVICE INFO" android:textSize="10sp" android:textColor="#8899AA" android:background="#1A2538" />
         </LinearLayout>
 
     </LinearLayout>
