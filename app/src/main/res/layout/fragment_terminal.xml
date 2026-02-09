@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#080C14">
+    android:background="@color/bg_dark">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="44dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
-        android:background="#0A0A0F">
+        android:background="@color/bg_card">
 
         <View
             android:id="@+id/statusDot"
@@ -27,7 +27,7 @@
             android:layout_marginStart="8dp"
             android:text="Terminal"
             android:textSize="13sp"
-            android:textColor="#4A5B78" />
+            android:textColor="@color/text_secondary" />
 
         <Button
             android:id="@+id/btnStop"
@@ -35,7 +35,7 @@
             android:layout_height="32dp"
             android:text="STOP"
             android:textSize="11sp"
-            android:textColor="#FF1744"
+            android:textColor="@color/danger"
             android:background="@android:color/transparent"
             android:minWidth="48dp" />
 
@@ -45,10 +45,30 @@
             android:layout_height="32dp"
             android:text="CLR"
             android:textSize="11sp"
-            android:textColor="#4A5B78"
+            android:textColor="@color/text_muted"
             android:background="@android:color/transparent"
             android:minWidth="48dp" />
     </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/bg_elevated"
+        android:scrollbars="none">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp">
+            <Button android:id="@+id/chipHelp" android:layout_width="wrap_content" android:layout_height="28dp" android:text="help" android:textSize="11sp" android:textColor="@color/text_secondary" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:layout_marginEnd="6dp" android:minWidth="0dp" android:minHeight="0dp" />
+            <Button android:id="@+id/chipDeviceInfo" android:layout_width="wrap_content" android:layout_height="28dp" android:text="device_info" android:textSize="11sp" android:textColor="@color/text_secondary" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:layout_marginEnd="6dp" android:minWidth="0dp" android:minHeight="0dp" />
+            <Button android:id="@+id/chip5vOn" android:layout_width="wrap_content" android:layout_height="28dp" android:text="5v on" android:textSize="11sp" android:textColor="@color/success" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:layout_marginEnd="6dp" android:minWidth="0dp" android:minHeight="0dp" />
+            <Button android:id="@+id/chip5vOff" android:layout_width="wrap_content" android:layout_height="28dp" android:text="5v off" android:textSize="11sp" android:textColor="@color/danger" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:layout_marginEnd="6dp" android:minWidth="0dp" android:minHeight="0dp" />
+            <Button android:id="@+id/chipStopScan" android:layout_width="wrap_content" android:layout_height="28dp" android:text="stopscan" android:textSize="11sp" android:textColor="@color/warning" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:layout_marginEnd="6dp" android:minWidth="0dp" android:minHeight="0dp" />
+            <Button android:id="@+id/chipListAll" android:layout_width="wrap_content" android:layout_height="28dp" android:text="list -a" android:textSize="11sp" android:textColor="@color/text_secondary" android:background="@drawable/btn_ghost" android:paddingHorizontal="10dp" android:minWidth="0dp" android:minHeight="0dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/terminalRecycler"
@@ -57,7 +77,7 @@
         android:layout_weight="1"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:background="#0A0A0F"
+        android:background="@color/bg_dark"
         android:scrollbars="vertical" />
 
     <LinearLayout
@@ -66,7 +86,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="8dp"
-        android:background="#0D1526">
+        android:background="@color/bg_card">
 
         <Button
             android:id="@+id/btnHistory"
@@ -74,8 +94,8 @@
             android:layout_height="40dp"
             android:text="H"
             android:textSize="13sp"
-            android:textColor="#7A8BA8"
-            android:background="#152238"
+            android:textColor="@color/text_secondary"
+            android:background="@drawable/btn_secondary"
             android:layout_marginEnd="6dp" />
 
         <EditText
@@ -85,8 +105,8 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:hint="Type a command..."
-            android:textColorHint="#4A5B78"
-            android:textColor="#E8F0FF"
+            android:textColorHint="@color/text_muted"
+            android:textColor="@color/text_primary"
             android:textSize="13sp"
             android:paddingHorizontal="12dp"
             android:fontFamily="monospace"
@@ -95,14 +115,10 @@
 
         <Button
             android:id="@+id/btnSend"
+            style="@style/Btn.Primary"
             android:layout_width="60dp"
-            android:layout_height="40dp"
             android:layout_marginStart="6dp"
-            android:text="SEND"
-            android:textSize="12sp"
-            android:textColor="#080C14"
-            android:textStyle="bold"
-            android:background="#00E5FF" />
+            android:text="SEND" />
     </LinearLayout>
 
 </LinearLayout>

@@ -25,12 +25,12 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         const val ESP32_CH340_VID = 0x1A86
         const val BAUD_RATE = 115200
         const val WRITE_TIMEOUT = 200
-        private val PROMPT_REGEX = Regex(">:\\s")
-        private val SUBSHELL_REGEX = Regex("\\[(nfc|subghz|ir|rfid)\\]>")
+        private val PROMPT_REGEX = Regex(">:\\s?|>\\s*$")
+        private val SUBSHELL_REGEX = Regex("\\[(nfc|subghz|ir|rfid|ikey)\\]>")
     }
 
     enum class DeviceType { NONE, FLIPPER, ESP32 }
-    enum class CliState { IDLE, WAKING, READY, BUSY }
+    enum class CliState { IDLE, WAKING, READY, BUSY, SUBSHELL_ENTERING, SUBSHELL_READY, SUBSHELL_BUSY }
 
     var listener: SerialListener? = null
     var connected = false
@@ -41,6 +41,9 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         private set
     var bridgeMode = false
         private set
+    var inSubshell: String? = null
+        private set
+    val isReady: Boolean get() = connected && (cliState == CliState.READY || cliState == CliState.SUBSHELL_READY)
 
     private val handler = Handler(Looper.getMainLooper())
     private var usbManager: UsbManager? = null
@@ -54,6 +57,10 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
     private var responseTimeoutRunnable: Runnable? = null
     private var currentCommand: String? = null
     private var ignorePromptUntil = 0L
+
+    private var subshellCommand: String? = null
+    private var subshellCallback: ((String) -> Unit)? = null
+    private var subshellExitPending = false
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -152,6 +159,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
             connected = true
             bridgeMode = false
             cliState = CliState.WAKING
+            inSubshell = null
             commandQueue.clear()
 
             handler.postDelayed({ writeRaw(byteArrayOf(0x03)) }, 300)
@@ -172,6 +180,7 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         deviceType = DeviceType.NONE
         cliState = CliState.IDLE
         bridgeMode = false
+        inSubshell = null
         commandQueue.clear()
         cancelResponseTimeout()
 
@@ -215,10 +224,31 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         }
     }
 
+    fun sendSubshellCommand(shell: String, cmd: String, callback: ((String) -> Unit)? = null) {
+        if (!connected) {
+            listener?.onSerialError("Not connected")
+            return
+        }
+        if (bridgeMode) {
+            sendCommand(cmd, callback)
+            return
+        }
+
+        subshellCommand = cmd
+        subshellCallback = callback
+        subshellExitPending = false
+        responseBuffer.clear()
+        cliState = CliState.SUBSHELL_ENTERING
+        currentCommand = "$shell $cmd"
+        listener?.onCommandStarted("$shell $cmd")
+        ignorePromptUntil = System.currentTimeMillis() + 500
+        writeRaw("$shell\r".toByteArray())
+        startResponseTimeout(getTimeoutForCommand(cmd))
+    }
+
     private fun getTimeoutForCommand(cmd: String): Long = when {
         cmd.startsWith("rfid") || cmd.startsWith("ikey") -> 30_000L
-        cmd.startsWith("nfc field") -> 5_000L
-        cmd.startsWith("nfc") -> 15_000L
+        cmd.startsWith("nfc") || cmd == "scanner" || cmd.startsWith("field") || cmd.startsWith("emulate") -> 30_000L
         cmd.startsWith("subghz rx") -> 60_000L
         cmd.startsWith("subghz") -> 10_000L
         cmd.startsWith("ir rx") -> 60_000L
@@ -245,10 +275,19 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         if (!connected) return
         cancelResponseTimeout()
         writeRaw(byteArrayOf(0x03))
-        if (cliState == CliState.BUSY) {
+        if (inSubshell != null) {
+            handler.postDelayed({
+                writeRaw("exit\r".toByteArray())
+                inSubshell = null
+                cliState = CliState.READY
+            }, 100)
+        }
+        if (cliState == CliState.BUSY || cliState == CliState.SUBSHELL_BUSY) {
             val response = responseBuffer.toString()
             currentCommand?.let { listener?.onCommandFinished(it, response) }
             pendingCallback = null
+            subshellCallback = null
+            subshellCommand = null
             responseBuffer.clear()
             currentCommand = null
         }
@@ -259,13 +298,21 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
         if (!connected || deviceType != DeviceType.FLIPPER) return
         listener?.onCommandStarted("Starting ESP32 bridge...")
         writeRaw("loader open GPIO/USB-UART Bridge\r".toByteArray())
-        handler.postDelayed({
-            bridgeMode = true
-            cliState = CliState.READY
-            listener?.onCommandFinished("bridge", "ESP32 UART bridge active")
-            listener?.onSerialConnect("ESP32/Marauder (via Flipper GPIO bridge)")
-            callback?.invoke()
-        }, 2000)
+        var attempts = 0
+        fun checkBridge() {
+            if (attempts >= 10) {
+                bridgeMode = true
+                cliState = CliState.READY
+                listener?.onCommandFinished("bridge", "ESP32 UART bridge active")
+                listener?.onSerialConnect("ESP32/Marauder (via Flipper GPIO bridge)")
+                callback?.invoke()
+                return
+            }
+            attempts++
+            writeRaw("\r\n".toByteArray())
+            handler.postDelayed({ checkBridge() }, 300)
+        }
+        handler.postDelayed({ checkBridge() }, 1500)
     }
 
     fun stopBridge() {
@@ -312,36 +359,70 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
                 return@post
             }
 
-            if (cliState == CliState.BUSY) {
-                responseBuffer.append(clean)
-            }
-
-            if (SUBSHELL_REGEX.containsMatchIn(clean)) {
-                if (cliState != CliState.BUSY) {
-                    handler.postDelayed({ writeRaw("exit\r".toByteArray()) }, 100)
+            when (cliState) {
+                CliState.SUBSHELL_ENTERING -> {
+                    responseBuffer.append(clean)
+                    if (SUBSHELL_REGEX.containsMatchIn(clean)) {
+                        val match = SUBSHELL_REGEX.find(clean)
+                        inSubshell = match?.groupValues?.get(1)
+                        cliState = CliState.SUBSHELL_BUSY
+                        responseBuffer.clear()
+                        val cmd = subshellCommand ?: return@post
+                        writeRaw("$cmd\r".toByteArray())
+                    }
                 }
-                return@post
-            }
-
-            if (PROMPT_REGEX.containsMatchIn(clean) || clean.contains(">:")) {
-                if (cliState == CliState.BUSY && System.currentTimeMillis() < ignorePromptUntil) {
-                    return@post
+                CliState.SUBSHELL_BUSY -> {
+                    responseBuffer.append(clean)
+                    if (SUBSHELL_REGEX.containsMatchIn(clean)) {
+                        if (subshellExitPending) {
+                            return@post
+                        }
+                        cancelResponseTimeout()
+                        val response = responseBuffer.toString()
+                        subshellExitPending = true
+                        writeRaw("exit\r".toByteArray())
+                        handler.postDelayed({
+                            inSubshell = null
+                            cliState = CliState.READY
+                            currentCommand?.let { listener?.onCommandFinished(it, response) }
+                            subshellCallback?.invoke(response)
+                            subshellCallback = null
+                            subshellCommand = null
+                            subshellExitPending = false
+                            responseBuffer.clear()
+                            currentCommand = null
+                            processQueue()
+                        }, 300)
+                    }
                 }
-
-                val wasBusy = cliState == CliState.BUSY
-                cliState = CliState.READY
-
-                if (wasBusy) {
-                    cancelResponseTimeout()
-                    val response = responseBuffer.toString()
-                    currentCommand?.let { listener?.onCommandFinished(it, response) }
-                    pendingCallback?.invoke(response)
-                    pendingCallback = null
-                    responseBuffer.clear()
-                    currentCommand = null
+                CliState.BUSY -> {
+                    responseBuffer.append(clean)
+                    if (SUBSHELL_REGEX.containsMatchIn(clean)) {
+                        handler.postDelayed({ writeRaw("exit\r".toByteArray()) }, 100)
+                        return@post
+                    }
+                    if (PROMPT_REGEX.containsMatchIn(clean) || clean.contains(">:")) {
+                        if (System.currentTimeMillis() < ignorePromptUntil) {
+                            return@post
+                        }
+                        cliState = CliState.READY
+                        cancelResponseTimeout()
+                        val response = responseBuffer.toString()
+                        currentCommand?.let { listener?.onCommandFinished(it, response) }
+                        pendingCallback?.invoke(response)
+                        pendingCallback = null
+                        responseBuffer.clear()
+                        currentCommand = null
+                        processQueue()
+                    }
                 }
-
-                processQueue()
+                CliState.WAKING, CliState.IDLE -> {
+                    if (PROMPT_REGEX.containsMatchIn(clean) || clean.contains(">:")) {
+                        cliState = CliState.READY
+                        processQueue()
+                    }
+                }
+                CliState.READY, CliState.SUBSHELL_READY -> {}
             }
         }
     }
@@ -375,11 +456,18 @@ class FlipperSerial(private val context: Context) : SerialInputOutputManager.Lis
     private fun startResponseTimeout(timeoutMs: Long = 5000L) {
         cancelResponseTimeout()
         responseTimeoutRunnable = Runnable {
-            if (cliState == CliState.BUSY) {
+            if (cliState == CliState.BUSY || cliState == CliState.SUBSHELL_BUSY || cliState == CliState.SUBSHELL_ENTERING) {
                 val response = responseBuffer.toString()
+                if (inSubshell != null) {
+                    writeRaw("exit\r".toByteArray())
+                    inSubshell = null
+                }
                 currentCommand?.let { listener?.onCommandFinished(it, response) }
                 pendingCallback?.invoke(response)
+                subshellCallback?.invoke(response)
                 pendingCallback = null
+                subshellCallback = null
+                subshellCommand = null
                 responseBuffer.clear()
                 currentCommand = null
                 cliState = CliState.READY

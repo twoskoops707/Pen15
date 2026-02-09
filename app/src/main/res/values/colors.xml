@@ -1,49 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_void">#080C14</color>
-    <color name="bg_primary">#0A1020</color>
-    <color name="bg_surface">#0D1526</color>
-    <color name="bg_card">#111B2E</color>
-    <color name="bg_elevated">#152238</color>
-    <color name="bg_input">#0A1222</color>
-    <color name="bg_terminal">#0A0A0F</color>
+    <color name="bg_dark">#0D1117</color>
+    <color name="bg_card">#161B22</color>
+    <color name="bg_elevated">#21262D</color>
+    <color name="bg_input">#0D1117</color>
+    <color name="border">#30363D</color>
 
-    <color name="cyan">#00E5FF</color>
-    <color name="cyan_dim">#00B8D4</color>
-    <color name="green">#00FF41</color>
-    <color name="green_dim">#00C853</color>
-    <color name="red">#FF1744</color>
-    <color name="red_dim">#D50000</color>
-    <color name="amber">#FFD600</color>
-    <color name="purple">#B388FF</color>
-    <color name="orange">#FF6E40</color>
+    <color name="accent">#58A6FF</color>
+    <color name="success">#3FB950</color>
+    <color name="danger">#F85149</color>
+    <color name="warning">#D29922</color>
 
-    <color name="text_primary">#E8F0FF</color>
-    <color name="text_secondary">#7A8BA8</color>
-    <color name="text_tertiary">#4A5B78</color>
-    <color name="text_disabled">#2A3548</color>
+    <color name="text_primary">#E6EDF3</color>
+    <color name="text_secondary">#8B949E</color>
+    <color name="text_muted">#484F58</color>
 
-    <color name="border_subtle">#152238</color>
-    <color name="border_default">#1E3050</color>
+    <color name="section_flipper">#58A6FF</color>
+    <color name="section_wifi">#F0883E</color>
 
-    <color name="section_subghz">#7C4DFF</color>
-    <color name="section_rfid">#FF6E40</color>
-    <color name="section_nfc">#00C853</color>
-    <color name="section_ir">#FF1744</color>
-    <color name="section_ibutton">#0091EA</color>
-    <color name="section_badusb">#D50000</color>
-    <color name="section_gpio">#F57F17</color>
-    <color name="section_scan">#00BCD4</color>
-    <color name="section_attack">#D50000</color>
-    <color name="section_capture">#00C853</color>
-    <color name="section_crack">#F57F17</color>
-    <color name="section_recon">#7C4DFF</color>
-    <color name="section_bluetooth">#0091EA</color>
-    <color name="section_header_bg">#1A2235</color>
-    <color name="section_content_bg">#111A2A</color>
-
-    <color name="status_connected">#00FF41</color>
-    <color name="status_disconnected">#4A5B78</color>
-
-    <color name="ic_launcher_background">#0A0F1A</color>
+    <color name="ic_launcher_background">#0D1117</color>
 </resources>
