@@ -26,7 +26,6 @@ class FlipperFragment : Fragment() {
     private val appState: AppState by activityViewModels()
     private val handler = Handler(Looper.getMainLooper())
     private var pulseAnimator: ObjectAnimator? = null
-    private val autoHideRunnables = mutableMapOf<TextView, Runnable>()
     private val streamBuffers = mutableMapOf<TextView, StringBuilder>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -242,8 +241,22 @@ class FlipperFragment : Fragment() {
 
     private fun setupRfid() {
         binding.btnRfidRead.setOnClickListener { showRfidWizard() }
-        binding.btnRfidWrite.setOnClickListener { send("rfid write") }
-        binding.btnRfidEmulate.setOnClickListener { send("rfid emulate") }
+        binding.btnRfidWrite.setOnClickListener {
+            val data = appState.lastRfidData
+            if (data == null) {
+                Toast.makeText(context, "Read a card first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            send("rfid write ${data.first} ${data.second}")
+        }
+        binding.btnRfidEmulate.setOnClickListener {
+            val data = appState.lastRfidData
+            if (data == null) {
+                Toast.makeText(context, "Read a card first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            send("rfid emulate ${data.first} ${data.second}")
+        }
         binding.btnRfidSaved.setOnClickListener { send("storage list /ext/lfrfid") }
     }
 
@@ -277,11 +290,23 @@ class FlipperFragment : Fragment() {
 
     private fun setupNfc() {
         binding.btnNfcRead.setOnClickListener { showNfcWizard() }
-        binding.btnNfcDetect.setOnClickListener { send("nfc detect_reader") }
-        binding.btnNfcEmulate.setOnClickListener { send("nfc emulate") }
-        binding.btnNfcFieldOn.setOnClickListener { send("nfc field on") }
-        binding.btnNfcFieldOff.setOnClickListener { send("nfc field off") }
+        binding.btnNfcDetect.setOnClickListener { sendNfcSubshell("scanner") }
+        binding.btnNfcEmulate.setOnClickListener {
+            val path = appState.lastNfcPath
+            if (path == null) {
+                Toast.makeText(context, "Read a tag first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            sendNfcSubshell("emulate f $path")
+        }
+        binding.btnNfcFieldOn.setOnClickListener { sendNfcSubshell("field on") }
+        binding.btnNfcFieldOff.setOnClickListener { sendNfcSubshell("field off") }
         binding.btnNfcSaved.setOnClickListener { send("storage list /ext/nfc") }
+    }
+
+    private fun sendNfcSubshell(cmd: String) {
+        if (!checkConnected()) return
+        mainActivity()?.serial?.sendSubshellCommand("nfc", cmd)
     }
 
     private fun showNfcWizard() {
@@ -299,7 +324,7 @@ class FlipperFragment : Fragment() {
                 AlertDialog.Builder(requireContext())
                     .setTitle("Reading NFC")
                     .setMessage(msg)
-                    .setPositiveButton("READ NOW") { _, _ -> send("nfc read") }
+                    .setPositiveButton("READ NOW") { _, _ -> sendNfcSubshell("scanner") }
                     .setNegativeButton("Cancel", null)
                     .show()
             }.show()
@@ -381,8 +406,22 @@ class FlipperFragment : Fragment() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-        binding.btnIkeyWrite.setOnClickListener { send("ikey write") }
-        binding.btnIkeyEmulate.setOnClickListener { send("ikey emulate") }
+        binding.btnIkeyWrite.setOnClickListener {
+            val data = appState.lastIkeyData
+            if (data == null) {
+                Toast.makeText(context, "Read a key first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            send("ikey write ${data.first} ${data.second}")
+        }
+        binding.btnIkeyEmulate.setOnClickListener {
+            val data = appState.lastIkeyData
+            if (data == null) {
+                Toast.makeText(context, "Read a key first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            send("ikey emulate ${data.first} ${data.second}")
+        }
     }
 
     private fun setupBadusb() {
@@ -443,7 +482,7 @@ class FlipperFragment : Fragment() {
             cmd.startsWith("nfc") || cmd.startsWith("storage list /ext/nfc") -> binding.statusNfc
             cmd.startsWith("ir ") || cmd.startsWith("storage list /ext/infrared") -> binding.statusIr
             cmd.startsWith("ikey") -> binding.statusIkey
-            cmd.startsWith("device_info") || cmd.startsWith("power") || cmd.startsWith("loader") -> binding.statusSubghz
+            cmd.startsWith("device_info") || cmd.startsWith("power") || cmd.startsWith("loader") -> binding.statusGpio
             else -> null
         }
     }
@@ -458,7 +497,6 @@ class FlipperFragment : Fragment() {
     }
 
     private fun showRunning(tv: TextView, cmd: String) {
-        cancelAutoHide(tv)
         streamBuffers.remove(tv)
         tv.visibility = View.VISIBLE
         tv.text = "RUNNING: $cmd"
@@ -474,7 +512,6 @@ class FlipperFragment : Fragment() {
         val display = if (lines.size > 6) lines.take(6).joinToString("\n") + "\n... (${lines.size - 6} more)" else lines.joinToString("\n")
         tv.text = if (display.isBlank()) "DONE (no output)" else display
         tv.visibility = View.VISIBLE
-        scheduleAutoHide(tv, 10_000)
     }
 
     private fun startPulse(tv: TextView) {
@@ -492,17 +529,6 @@ class FlipperFragment : Fragment() {
             if (it.target == tv) { it.cancel(); pulseAnimator = null }
         }
         tv.alpha = 1.0f
-    }
-
-    private fun scheduleAutoHide(tv: TextView, delayMs: Long) {
-        cancelAutoHide(tv)
-        val r = Runnable { tv.visibility = View.GONE }
-        autoHideRunnables[tv] = r
-        handler.postDelayed(r, delayMs)
-    }
-
-    private fun cancelAutoHide(tv: TextView) {
-        autoHideRunnables.remove(tv)?.let { handler.removeCallbacks(it) }
     }
 
     private fun checkConnected(): Boolean {
@@ -524,8 +550,6 @@ class FlipperFragment : Fragment() {
         super.onDestroyView()
         pulseAnimator?.cancel()
         pulseAnimator = null
-        autoHideRunnables.values.forEach { handler.removeCallbacks(it) }
-        autoHideRunnables.clear()
         streamBuffers.clear()
         _binding = null
     }

@@ -65,6 +65,13 @@ class TerminalFragment : Fragment() {
         }
         binding.btnHistory.setOnClickListener { showHistory() }
 
+        binding.chipHelp.setOnClickListener { quickSend("help") }
+        binding.chipDeviceInfo.setOnClickListener { quickSend("device_info") }
+        binding.chip5vOn.setOnClickListener { quickSend("power 5v 1") }
+        binding.chip5vOff.setOnClickListener { quickSend("power 5v 0") }
+        binding.chipStopScan.setOnClickListener { quickSend("stopscan") }
+        binding.chipListAll.setOnClickListener { quickSend("list -a") }
+
         binding.inputField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 sendInput()
@@ -121,6 +128,18 @@ class TerminalFragment : Fragment() {
             .show()
     }
 
+    private fun quickSend(cmd: String) {
+        if (mainActivity()?.serial?.connected != true) {
+            Toast.makeText(context, "Connect device first (STATUS tab)", Toast.LENGTH_SHORT).show()
+            return
+        }
+        lines.add("> $cmd")
+        adapter.notifyDataSetChanged()
+        if (lines.isNotEmpty()) binding.terminalRecycler.scrollToPosition(lines.size - 1)
+        mainActivity()?.sendCommand(cmd)
+        appState.addToHistory(cmd)
+    }
+
     private fun mainActivity(): MainActivity? = activity as? MainActivity
 
     override fun onDestroyView() {
@@ -135,8 +154,8 @@ class TerminalFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val tv = TextView(parent.context).apply {
-                setTextColor(0xFF9CA3AF.toInt())
-                textSize = 11f
+                setTextColor(0xFF8B949E.toInt())
+                textSize = 12f
                 typeface = android.graphics.Typeface.MONOSPACE
                 setPadding(4, 2, 4, 2)
             }
@@ -148,10 +167,10 @@ class TerminalFragment : Fragment() {
             holder.textView.text = line
             holder.textView.setTextColor(
                 when {
-                    line.startsWith("> ") -> 0xFF00E5FF.toInt()
-                    line.startsWith("[") -> 0xFF00FF41.toInt()
-                    line.contains("error", ignoreCase = true) -> 0xFFFF1744.toInt()
-                    else -> 0xFF7A8BA8.toInt()
+                    line.startsWith("> ") -> 0xFF58A6FF.toInt()
+                    line.startsWith("[") -> 0xFF3FB950.toInt()
+                    line.contains("error", ignoreCase = true) -> 0xFFF85149.toInt()
+                    else -> 0xFF8B949E.toInt()
                 }
             )
         }

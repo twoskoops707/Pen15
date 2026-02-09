@@ -62,10 +62,10 @@ class MainActivity : AppCompatActivity(), SerialListener {
             it.register()
         }
 
-        appendToTerminal("=== PEN15 v2.1.0 BUILD 229 ===")
+        appendToTerminal("=== PEN15 v3.0.0 BUILD 230 ===")
         appendToTerminal("Tap STATUS tab to connect your device")
 
-        Toast.makeText(this, "PEN15 v2.1.0 Build 229", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "PEN15 v3.0.0 Build 230", Toast.LENGTH_LONG).show()
     }
 
     fun sendCommand(cmd: String) {

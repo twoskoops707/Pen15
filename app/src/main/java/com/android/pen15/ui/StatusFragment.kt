@@ -67,8 +67,8 @@ class StatusFragment : Fragment() {
         appState.connectionStatus.observe(viewLifecycleOwner) { status ->
             binding.statusText.text = status
             binding.statusText.setTextColor(
-                if (status == "OFFLINE") requireContext().getColor(R.color.text_tertiary)
-                else requireContext().getColor(R.color.green)
+                if (status == "OFFLINE") requireContext().getColor(R.color.text_muted)
+                else requireContext().getColor(R.color.success)
             )
         }
 

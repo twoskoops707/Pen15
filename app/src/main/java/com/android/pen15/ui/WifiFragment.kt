@@ -27,7 +27,6 @@ class WifiFragment : Fragment() {
     private val appState: AppState by activityViewModels()
     private val handler = Handler(Looper.getMainLooper())
     private var pulseAnimator: ObjectAnimator? = null
-    private val autoHideRunnables = mutableMapOf<TextView, Runnable>()
     private val streamBuffers = mutableMapOf<TextView, StringBuilder>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -86,6 +85,7 @@ class WifiFragment : Fragment() {
         binding.btnListAp.setOnClickListener { send("list -a") }
         binding.btnSelectAp.setOnClickListener { showSelectApDialog() }
         binding.btnStopScan.setOnClickListener { send("stopscan") }
+        binding.btnSetChannel.setOnClickListener { showSetChannelDialog() }
         binding.btnWardrive.setOnClickListener { send("wardrive") }
         binding.btnSigmon.setOnClickListener { send("sigmon") }
     }
@@ -201,7 +201,7 @@ class WifiFragment : Fragment() {
     private fun statusViewForCommand(cmd: String): TextView? {
         if (_binding == null) return null
         return when {
-            cmd.startsWith("scan") || cmd.startsWith("list") || cmd.startsWith("select") || cmd == "stopscan" || cmd == "wardrive" || cmd == "sigmon" -> binding.statusScan
+            cmd.startsWith("scan") || cmd.startsWith("list") || cmd.startsWith("select") || cmd == "stopscan" || cmd == "wardrive" || cmd == "sigmon" || cmd.startsWith("channel") -> binding.statusScan
             cmd.startsWith("attack") || cmd.startsWith("evilportal") || cmd == "karma" -> binding.statusAttack
             cmd.startsWith("sniffpmkid") || cmd.startsWith("sniffbeacon") || cmd.startsWith("sniffdeauth") || cmd.startsWith("sniffraw") || cmd.startsWith("sniffprobe") || cmd.startsWith("sniffskim") -> binding.statusCapture
             cmd.startsWith("pingscan") || cmd.startsWith("portscan") || cmd.startsWith("join") -> binding.statusRecon
@@ -370,31 +370,36 @@ class WifiFragment : Fragment() {
 
     private fun showPortScanDialog() {
         if (!checkConnected()) return
-        val options = arrayOf("Scan selected AP", "Scan by IP address")
+        val options = arrayOf("Common ports (selected target)", "All ports (selected target)")
         AlertDialog.Builder(requireContext())
             .setTitle("Port Scan")
+            .setMessage("Make sure you've scanned and selected a target first.")
             .setItems(options) { _, w ->
                 when (w) {
                     0 -> send("portscan")
-                    1 -> {
-                        val input = EditText(requireContext()).apply {
-                            hint = "192.168.1.1"
-                            setPadding(48, 24, 48, 24)
-                            setTextColor(0xFFE8F0FF.toInt())
-                            setHintTextColor(0xFF4A5B78.toInt())
-                        }
-                        AlertDialog.Builder(requireContext())
-                            .setTitle("Port Scan IP")
-                            .setView(input)
-                            .setPositiveButton("Scan") { _, _ ->
-                                val ip = input.text.toString().trim()
-                                if (ip.isNotEmpty()) send("portscan -a $ip")
-                            }
-                            .setNegativeButton("Cancel", null)
-                            .show()
-                    }
+                    1 -> send("portscan -a")
                 }
             }.show()
+    }
+
+    private fun showSetChannelDialog() {
+        if (!checkConnected()) return
+        val input = EditText(requireContext()).apply {
+            hint = "Channel (1-14)"
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            setPadding(48, 24, 48, 24)
+            setTextColor(0xFFE6EDF3.toInt())
+            setHintTextColor(0xFF484F58.toInt())
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Set WiFi Channel")
+            .setView(input)
+            .setPositiveButton("Set") { _, _ ->
+                val ch = input.text.toString().trim()
+                if (ch.isNotEmpty()) send("channel -s $ch")
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun showJoinNetworkDialog() {
@@ -456,7 +461,6 @@ class WifiFragment : Fragment() {
     }
 
     private fun showRunning(tv: TextView, cmd: String) {
-        cancelAutoHide(tv)
         streamBuffers.remove(tv)
         tv.visibility = View.VISIBLE
         tv.text = "RUNNING: $cmd"
@@ -472,7 +476,6 @@ class WifiFragment : Fragment() {
         val display = if (lines.size > 8) lines.take(8).joinToString("\n") + "\n... (${lines.size - 8} more)" else lines.joinToString("\n")
         tv.text = if (display.isBlank()) "DONE (no output)" else display
         tv.visibility = View.VISIBLE
-        scheduleAutoHide(tv, 10_000)
     }
 
     private fun startPulse(tv: TextView) {
@@ -490,17 +493,6 @@ class WifiFragment : Fragment() {
             if (it.target == tv) { it.cancel(); pulseAnimator = null }
         }
         tv.alpha = 1.0f
-    }
-
-    private fun scheduleAutoHide(tv: TextView, delayMs: Long) {
-        cancelAutoHide(tv)
-        val r = Runnable { tv.visibility = View.GONE }
-        autoHideRunnables[tv] = r
-        handler.postDelayed(r, delayMs)
-    }
-
-    private fun cancelAutoHide(tv: TextView) {
-        autoHideRunnables.remove(tv)?.let { handler.removeCallbacks(it) }
     }
 
     private fun checkConnected(): Boolean {
@@ -528,8 +520,6 @@ class WifiFragment : Fragment() {
         super.onDestroyView()
         pulseAnimator?.cancel()
         pulseAnimator = null
-        autoHideRunnables.values.forEach { handler.removeCallbacks(it) }
-        autoHideRunnables.clear()
         streamBuffers.clear()
         _binding = null
     }
