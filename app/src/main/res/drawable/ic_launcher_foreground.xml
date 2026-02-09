@@ -4,73 +4,56 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Modern Flipper/Hacker Icon - Clean Terminal Style -->
+    <path
+        android:pathData="M54,50m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0"
+        android:fillColor="#58A6FF"
+        android:fillAlpha="0.08"/>
 
-    <!-- Background circle -->
     <path
-        android:pathData="M54,54m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0"
-        android:fillColor="#00E5FF"
-        android:fillAlpha="0.15"/>
+        android:pathData="M54,50m-26,0a26,26 0,1 1,52 0a26,26 0,1 1,-52 0"
+        android:strokeColor="#58A6FF"
+        android:strokeWidth="0.5"
+        android:strokeAlpha="0.2"
+        android:fillColor="#00000000"/>
 
-    <!-- Terminal window frame -->
     <path
-        android:pathData="M30,36 L78,36 Q80,36 80,38 L80,70 Q80,72 78,72 L30,72 Q28,72 28,70 L28,38 Q28,36 30,36 Z"
-        android:fillColor="#0D1526"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="1.5"/>
+        android:pathData="M30,52 Q28,46 32,40 Q36,34 42,32 Q48,30 52,32 Q52,26 56,22 Q58,20 58,24 Q58,28 56,32 Q60,32 66,36 Q72,40 76,48 L82,42 L78,50 L82,58 L76,52 Q72,58 64,62 Q54,66 44,64 Q36,62 30,56 Z"
+        android:fillColor="#58A6FF"/>
 
-    <!-- Terminal title bar -->
     <path
-        android:pathData="M28,36 L80,36 L80,44 L28,44 Z"
-        android:fillColor="#1A2744"/>
+        android:pathData="M44,50 Q50,56 44,58 Q40,54 44,50 Z"
+        android:fillColor="#4088D8"/>
 
-    <!-- Window buttons -->
     <path
-        android:pathData="M34,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
-        android:fillColor="#FF5F57"/>
-    <path
-        android:pathData="M42,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
-        android:fillColor="#FEBC2E"/>
-    <path
-        android:pathData="M50,40m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"
-        android:fillColor="#28C840"/>
+        android:pathData="M38,38m-2,0a2,2 0,1 0,4 0a2,2 0,1 0,-4 0"
+        android:fillColor="#0D1117"/>
 
-    <!-- Prompt line 1 -->
     <path
-        android:pathData="M34,52 L40,52"
-        android:strokeColor="#00FF41"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"/>
+        android:pathData="M37.5,37m-0.7,0a0.7,0.7 0,1 0,1.4 0a0.7,0.7 0,1 0,-1.4 0"
+        android:fillColor="#FFFFFF"/>
+
     <path
-        android:pathData="M44,52 L66,52"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="2"
+        android:pathData="M32,46 Q35,49 38,47"
+        android:strokeColor="#0D1117"
+        android:strokeWidth="1.2"
+        android:fillColor="#00000000"
         android:strokeLineCap="round"/>
 
-    <!-- Prompt line 2 -->
     <path
-        android:pathData="M34,60 L40,60"
-        android:strokeColor="#00FF41"
-        android:strokeWidth="2"
+        android:pathData="M30,76 L38,76"
+        android:strokeColor="#3FB950"
+        android:strokeWidth="2.5"
         android:strokeLineCap="round"/>
     <path
-        android:pathData="M44,60 L58,60"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2"
-        android:strokeAlpha="0.7"
+        android:pathData="M42,76 L66,76"
+        android:strokeColor="#58A6FF"
+        android:strokeWidth="2.5"
+        android:strokeAlpha="0.5"
         android:strokeLineCap="round"/>
-
-    <!-- Cursor -->
     <path
-        android:pathData="M62,58 L62,64"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="2"
+        android:pathData="M70,73 L70,79"
+        android:strokeColor="#58A6FF"
+        android:strokeWidth="2.5"
         android:strokeLineCap="round"/>
-
-    <!-- Dolphin silhouette (Flipper) - small, in corner -->
-    <path
-        android:pathData="M68,66 Q72,64 74,66 Q76,68 74,70 L68,70 Q66,68 68,66"
-        android:fillColor="#00E5FF"
-        android:fillAlpha="0.6"/>
 
 </vector>
