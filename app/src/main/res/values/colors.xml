@@ -1,99 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- NEON TERMINAL HACKER COLOR SCHEME -->
+    <color name="bg_dark">#0D1117</color>
+    <color name="bg_card">#161B22</color>
+    <color name="bg_elevated">#21262D</color>
+    <color name="bg_input">#0D1117</color>
+    <color name="border">#30363D</color>
 
-    <!-- Base Colors - Deep Black Matrix Background -->
-    <color name="black_bg">#000000</color>
-    <color name="dark_bg">#050505</color>
-    <color name="surface_bg">#0A0A0A</color>
-    <color name="elevated_bg">#101010</color>
-    <!-- color name="card_bg">#0F0F0F</color -->
+    <color name="accent">#58A6FF</color>
+    <color name="success">#3FB950</color>
+    <color name="danger">#F85149</color>
+    <color name="warning">#D29922</color>
 
-    <!-- Neon Primary Colors - Vivid & Aggressive -->
-    <color name="neon_green">#00FF00</color>
-    <color name="neon_cyan">#00FFFF</color>
-    <color name="neon_magenta">#FF00FF</color>
-    <color name="neon_yellow">#FFFF00</color>
-    <color name="neon_red">#FF0055</color>
-    <color name="neon_blue">#0088FF</color>
-    <color name="neon_purple">#BB00FF</color>
-    <color name="neon_orange">#FF7700</color>
+    <color name="text_primary">#E6EDF3</color>
+    <color name="text_secondary">#8B949E</color>
+    <color name="text_muted">#484F58</color>
 
-    <!-- Neon Glow Effects (Semi-transparent for layering) -->
-    <color name="glow_green">#4000FF41</color>
-    <color name="glow_cyan">#4000FFFF</color>
-    <color name="glow_magenta">#40FF00FF</color>
-    <color name="glow_red">#40FF0055</color>
+    <color name="section_flipper">#58A6FF</color>
+    <color name="section_wifi">#F0883E</color>
 
-    <!-- Legacy Mappings -->
-    <color name="electric_blue">@color/neon_cyan</color>
-    <color name="electric_blue_dim">@color/neon_blue</color>
-    <color name="card_bg">#0F0F0F</color>
-
-    <!-- Text Colors - Terminal Style -->
-    <color name="text_white">#FFFFFF</color>
-    <color name="text_light">#E0E0E0</color>
-    <color name="text_gray">#888888</color>
-    <color name="text_dim">#00AA33</color>
-    <color name="text_muted">#666666</color>
-    <color name="dark_grey">#333333</color>
-
-    <!-- Status Colors - Vivid & Clear -->
-    <color name="status_connected">@color/neon_green</color>
-    <color name="status_disconnected">@color/neon_red</color>
-    <color name="status_scanning">@color/neon_yellow</color>
-    <color name="status_warning">@color/neon_orange</color>
-    <color name="status_error">@color/neon_red</color>
-    <color name="status_success">@color/neon_green</color>
-
-    <!-- Function Colors - Neon Spectrum -->
-    <color name="func_subghz">@color/neon_cyan</color>
-    <color name="func_rfid">@color/neon_green</color>
-    <color name="func_nfc">@color/neon_magenta</color>
-    <color name="func_infrared">@color/neon_red</color>
-    <color name="func_ir">@color/neon_red</color>
-    <color name="func_gpio">@color/neon_purple</color>
-    <color name="func_badusb">@color/neon_yellow</color>
-    <color name="func_ibutton">@color/neon_blue</color>
-    <color name="func_bluetooth">@color/neon_orange</color>
-    <color name="func_ble">@color/neon_orange</color>
-    <color name="func_wifi">@color/neon_cyan</color>
-    <color name="func_network">@color/neon_green</color>
-    <color name="func_exploit">@color/neon_red</color>
-
-    <!-- Terminal Colors - Classic Terminal Palette -->
-    <color name="terminal_black">#000000</color>
-    <color name="terminal_dark_gray">#0A0A0A</color>
-    <color name="terminal_gray">#00AA33</color>
-    <color name="terminal_green">@color/neon_green</color>
-    <color name="terminal_red">@color/neon_red</color>
-    <color name="terminal_yellow">@color/neon_yellow</color>
-    <color name="terminal_cyan">@color/neon_cyan</color>
-    <color name="terminal_magenta">@color/neon_magenta</color>
-
-    <!-- Legacy Compatibility -->
-    <color name="primary">@color/neon_green</color>
-    <color name="primary_dark">#00AA33</color>
-    <color name="accent">@color/neon_cyan</color>
-    <color name="background">@color/black_bg</color>
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="card_background">@color/surface_bg</color>
-    <color name="ic_launcher_background">#0A0A0A</color>
-
-    <!-- BUTTON COLORS -->
-    <color name="btn_primary">@color/neon_cyan</color>
-    <color name="btn_primary_dark">@color/neon_blue</color>
-    <color name="btn_danger">@color/neon_red</color>
-    <color name="btn_success">@color/neon_green</color>
-    <color name="btn_warning">@color/neon_yellow</color>
-
-    <!-- PROGRESS & LOADING -->
-    <color name="progress_bar">@color/neon_green</color>
-    <color name="progress_background">@color/elevated_bg</color>
-
-    <!-- ADDITIONAL BACKGROUNDS -->
-    <!-- color name="card_bg">#0F0F0F</color -->
-    <color name="error">@color/neon_red</color>
-    <color name="success">@color/neon_green</color>
+    <color name="ic_launcher_background">#0D1117</color>
 </resources>
