@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#141920"
+    android:padding="12dp"
+    android:layout_marginBottom="2dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Selection Indicator -->
+    <View
+        android:id="@+id/selectionIndicator"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="#0a0e14"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Network Info -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtNetworkSsid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NETWORK_NAME"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/txtNetworkBssid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00:00:00:00"
+                android:textColor="#666d7a"
+                android:textSize="10sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" │ "
+                android:textColor="#2a3240"
+                android:textSize="10sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/txtNetworkChannel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CH:--"
+                android:textColor="#666d7a"
+                android:textSize="10sp"
+                android:fontFamily="monospace" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Signal Strength -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginStart="12dp">
+
+        <TextView
+            android:id="@+id/txtSignalStrength"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-00"
+            android:textColor="#ff9500"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="dBm"
+            android:textColor="#666d7a"
+            android:textSize="9sp"
+            android:fontFamily="monospace" />
+
+        <!-- Signal Bars -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <View
+                android:id="@+id/signalBar1"
+                android:layout_width="3dp"
+                android:layout_height="6dp"
+                android:background="#666d7a"
+                android:layout_marginEnd="2dp" />
+
+            <View
+                android:id="@+id/signalBar2"
+                android:layout_width="3dp"
+                android:layout_height="10dp"
+                android:background="#666d7a"
+                android:layout_marginEnd="2dp" />
+
+            <View
+                android:id="@+id/signalBar3"
+                android:layout_width="3dp"
+                android:layout_height="14dp"
+                android:background="#666d7a"
+                android:layout_marginEnd="2dp" />
+
+            <View
+                android:id="@+id/signalBar4"
+                android:layout_width="3dp"
+                android:layout_height="18dp"
+                android:background="#666d7a" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Target Index -->
+    <TextView
+        android:id="@+id/txtTargetIndex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="#00"
+        android:textColor="#4a5160"
+        android:textSize="10sp"
+        android:fontFamily="monospace"
+        android:layout_marginStart="12dp"
+        android:gravity="center"
+        android:layout_gravity="center_vertical" />
+</LinearLayout>
