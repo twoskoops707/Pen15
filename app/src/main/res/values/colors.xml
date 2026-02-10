@@ -99,4 +99,10 @@
     <!-- color name="card_bg">#0F0F0F</color -->
     <color name="error">@color/neon_red</color>
     <color name="success">@color/neon_green</color>
+    <color name="danger">@color/neon_red</color>
+    <color name="warning">@color/neon_orange</color>
+    <color name="border">#333333</color>
+    <color name="bg_elevated">@color/elevated_bg</color>
+    <color name="bg_card">@color/card_bg</color>
+    <color name="section_flipper">@color/neon_cyan</color>
 </resources>
