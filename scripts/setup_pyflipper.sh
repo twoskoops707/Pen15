@@ -1,31 +1,31 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Install pyflipper and dependencies
-# This ACTUALLY installs the real library
+# Setup script for pyflipper installation in Termux
 
-echo "=== Installing pyflipper for Flipper Zero ==="
+echo "=== Setting up pyflipper for Flipper Zero ==="
 echo ""
 
-# Install Python if not present
-if ! command -v python &> /dev/null; then
-    echo "Installing Python..."
-    pkg install -y python
-fi
+# Update packages
+echo "[1/4] Updating packages..."
+pkg update -y
 
-# Install pip packages
-echo "Installing pyflipper..."
+# Install Python and dependencies
+echo "[2/4] Installing Python and dependencies..."
+pkg install -y python python-pip git
+
+# Install pyflipper and pyserial
+echo "[3/4] Installing pyflipper..."
 pip install --upgrade pyflipper pyserial
 
-echo ""
-echo "✓ Installation complete"
-echo ""
-echo "Testing connection to Flipper..."
-python3 -c "from flipperzero import FlipperZero; f = FlipperZero.create(); print('✓ Flipper Zero detected')"
+# Create scripts directory
+echo "[4/4] Creating scripts directory..."
+mkdir -p /data/data/com.termux/files/home/Pen15/scripts
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "✓✓✓ ALL GOOD - Flipper is ready! ✓✓✓"
-else
-    echo ""
-    echo "✗ Could not connect to Flipper"
-    echo "Make sure Flipper is connected via USB"
-fi
+echo ""
+echo "=== Setup Complete ==="
+echo ""
+echo "Test connection:"
+echo "  python3 -c \"from flipperzero import FlipperZero; print('pyflipper OK')\""
+echo ""
+echo "List USB devices:"
+echo "  ls -la /dev/tty*"
+echo ""
