@@ -72,6 +72,9 @@
     <color name="terminal_magenta">@color/neon_magenta</color>
 
     <!-- Legacy Compatibility -->
+    <color name="text_primary">@color/text_white</color>
+    <color name="text_secondary">@color/text_gray</color>
+    <color name="bg_dark">@color/dark_bg</color>
     <color name="primary">@color/neon_green</color>
     <color name="primary_dark">#00AA33</color>
     <color name="accent">@color/neon_cyan</color>
