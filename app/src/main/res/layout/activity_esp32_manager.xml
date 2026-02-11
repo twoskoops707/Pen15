@@ -152,6 +152,16 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStop"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="STOP ALL"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:backgroundTint="#FF0055"
+                android:layout_marginBottom="8dp"/>
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -44,14 +44,14 @@
                 android:layout_marginTop="4dp">
 
                 <View
-                    android:id="@+id/connectionIndicator"
+                    android:id="@+id/statusIndicator"
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:background="@drawable/status_pulse"
                     android:backgroundTint="#E6A546"/>
 
                 <TextView
-                    android:id="@+id/connectionStatus"
+                    android:id="@+id/statusText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="STANDBY"
@@ -63,6 +63,16 @@
                     android:layout_marginStart="8dp"/>
             </LinearLayout>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnArchive"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:tint="#808080"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
 
         <!-- Settings Button -->
         <ImageView
@@ -88,6 +98,65 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConnect"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="CONNECT FLIPPER ZERO"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"
+                app:backgroundTint="#00FF41"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:id="@+id/currentOperation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ready"
+                android:textColor="#808080"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#1E1E1E"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/infoPanelTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SYSTEM INFO"
+                        android:textColor="#00FFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-condensed"
+                        android:letterSpacing="0.15"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/infoDisplay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Waiting for connection..."
+                        android:textColor="#808080"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:maxLines="20"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Device Info Panel -->
             <androidx.cardview.widget.CardView
@@ -213,7 +282,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:rowCount="4">
+                android:rowCount="5">
 
                 <!-- RFID Module -->
                 <androidx.cardview.widget.CardView
@@ -601,7 +670,7 @@
 
                 <!-- iButton Module -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardiButton"
+                    android:id="@+id/cardIButton"
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_columnWeight="1"
@@ -718,6 +787,55 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="Learn and transmit IR signals"
+                            android:textColor="#808080"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif"
+                            android:layout_marginTop="8dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                <!-- Bluetooth Module -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardBluetooth"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="4dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:cardElevation="2dp"
+                    app:cardCornerRadius="0dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BLUETOOTH"
+                            android:textColor="#E0E0E0"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-condensed"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BLE/BT"
+                            android:textColor="#606060"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif-condensed"
+                            android:layout_marginTop="4dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:text="Bluetooth scanning and attacks"
                             android:textColor="#808080"
                             android:textSize="11sp"
                             android:fontFamily="sans-serif"
