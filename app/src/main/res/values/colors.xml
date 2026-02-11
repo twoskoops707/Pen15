@@ -7,6 +7,7 @@
     <color name="dark_bg">#050505</color>
     <color name="surface_bg">#0A0A0A</color>
     <color name="elevated_bg">#101010</color>
+    <!-- color name="card_bg">#0F0F0F</color -->
 
     <!-- Neon Primary Colors - Vivid & Aggressive -->
     <color name="neon_green">#00FF00</color>
@@ -70,7 +71,7 @@
     <color name="terminal_cyan">@color/neon_cyan</color>
     <color name="terminal_magenta">@color/neon_magenta</color>
 
-    <!-- Legacy Compatibility - SINGLE DEFINITIONS ONLY -->
+    <!-- Legacy Compatibility -->
     <color name="text_primary">@color/text_white</color>
     <color name="text_secondary">@color/text_gray</color>
     <color name="bg_dark">@color/dark_bg</color>
@@ -95,6 +96,7 @@
     <color name="progress_background">@color/elevated_bg</color>
 
     <!-- ADDITIONAL BACKGROUNDS -->
+    <!-- color name="card_bg">#0F0F0F</color -->
     <color name="error">@color/neon_red</color>
     <color name="success">@color/neon_green</color>
     <color name="danger">@color/neon_red</color>
