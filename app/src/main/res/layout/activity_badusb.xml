@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- MILITARY-GRADE BAD USB OPERATIONS INTERFACE -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0D0D0D">
+    android:background="@drawable/grid_pattern">
 
-    <!-- STATUS BAR -->
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#1A1A1A"
+        android:background="#DD000000"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
-        android:elevation="4dp"
+        android:elevation="8dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#808080"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:tint="#00FFFF"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BAD USB OPERATIONS"
-            android:textColor="#E6E6E6"
-            android:textSize="14sp"
+            android:text="BAD USB"
+            android:textColor="#FF0055"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.1"
             android:layout_marginStart="12dp"/>
 
         <View
@@ -45,20 +45,19 @@
             android:layout_height="8dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/status_dot"
-            android:backgroundTint="#D4672A"/>
+            android:backgroundTint="#FF0055"/>
 
         <TextView
             android:id="@+id/statusBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ARMED"
-            android:textColor="#D4672A"
-            android:textSize="11sp"
+            android:textColor="#FF0055"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"/>
+            android:fontFamily="monospace"/>
     </LinearLayout>
 
-    <!-- SCROLLABLE CONTENT -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -72,13 +71,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- PAYLOAD LIBRARY PANEL -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1E1E1E"
+                app:cardBackgroundColor="#44000000"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="2dp"
+                app:cardCornerRadius="0dp"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -91,27 +89,26 @@
                         android:text="PAYLOAD LIBRARY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="#00FFFF"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:layout_marginBottom="12dp"/>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/payloadsList"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:background="#141414"/>
+                        android:background="#22000000"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- QUICK DEPLOY PANEL -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1E1E1E"
+                app:cardBackgroundColor="#44000000"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="2dp"
+                app:cardCornerRadius="0dp"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -124,10 +121,10 @@
                         android:text="QUICK DEPLOY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="#00FFFF"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:layout_marginBottom="12dp"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -138,10 +135,10 @@
                         android:text="RICK ROLL"
                         android:textColor="#000000"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:textSize="12sp"
-                        app:backgroundTint="#7C8D3C"
-                        app:cornerRadius="2dp"
+                        app:backgroundTint="#00FF41"
+                        app:cornerRadius="0dp"
                         android:layout_marginBottom="8dp"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -150,12 +147,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="WIFI CREDENTIAL EXFIL"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#000000"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:textSize="12sp"
-                        app:backgroundTint="#D4672A"
-                        app:cornerRadius="2dp"
+                        app:backgroundTint="#FF0055"
+                        app:cornerRadius="0dp"
                         android:layout_marginBottom="8dp"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -164,23 +161,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="LOAD CUSTOM SCRIPT"
-                        android:textColor="#E6E6E6"
+                        android:textColor="#00FFFF"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:textSize="12sp"
-                        app:strokeColor="#666666"
+                        app:strokeColor="#00FFFF"
                         app:strokeWidth="1dp"
-                        app:cornerRadius="2dp"/>
+                        app:cornerRadius="0dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- EXECUTE CONTROL PANEL -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1E1E1E"
+                app:cardBackgroundColor="#44000000"
                 app:cardElevation="0dp"
-                app:cardCornerRadius="2dp">
+                app:cardCornerRadius="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -192,10 +188,10 @@
                         android:text="EXECUTION CONTROL"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="#00FFFF"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:layout_marginBottom="12dp"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -206,12 +202,12 @@
                         android:text="EXECUTE PAYLOAD"
                         android:textColor="#000000"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="monospace"
                         android:textSize="14sp"
                         app:icon="@android:drawable/ic_media_play"
                         app:iconTint="#000000"
-                        app:backgroundTint="#D4672A"
-                        app:cornerRadius="2dp"/>
+                        app:backgroundTint="#FFFF00"
+                        app:cornerRadius="0dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
