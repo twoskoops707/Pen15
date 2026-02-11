@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- INTUITIVE FAB-BASED WIFI DEAUTH INTERFACE -->
-<!-- Primary: FAB (green=start, red=stop) | Secondary: Swipe gestures -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -38,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="⬡ WIFI DEAUTH"
+                android:text="WIFI DEAUTH"
                 android:textColor="#FF0055"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -62,97 +60,172 @@
                 android:paddingBottom="4dp"/>
         </LinearLayout>
 
-        <!-- BUTTONS -->
-        <LinearLayout
-            android:id="@+id/buttonBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/header">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnScan"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:text="SCAN"
-                android:textSize="10sp"
-                android:fontFamily="monospace"
-                app:backgroundTint="#00FF41"
-                android:textColor="#000000"
-                android:layout_marginEnd="4dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDeauth"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:text="DEAUTH"
-                android:textSize="10sp"
-                android:fontFamily="monospace"
-                app:backgroundTint="#FF0055"
-                android:textColor="#FFFFFF"
-                android:layout_marginEnd="4dp"
-                android:enabled="false"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnStop"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:text="STOP"
-                android:textSize="10sp"
-                android:fontFamily="monospace"
-                app:backgroundTint="#FFFF00"
-                android:textColor="#000000"
-                android:enabled="false"/>
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:indeterminate="true"
-            android:indeterminateTint="#00FFFF"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/buttonBar"/>
-
-        <!-- NETWORK LIST -->
-        <ListView
-            android:id="@+id/networkList"
+        <!-- CONTENT AREA WITH STATES -->
+        <FrameLayout
+            android:id="@+id/contentArea"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#0A000000"
-            android:divider="#222222"
-            android:dividerHeight="1dp"
-            android:padding="8dp"
-            app:layout_constraintTop_toBottomOf="@id/progressBar"
-            app:layout_constraintBottom_toTopOf="@id/logScroll"
-            app:layout_constraintHeight_percent="0.3"/>
-
-        <!-- LOG OUTPUT -->
-        <ScrollView
-            android:id="@+id/logScroll"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="#05000000"
-            android:padding="8dp"
-            app:layout_constraintTop_toBottomOf="@id/networkList"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/header"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/logOutput"
+            <!-- IDLE STATE -->
+            <LinearLayout
+                android:id="@+id/idleState"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#00FF41"
-                android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:lineSpacingExtra="2dp"/>
-        </ScrollView>
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TAP START TO SCAN"
+                    android:textColor="#00FFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scan for nearby WiFi networks"
+                    android:textColor="#808080"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- SCANNING STATE -->
+            <LinearLayout
+                android:id="@+id/scanningState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="#00FFFF"/>
+
+                <TextView
+                    android:id="@+id/scanningText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scanning networks..."
+                    android:textColor="#00FFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="16dp"/>
+
+                <TextView
+                    android:id="@+id/networkCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 NETWORKS FOUND"
+                    android:textColor="#FFFF00"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+
+            <!-- RESULTS STATE -->
+            <LinearLayout
+                android:id="@+id/resultsState"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="NETWORKS"
+                        android:textColor="#00FF41"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/resultsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 APs"
+                        android:textColor="#FFFF00"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/networkList"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="#0A000000"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="SELECT TARGET"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    app:backgroundTint="#00FFFF"
+                    android:textColor="#000000"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeauth"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="DEAUTH ATTACK"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    app:backgroundTint="#FF0055"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCapture"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="CAPTURE HANDSHAKE"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    app:backgroundTint="#FFFF00"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- FAB CONTROL -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        android:text="START SCAN"
+        android:textColor="#000000"
+        android:fontFamily="monospace"
+        app:backgroundTint="@color/func_wifi"
+        app:icon="@android:drawable/ic_media_play"
+        app:iconTint="#000000"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

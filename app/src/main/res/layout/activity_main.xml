@@ -44,14 +44,14 @@
                 android:layout_marginTop="4dp">
 
                 <View
-                    android:id="@+id/statusIndicator"
+                    android:id="@+id/connectionIndicator"
                     android:layout_width="8dp"
                     android:layout_height="8dp"
                     android:background="@drawable/status_pulse"
                     android:backgroundTint="#E6A546"/>
 
                 <TextView
-                    android:id="@+id/statusText"
+                    android:id="@+id/connectionStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="STANDBY"
@@ -670,7 +670,7 @@
 
                 <!-- iButton Module -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardIButton"
+                    android:id="@+id/cardiButton"
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_columnWeight="1"
