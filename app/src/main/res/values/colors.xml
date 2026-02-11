@@ -35,12 +35,7 @@
     <color name="text_gray">#888888</color>
     <color name="text_dim">#00AA33</color>
     <color name="text_muted">#666666</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#E0E0E0</color>
     <color name="dark_grey">#333333</color>
-
-    <!-- Background Colors -->
-    <color name="bg_dark">#050505</color>
 
     <!-- Status Colors - Vivid & Clear -->
     <color name="status_connected">@color/neon_green</color>
@@ -75,7 +70,7 @@
     <color name="terminal_cyan">@color/neon_cyan</color>
     <color name="terminal_magenta">@color/neon_magenta</color>
 
-    <!-- Legacy Compatibility -->
+    <!-- Legacy Compatibility - SINGLE DEFINITIONS ONLY -->
     <color name="text_primary">@color/text_white</color>
     <color name="text_secondary">@color/text_gray</color>
     <color name="bg_dark">@color/dark_bg</color>
