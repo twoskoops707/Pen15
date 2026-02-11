@@ -1,0 +1,55 @@
+name: Python Integration Build
+
+on:
+  push:
+    branches: [ "zo/python-integration" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pen15-python-integration-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/zo/python-integration'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: python-integration-${{ github.run_number }}
+          name: Python Integration Build ${{ github.run_number }}
+          body: |
+            ## Pen15 - Python/pyflipper Integration Build
+            
+            **⚠️ EXPERIMENTAL:** This build uses Python/pyflipper for Flipper Zero integration.
+            
+            ### Features:
+            - Python-based Flipper Zero communication
+            - pyflipper library integration
+            - Termux script execution
+            
+            ### Note:
+            This is a development branch. For stable builds, use the main branch.
+          files: "**/*.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
