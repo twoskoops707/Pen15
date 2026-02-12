@@ -185,6 +185,7 @@
                 app:cardCornerRadius="0dp">
 
                 <ScrollView
+                    android:id="@+id/logScroll"
                     android:layout_width="match_parent"
                     android:layout_height="400dp"
                     android:padding="16dp">
