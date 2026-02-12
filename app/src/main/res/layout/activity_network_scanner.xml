@@ -148,6 +148,17 @@
                         android:backgroundTint="@color/terminal_red"
                         android:textColor="@color/white"
                         android:fontFamily="monospace" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStop"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="STOP SCAN"
+                        android:backgroundTint="#FF0055"
+                        android:textColor="@color/white"
+                        android:fontFamily="monospace"
+                        android:enabled="false"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -160,6 +171,7 @@
                 app:cardCornerRadius="8dp">
 
                 <ScrollView
+                    android:id="@+id/outputScroll"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:padding="16dp">
