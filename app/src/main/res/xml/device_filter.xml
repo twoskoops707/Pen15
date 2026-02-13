@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Flipper Zero USB Device (STM32 CDC) -->
-    <!-- VID: 0x0483 (1155) = STMicroelectronics -->
-    <!-- PID: 0x5740 (22336) = Virtual COM Port -->
+    <!-- Flipper Zero USB Device (STM32 CDC) - Stock firmware -->
     <usb-device vendor-id="1155" product-id="22336" />
 
+    <!-- Flipper Zero - Momentum firmware (VID-only, PID may be spoofed) -->
+    <usb-device vendor-id="1155" />
+
     <!-- ESP32 Devices (AWOK Mini V3, Generic ESP32-S2/S3) -->
-    <!-- VID: 0x303A (12346) = Espressif -->
     <usb-device vendor-id="12346" />
 
-    <!-- CH340/CH341 USB-Serial (Common ESP32 boards) -->
-    <!-- VID: 0x1A86 (6790) = QinHeng Electronics -->
-    <usb-device vendor-id="6790" product-id="29987" /> <!-- CH340 -->
-    <usb-device vendor-id="6790" product-id="21795" /> <!-- CH341 -->
+    <!-- CH340/CH341 USB-Serial -->
+    <usb-device vendor-id="6790" product-id="29987" />
+    <usb-device vendor-id="6790" product-id="21795" />
 
-    <!-- CP210x USB-Serial (Common ESP32 boards) -->
-    <!-- VID: 0x10C4 (4292) = Silicon Labs -->
-    <usb-device vendor-id="4292" product-id="60000" /> <!-- CP2102 -->
-    <usb-device vendor-id="4292" product-id="60016" /> <!-- CP2104 -->
+    <!-- CP210x USB-Serial -->
+    <usb-device vendor-id="4292" product-id="60000" />
+    <usb-device vendor-id="4292" product-id="60016" />
 
     <!-- FTDI USB-Serial -->
-    <!-- VID: 0x0403 (1027) = FTDI -->
-    <usb-device vendor-id="1027" product-id="24577" /> <!-- FT232R -->
-    <usb-device vendor-id="1027" product-id="24596" /> <!-- FT232H -->
+    <usb-device vendor-id="1027" product-id="24577" />
+    <usb-device vendor-id="1027" product-id="24596" />
+
+    <!-- Catch common spoofed VIDs (Momentum can set custom VID/PID) -->
+    <!-- Arduino / Atmel -->
+    <usb-device vendor-id="9025" />
+    <!-- Microchip -->
+    <usb-device vendor-id="1240" />
+    <!-- Linux Foundation (gadget devices) -->
+    <usb-device vendor-id="7531" />
 </resources>
