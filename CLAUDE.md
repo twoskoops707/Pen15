@@ -1,5 +1,12 @@
 # Pen15 Project - v2.0
 
+## Branches
+| Branch | Purpose | Status |
+|--------|---------|--------|
+| main | Stable release | v1.0.129 |
+| recon-tools | OSINT, Google Dork, Phone Sensors, Termux fixes | Active |
+| awok-only | Direct AWOK/ESP32 USB serial (no Termux dependency) | Active - primary dev |
+
 ## USB Serial Communication
 
 ### Flipper Zero USB CDC Serial
@@ -15,20 +22,84 @@ RTS:        ENABLED
 
 ### Flipper Zero USB IDs
 ```
-VID: 0x0483 (STMicroelectronics)
-PID: 0x5740 (Virtual COM Port)
+Stock:      VID 0x0483 (STMicroelectronics) PID 0x5740 (Virtual COM Port)
+Momentum:   VID/PID can be spoofed to arbitrary values
 ```
 
-## Architecture (v2.0)
-- Tab-based navigation: Terminal, Flipper, WiFi, Status
-- FlipperSerial.kt handles all USB serial communication
-- AppState ViewModel shares state across fragments
-- Material3 dark theme
-- SubGHz brute force generator (CAME, NICE, Linear, Chamberlain, Holtek, Ansonic)
-- WPA2 PMKID cracker (in-app PBKDF2-SHA1)
-- Termux integration for aircrack-ng/hashcat
+### Momentum Firmware (mntm-014)
+- Flipper updated from Unleashed to Momentum firmware
+- Can spoof USB VID/PID - breaks hardcoded detection
+- FlipperUSBManager uses 3-tier fallback:
+  1. Stock VID/PID match (0x0483/0x5740)
+  2. Any default prober driver
+  3. CdcAcmSerialDriver on ALL USB devices
+- device_filter.xml includes VID-only matches and common spoofed VIDs
 
-## Flipper CLI Commands (Verified Working - Unleashed 084e)
+### ESP32/AWOK USB IDs
+```
+CP2102:     VID 0x10C4
+CH340:      VID 0x1A86
+Espressif:  VID 0x303A
+FTDI:       VID 0x0403
+```
+
+### ESP32 Marauder CLI Commands (AWOK Dual Mini v3)
+```
+scanap              - Scan WiFi access points
+stopscan            - Stop current scan
+select -a <idx>     - Select AP by index
+attack -t deauth    - Deauth attack on selected AP
+sniffpmkid          - Capture PMKID hashes
+sniffbt             - Bluetooth sniffing
+blespam             - BLE spam attack
+evilportal          - Evil twin portal
+channel <n>         - Set WiFi channel
+list                - List scan results
+clearlist           - Clear results
+gps                 - GPS info (if module present)
+help                - List commands
+reboot              - Reboot ESP32
+```
+
+## Architecture (v2.0 - awok-only branch)
+
+### Core Serial Managers
+- **FlipperUSBManager.kt** - Flipper Zero USB serial with Momentum firmware support
+- **ESP32SerialManager.kt** - Direct AWOK/ESP32 USB serial (bypasses Termux)
+- **FlipperConnectionManager.kt** - Singleton connection state manager
+
+### Activity Modules
+- **MainActivity.kt** - Dashboard with Flipper + ESP32 dual detection
+- **ESP32ManagerActivity.kt** - Direct Marauder commands via USB serial
+- **WiFiDeauthActivity.kt** - WiFi scan/deauth via ESP32 serial (no Termux)
+- **SubGHzActivity.kt** - SubGHz via Flipper CLI
+- **RFIDActivity.kt** - RFID via Flipper CLI
+- **NFCActivity.kt** - NFC via Flipper CLI
+- **InfraredActivity.kt** - IR via Flipper CLI
+- **GPIOActivity.kt** - GPIO via Flipper CLI
+- **BadUSBActivity.kt** - BadUSB via Flipper CLI
+- **IButtonActivity.kt** - iButton via Flipper CLI
+- **OSINTActivity.kt** - OSINT tools via Termux
+- **GoogleDorkActivity.kt** - Google dork query builder
+- **NetworkScannerActivity.kt** - Network scanning via Termux
+- **ExploitDatabaseActivity.kt** - Exploit DB search
+- **PhoneSensorsActivity.kt** - Phone WiFi/BLE/NFC sensors
+- **PacketSnifferActivity.kt** - Packet capture
+- **HashCrackerActivity.kt** - Hash cracking
+- **SettingsActivity.kt** - App settings
+
+### Support Classes
+- **TermuxIntegration.kt** - Termux command builders (OSINT, network, hash, WiFi)
+- **ProcessManager.kt** - Inline script execution (no file writes to scoped storage)
+- **ParameterDialog.kt** - Auto-discovery parameter dialog
+
+### Key Design Decisions
+- ESP32 communication uses usb-serial-for-android (mik3y v3.9.0) directly
+- No Termux dependency for AWOK commands (was causing Permission Denied code 126)
+- ProcessManager passes scripts inline to avoid Android scoped storage issues
+- Flipper modules require Flipper connection; ESP32/tool cards do not
+
+## Flipper CLI Commands (Verified Working)
 
 | Feature | Command | Notes |
 |---------|---------|-------|
@@ -51,3 +122,23 @@ PID: 0x5740 (Virtual COM Port)
 1. **ALWAYS use GitHub Actions** - Never build locally
 2. **Batch changes** - Don't trigger builds for every small change
 3. **Test before commit** - Verify code compiles
+
+## Termux Limitations on Android 11
+- `/tmp` is read-only - can't create temp files there
+- `getExternalFilesDir()` inaccessible to Termux (scoped storage)
+- Scripts must be passed inline, not written to files
+- `gh` CLI crashes on Termux ARM64 (SIGSYS: bad system call)
+- Use `$HOME/.pen15/` for PID/output storage
+
+## Recent Session History (awok-only branch)
+1. Fixed Termux Permission Denied (code 126) - ProcessManager inline scripts
+2. Created awok-only branch from recon-tools
+3. Created ESP32SerialManager.kt for direct AWOK USB serial
+4. Rewrote ESP32ManagerActivity + WiFiDeauthActivity to use direct serial
+5. Fixed FlipperUSBManager for Momentum firmware VID/PID spoofing
+6. Updated device_filter.xml with broader VID matching
+
+## Next Steps
+- Test Momentum firmware connection (check `adb logcat | grep FlipperUSBManager`)
+- Verify ESP32 serial commands work end-to-end on device
+- Merge awok-only improvements back to main when stable
