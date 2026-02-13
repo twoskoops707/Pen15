@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D0D0F">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📶 WiFi Tools"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#00B894"
+            android:fontFamily="monospace"
+            android:gravity="center" />
+
+        <View android:layout_width="32dp" android:layout_height="32dp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardScan"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="🔍" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Scan Networks" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Find all WiFi" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardDeauth"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="⚡" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Deauth" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Kick devices off" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardEvilPortal"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="🕸️" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Evil Portal" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Fake login page" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSniff"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="👃" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Sniff" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Capture packets" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </GridLayout>
+    </ScrollView>
+</LinearLayout>

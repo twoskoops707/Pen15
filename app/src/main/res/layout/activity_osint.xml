@@ -1,63 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg_deep">
+    android:background="#0D0D0F">
 
     <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="horizontal"
-        android:padding="20dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="@color/text_secondary"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"/>
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF"
+            android:padding="4dp" />
 
-        <LinearLayout
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            android:text="🔍 OSINT &amp; Recon"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#00FF88"
+            android:fontFamily="monospace"
+            android:gravity="center" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔍 OSINT &amp; DORKING"
-                android:textColor="@color/neon_orange"
-                android:textSize="20sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Google Dorks for reconnaissance"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"/>
-        </LinearLayout>
+        <View android:layout_width="32dp" android:layout_height="32dp" />
     </LinearLayout>
 
-    <!-- Target Input -->
-    <com.google.android.material.card.MaterialCardView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="@color/bg_card"
-        app:strokeWidth="1dp"
-        app:strokeColor="@color/text_muted">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,59 +47,230 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎯 TARGET (optional)"
-                android:textColor="@color/neon_orange"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"/>
-
+            <!-- Target Input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:boxBackgroundColor="@color/bg_input"
-                app:boxStrokeColor="@color/neon_orange"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:hint="Enter target (domain, IP, username)"
+                app:hintTextColor="#888888"
+                app:boxStrokeColor="#00FF88"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/targetInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="example.com"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_hint"
-                    android:inputType="textUri"/>
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="monospace"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Status -->
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ready"
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:fontFamily="monospace"
+                android:paddingTop="8dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:progressTint="#00FF88" />
+
+            <!-- Google Dorks Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Leave empty to search the entire web"
-                android:textColor="@color/text_muted"
-                android:textSize="10sp"
-                android:layout_marginTop="4dp"/>
+                android:text="GOOGLE DORKS"
+                android:textSize="12sp"
+                android:textColor="#6C5CE7"
+                android:fontFamily="monospace"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkFiles"
+                    style="@style/DorkButton"
+                    android:text="📁 FILES"
+                    app:backgroundTint="#6C5CE7" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkAdmin"
+                    style="@style/DorkButton"
+                    android:text="🔐 ADMIN"
+                    app:backgroundTint="#FF6B6B" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkDirectories"
+                    style="@style/DorkButton"
+                    android:text="📂 DIRS"
+                    app:backgroundTint="#00D2D3" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkCameras"
+                    style="@style/DorkButton"
+                    android:text="📹 CAMS"
+                    app:backgroundTint="#FDCB6E" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkEmail"
+                    style="@style/DorkButton"
+                    android:text="📧 EMAILS"
+                    app:backgroundTint="#E17055" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDorkPasswords"
+                    style="@style/DorkButton"
+                    android:text="🔑 CREDS"
+                    app:backgroundTint="#00B894" />
+            </GridLayout>
+
+            <!-- Recon Tools Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RECON TOOLS"
+                android:textSize="12sp"
+                android:textColor="#00FF88"
+                android:fontFamily="monospace"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="3">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardWhois"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🔍\nWHOIS"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardDNS"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🌐\nDNS"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardShodan"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🛰️\nShodan"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardCensys"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🔎\nCensys"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardGitHub"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="💻\nGitHub"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardSocial"
+                    style="@style/ReconCard">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="👤\nSocial"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="center" />
+                </androidx.cardview.widget.CardView>
+            </GridLayout>
+
+            <!-- Results -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOG"
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:fontFamily="monospace"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:cardBackgroundColor="#0A0A0F"
+                app:cardCornerRadius="12dp">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/resultsOutput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#00FF88"
+                        android:fontFamily="monospace"
+                        android:textSize="11sp"
+                        android:lineSpacingExtra="4dp" />
+                </ScrollView>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Clear Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClear"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:text="CLEAR"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#333333"
+                app:cornerRadius="24dp" />
+
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Scrollable Results -->
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="16dp">
-
-        <LinearLayout
-            android:id="@+id/resultsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="40dp">
-
-            <!-- Categories will be added here programmatically -->
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
+    </ScrollView>
 </LinearLayout>

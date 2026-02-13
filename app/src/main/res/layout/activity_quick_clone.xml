@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D0D0F">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📋 Quick Clone"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#00D2D3"
+            android:fontFamily="monospace"
+            android:gravity="center" />
+
+        <View android:layout_width="32dp" android:layout_height="32dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select a card type to clone"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:fontFamily="monospace"
+            android:layout_gravity="center"
+            android:paddingBottom="16dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateTint="#00D2D3" />
+
+        <!-- Clone Options -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:paddingVertical="16dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardCloneRFID"
+                style="@style/CloneCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:text="📡" android:textSize="32sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="RFID" android:textColor="#FFF" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardCloneNFC"
+                style="@style/CloneCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:text="📲" android:textSize="32sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="NFC" android:textColor="#FFF" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardCloneiButton"
+                style="@style/CloneCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView android:text="🔑" android:textSize="32sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="iButton" android:textColor="#FFF" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </GridLayout>
+
+        <!-- Results -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#0A0A0F"
+            app:cardCornerRadius="12dp">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/resultText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No data yet.\n\nTap a card type above and hold your key/card to the Flipper."
+                    android:textColor="#00D2D3"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp" />
+            </ScrollView>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
+
+            <Button
+                android:id="@+id/btnEmulate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="📲 EMULATE"
+                android:textSize="12sp"
+                android:backgroundTint="#6C5CE7" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="💾 SAVE"
+                android:textSize="12sp"
+                android:backgroundTint="#00D2D3" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
