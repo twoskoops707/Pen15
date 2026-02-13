@@ -10,6 +10,7 @@
 
     <!-- Neon Accents -->
     <color name="neon_pink">#FF2D7D</color>
+    <color name="neon_magenta">#FF00FF</color>
     <color name="neon_cyan">#00F5FF</color>
     <color name="neon_green">#39FF14</color>
     <color name="neon_purple">#B026FF</color>
