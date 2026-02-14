@@ -1,42 +1,38 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- TERMINAL HACKER THEME - Dark & Low Profile -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Backgrounds - Pure Black -->
-        <item name="android:windowBackground">@color/black_bg</item>
-        <item name="android:colorBackground">@color/dark_bg</item>
-        <item name="colorSurface">@color/surface_bg</item>
-        <item name="colorSurfaceVariant">@color/elevated_bg</item>
-
-        <!-- Primary - Neon Green Matrix Style -->
-        <item name="colorPrimary">@color/neon_green</item>
-        <item name="colorPrimaryVariant">#007722</item>
-        <item name="colorOnPrimary">@color/black_bg</item>
-
-        <!-- Secondary - Neon Cyan Accents -->
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="colorOnSecondary">@color/black_bg</item>
-
-        <!-- Error - Neon Red -->
+        <item name="android:windowBackground">@color/bg_deep</item>
+        <item name="android:colorBackground">@color/bg_deep</item>
+        <item name="colorSurface">@color/bg_card</item>
+        <item name="colorSurfaceVariant">@color/bg_elevated</item>
+        <item name="colorPrimary">@color/neon_cyan</item>
+        <item name="colorPrimaryVariant">@color/neon_blue</item>
+        <item name="colorOnPrimary">@color/bg_deep</item>
+        <item name="colorSecondary">@color/neon_pink</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="colorError">@color/neon_red</item>
-
-        <!-- Text - Subtle Green Tint -->
-        <item name="android:textColorPrimary">@color/text_white</item>
-        <item name="android:textColorSecondary">@color/text_gray</item>
-
-        <!-- System Bars - Black -->
-        <item name="android:statusBarColor">@color/black_bg</item>
-        <item name="android:navigationBarColor">@color/black_bg</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:statusBarColor">@color/bg_deep</item>
+        <item name="android:navigationBarColor">@color/bg_deep</item>
         <item name="android:windowLightStatusBar">false</item>
-
-        <!-- Typography - Monospace for Terminal Feel -->
-        <item name="android:fontFamily">monospace</item>
     </style>
 
-    <!-- Tab Text Style for Terminal Tabs -->
-    <style name="TabTextStyle">
-        <item name="android:fontFamily">monospace</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0.1</item>
-        <item name="android:textAllCaps">true</item>
+    <!-- Big Action Button Style -->
+    <style name="BigActionButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="elevation">8dp</item>
+    </style>
+
+    <!-- Category Card Style -->
+    <style name="CategoryCard">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">2dp</item>
     </style>
 </resources>

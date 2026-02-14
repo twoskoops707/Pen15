@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0D0D0F">
+
+    <!-- Animated Background -->
+    <View
+        android:id="@+id/backgroundGlow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_cyber_grid" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Header with Connection Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pen15"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:textColor="#00FF88" />
+
+                    <TextView
+                        android:id="@+id/connectionStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="● Searching for Flipper..."
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:textColor="#FF6B6B" />
+                </LinearLayout>
+
+                <!-- Connection Indicator Pulse -->
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp">
+
+                    <View
+                        android:id="@+id/connectionPulse"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/pulse_ring" />
+
+                    <ImageView
+                        android:id="@+id/flipperIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_flipper"
+                        android:tint="#FF6B6B" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Quick Actions Row -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnQuickScan"
+                        style="@style/QuickActionButton"
+                        android:text="🔍 SCAN ALL"
+                        app:backgroundTint="#6C5CE7" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnQuickAttack"
+                        style="@style/QuickActionButton"
+                        android:text="⚡ ATTACK"
+                        app:backgroundTint="#FF6B6B" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnQuickClone"
+                        style="@style/QuickActionButton"
+                        android:text="📋 CLONE"
+                        app:backgroundTint="#00D2D3" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Main Tools Grid -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOOLS"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:textColor="#888888"
+                android:paddingBottom="12dp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="4"
+                android:useDefaultMargins="true">
+
+                <!-- RFID Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardRFID"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#1A1A2E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📡"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RFID"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Read &amp; Clone"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- NFC Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardNFC"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#16213E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📲"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NFC"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tap &amp; Read"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- SubGHz Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardSubGHz"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#1A1A2E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📻"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SubGHz"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="433/868 MHz"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- IR Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardIR"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#16213E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎯"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Infrared"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Learn &amp; Blast"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- WiFi Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardWiFi"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#0F3460">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📶"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WiFi"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Deauth &amp; Sniff"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- BadUSB Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardBadUSB"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#533483">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⌨️"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BadUSB"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Auto-Type"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- iButton Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardiButton"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#1A1A2E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔑"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="iButton"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dallas Key"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- OSINT Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardOSINT"
+                    style="@style/ToolCard"
+                    app:cardBackgroundColor="#16213E">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔍"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OSINT"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:paddingTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Recon &amp; Dorks"
+                            android:textSize="10sp"
+                            android:textColor="#888888" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </GridLayout>
+
+            <!-- Recent Activity -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RECENT"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:textColor="#888888"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                app:cardBackgroundColor="#0A0A0F"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:id="@+id/recentActivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp"
+                    android:text="No activity yet...\nConnect your Flipper and start scanning!"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:textColor="#00FF88"
+                    android:gravity="top" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

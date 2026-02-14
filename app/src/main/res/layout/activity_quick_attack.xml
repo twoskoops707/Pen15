@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D0D0F">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF"
+            android:padding="4dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⚡ Quick Attack"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FF6B6B"
+            android:fontFamily="monospace"
+            android:gravity="center" />
+
+        <View android:layout_width="32dp" android:layout_height="32dp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2">
+
+            <!-- WiFi Deauth -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardDeauth"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="📶" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="WiFi Deauth" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Disconnect all" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- SubGHz Replay -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSubGHzReplay"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="📻" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Replay Signal" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Resend captured" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Rickroll -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRickroll"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="🎵" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Rickroll" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Never gonna..." android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- BLE Spam -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardBLESpam"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="📡" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="BLE Spam" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Flood devices" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- RFID Brute -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRFIDBrute"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="🔑" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="RFID Brute" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Try all codes" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- NFC Emulate -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardNFCEmulate"
+                style="@style/AttackCard">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="20dp">
+                    <TextView android:text="📲" android:textSize="40sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="NFC Emulate" android:textColor="#FFF" android:textStyle="bold" android:paddingTop="8dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Clone &amp; use" android:textColor="#888" android:textSize="10sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </GridLayout>
+    </ScrollView>
+</LinearLayout>
