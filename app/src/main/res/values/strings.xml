@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pentest Dashboard</string>
+    <string name="app_name">Pen15</string>
     <string name="warning_message">⚠️ Only use on networks/devices you OWN</string>
     <string name="target_hint">Target IP/Network (e.g., 192.168.1.0/24)</string>
 </resources>
