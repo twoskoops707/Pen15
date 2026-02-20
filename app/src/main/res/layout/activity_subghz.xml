@@ -135,13 +135,30 @@
                 android:textColor="#00FFFF"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/hintBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#FFFF00"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:background="#33FFFF00"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/frequencyBar"/>
+
         <!-- CONTENT AREA WITH STATES -->
         <FrameLayout
             android:id="@+id/contentArea"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/frequencyBar"
+            app:layout_constraintTop_toBottomOf="@id/hintBanner"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <!-- IDLE STATE -->

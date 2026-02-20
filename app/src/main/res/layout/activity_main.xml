@@ -340,7 +340,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardRFID"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -351,7 +352,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -380,7 +381,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardNFC"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -391,7 +393,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -428,7 +430,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardSubGHz"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -439,7 +442,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -468,7 +471,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardInfrared"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -479,7 +483,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -516,7 +520,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardBadUSB"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -527,7 +532,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -556,7 +561,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardiButton"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -567,7 +573,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -633,7 +639,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardWiFiDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -644,7 +651,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -673,7 +680,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardBluetooth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -684,7 +692,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -721,7 +729,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardESP32"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -732,7 +741,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -761,7 +770,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardGPIO"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -772,7 +782,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -838,7 +848,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardOSINT"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -849,7 +860,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -878,7 +889,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardGoogleDork"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -889,7 +901,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -926,7 +938,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardNetworkScanner"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -937,7 +950,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -966,7 +979,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardExploitDB"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -977,7 +991,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -1014,7 +1028,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardHashCracker"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -1025,7 +1040,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -1054,7 +1069,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPacketSniffer"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -1065,7 +1081,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
@@ -1102,7 +1118,8 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPhoneSensors"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="90dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
                     app:cardBackgroundColor="@color/bg_card"
@@ -1113,7 +1130,7 @@
                     android:foreground="?attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="10dp">
                         <TextView
