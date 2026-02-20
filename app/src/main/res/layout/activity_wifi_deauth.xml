@@ -58,6 +58,17 @@
                 android:paddingEnd="8dp"
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp"/>
+
+            <ImageView
+                android:id="@+id/btnHelp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_help"
+                android:tint="@color/text_secondary"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Help"/>
         </LinearLayout>
 
         <!-- CONTENT AREA WITH STATES -->
