@@ -28,6 +28,11 @@
     <color name="status_disconnected">#FF5555</color>
     <color name="status_idle">#6272A4</color>
 
+    <!-- Function-specific tints (FAB backgrounds per module) -->
+    <color name="func_wifi">#FF5555</color>
+    <color name="func_subghz">#BD93F9</color>
+    <color name="func_bluetooth">#8BE9FD</color>
+
     <!-- Legacy name aliases (map old color names to new palette) -->
     <color name="electric_blue">#8BE9FD</color>
     <color name="neon_cyan">#8BE9FD</color>
