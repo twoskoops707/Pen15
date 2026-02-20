@@ -1,4 +1,14 @@
-# Pen15 Project - v2.0
+# Pen15 Project - v3.0
+
+## MANDATORY WORKING RULES — NEVER SKIP
+
+1. **READ BEFORE TOUCHING.** Before editing ANY file, read its current contents in full. No exceptions.
+2. **NEVER GUESS.** If you don't know what a file contains, read it. If you don't know what a class does, grep it.
+3. **RESEARCH FIRST, CODE SECOND.** Every change starts with reading the actual current state of the code.
+4. **NO ASSUMPTIONS.** Just because something was written in a previous session doesn't mean it's correct. Read it anyway.
+5. **WHEN IN DOUBT, READ MORE FILES.** Use Read, Grep, Glob tools exhaustively before proposing any change.
+
+Violating these rules wastes the user's time and money. Do not do it.
 
 ## Branches
 | Branch | Purpose | Status |
