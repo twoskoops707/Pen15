@@ -1,42 +1,95 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- TERMINAL HACKER THEME - Dark & Low Profile -->
-    <style name="Theme.PentestDashboard" parent="Theme.Material3.Dark.NoActionBar">
-        <!-- Backgrounds - Pure Black -->
-        <item name="android:windowBackground">@color/black_bg</item>
-        <item name="android:colorBackground">@color/dark_bg</item>
-        <item name="colorSurface">@color/surface_bg</item>
-        <item name="colorSurfaceVariant">@color/elevated_bg</item>
-
-        <!-- Primary - Neon Green Matrix Style -->
-        <item name="colorPrimary">@color/neon_green</item>
-        <item name="colorPrimaryVariant">#007722</item>
-        <item name="colorOnPrimary">@color/black_bg</item>
-
-        <!-- Secondary - Neon Cyan Accents -->
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="colorOnSecondary">@color/black_bg</item>
-
-        <!-- Error - Neon Red -->
-        <item name="colorError">@color/neon_red</item>
-
-        <!-- Text - Subtle Green Tint -->
-        <item name="android:textColorPrimary">@color/text_white</item>
-        <item name="android:textColorSecondary">@color/text_gray</item>
-
-        <!-- System Bars - Black -->
-        <item name="android:statusBarColor">@color/black_bg</item>
-        <item name="android:navigationBarColor">@color/black_bg</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PentestDashboard" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/background</item>
+        <item name="colorSecondary">@color/info</item>
+        <item name="colorOnSecondary">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="materialButtonStyle">@style/Widget.Pen15.Button</item>
+        <item name="cardViewStyle">@style/Widget.Pen15.CardView</item>
+    </style>
 
-        <!-- Typography - Monospace for Terminal Feel -->
+    <!-- Buttons -->
+    <style name="Widget.Pen15.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/background</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="Widget.Pen15.Button.Danger" parent="Widget.Pen15.Button">
+        <item name="backgroundTint">@color/danger</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="Widget.Pen15.Button.Success" parent="Widget.Pen15.Button">
+        <item name="backgroundTint">@color/success</item>
+        <item name="android:textColor">@color/background</item>
+    </style>
+
+    <style name="Widget.Pen15.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/primary</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:minHeight">44dp</item>
+    </style>
+
+    <!-- Cards -->
+    <style name="Widget.Pen15.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/border</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+    <style name="Widget.Pen15.CardView.Danger" parent="Widget.Pen15.CardView">
+        <item name="strokeColor">@color/danger</item>
+    </style>
+
+    <!-- Text styles -->
+    <style name="TextAppearance.Pen15.SectionHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Pen15.Terminal" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/terminal_text</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">monospace</item>
     </style>
 
-    <!-- Tab Text Style for Terminal Tabs -->
-    <style name="TabTextStyle">
-        <item name="android:fontFamily">monospace</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0.1</item>
-        <item name="android:textAllCaps">true</item>
+    <style name="TextAppearance.Pen15.StatusBadge" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Module card title -->
+    <style name="TextAppearance.Pen15.ModuleTitle" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Status dot -->
+    <style name="Widget.Pen15.StatusDot">
+        <item name="android:layout_width">8dp</item>
+        <item name="android:layout_height">8dp</item>
+        <item name="android:background">@drawable/shape_status_dot</item>
     </style>
 </resources>

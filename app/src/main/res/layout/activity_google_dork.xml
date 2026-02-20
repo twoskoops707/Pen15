@@ -1,304 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/grid_pattern">
+    android:orientation="vertical"
+    android:background="#13111C">
 
+    <!-- Toolbar -->
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#DD000000"
-        android:paddingStart="16dp"
+        android:background="#1A1826"
+        android:paddingStart="12dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
-        android:elevation="8dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:elevation="4dp">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#00FFFF"
+            android:tint="#BD93F9"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"/>
+            android:padding="6dp"
+            android:contentDescription="Back"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="GOOGLE DORKING"
-            android:textColor="#FF0055"
+            android:text="GOOGLE DORKS"
+            android:textColor="#F8F8F2"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
             android:letterSpacing="0.1"
-            android:layout_marginStart="12dp"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
 
+    <!-- Tab Row -->
+    <LinearLayout
+        android:id="@+id/tabRow"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:background="#1A1826">
+
+        <TextView
+            android:id="@+id/tabPerson"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="PERSON"
+            android:textColor="#BD93F9"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:background="#1A1826"/>
+
+        <TextView
+            android:id="@+id/tabOrg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="ORG"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:background="#1A1826"/>
+
+        <TextView
+            android:id="@+id/tabBuilder"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="BUILDER"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:background="#1A1826"/>
+
+        <TextView
+            android:id="@+id/tabLibrary"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="LIBRARY"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:background="#1A1826"/>
+    </LinearLayout>
+
+    <!-- Tab Indicator Bar -->
+    <LinearLayout
+        android:id="@+id/tabIndicatorRow"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:orientation="horizontal"
+        android:background="#2A2840">
+
+        <View
+            android:id="@+id/indicatorPerson"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#BD93F9"/>
+
+        <View
+            android:id="@+id/indicatorOrg"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#2A2840"/>
+
+        <View
+            android:id="@+id/indicatorBuilder"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#2A2840"/>
+
+        <View
+            android:id="@+id/indicatorLibrary"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#2A2840"/>
+    </LinearLayout>
+
+    <!-- Content: each tab's layout included directly, toggled via visibility -->
     <ScrollView
+        android:id="@+id/contentScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="0dp">
+            <!-- ==================== PERSON TAB ==================== -->
+            <include
+                android:id="@+id/panelPerson"
+                layout="@layout/fragment_dork_person"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+            <!-- ==================== ORG TAB ==================== -->
+            <include
+                android:id="@+id/panelOrg"
+                layout="@layout/fragment_dork_org"
+                android:visibility="gone"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TARGET DOMAIN / SITE"
-                        android:textColor="#00FFFF"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp"/>
+            <!-- ==================== BUILDER TAB ==================== -->
+            <include
+                android:id="@+id/panelBuilder"
+                layout="@layout/fragment_dork_builder"
+                android:visibility="gone"/>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:boxStrokeColor="#00FFFF"
-                        app:hintTextColor="#00FFFF">
+            <!-- ==================== LIBRARY TAB ==================== -->
+            <include
+                android:id="@+id/panelLibrary"
+                layout="@layout/fragment_dork_library"
+                android:visibility="gone"/>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputDomain"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="example.com (leave empty for global)"
-                            android:textColor="#00FF41"
-                            android:textColorHint="#808080"
-                            android:fontFamily="monospace"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="WHAT ARE YOU LOOKING FOR?"
-                        android:textColor="#00FFFF"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="12dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExposedFiles"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="EXPOSED FILES (PDF, DOC, XLS)"
-                        android:textColor="#00FF41"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#00FF41"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnLoginPages"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="LOGIN / ADMIN PAGES"
-                        android:textColor="#FFFF00"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#FFFF00"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnConfigSecrets"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="CONFIG FILES / SECRETS"
-                        android:textColor="#FF0055"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#FF0055"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDatabaseDumps"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="DATABASE DUMPS"
-                        android:textColor="#FF0055"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#FF0055"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCamerasIoT"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="CAMERAS / IoT DEVICES"
-                        android:textColor="#00FFFF"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#00FFFF"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnVulnServers"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="DIRECTORY LISTINGS / OPEN SERVERS"
-                        android:textColor="#FFFF00"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#FFFF00"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEmailLists"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="EMAIL LISTS / CONTACTS"
-                        android:textColor="#00FF41"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:strokeColor="#00FF41"
-                        app:strokeWidth="1dp"
-                        app:cornerRadius="0dp"
-                        android:layout_marginBottom="6dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCustomDork"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="CUSTOM DORK QUERY"
-                        android:textColor="#000000"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        app:backgroundTint="#00FFFF"
-                        app:cornerRadius="0dp"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
-                app:cardElevation="0dp"
-                app:cardCornerRadius="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="GENERATED DORK"
-                        android:textColor="#00FFFF"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/dorkPreview"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Select a category above..."
-                        android:textColor="#FFFF00"
-                        android:fontFamily="monospace"
-                        android:textSize="13sp"
-                        android:padding="12dp"
-                        android:background="#22000000"
-                        android:layout_marginBottom="12dp"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSearch"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:text="SEARCH"
-                            app:backgroundTint="#00FF41"
-                            android:textColor="#000000"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace"
-                            app:cornerRadius="0dp"
-                            android:layout_marginEnd="4dp"/>
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnCopy"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:text="COPY"
-                            android:textColor="#00FFFF"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace"
-                            app:strokeColor="#00FFFF"
-                            app:strokeWidth="1dp"
-                            app:cornerRadius="0dp"
-                            android:layout_marginStart="4dp"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

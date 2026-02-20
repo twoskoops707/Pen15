@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Section header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BUILD YOUR SEARCH QUERY"
+        android:textColor="#BD93F9"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:letterSpacing="0.1"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mix and match search operators. Only fill in the ones you need — the rest are ignored."
+        android:textColor="#6272A4"
+        android:textSize="12sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Builder fields card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1A1826"
+        android:padding="16dp"
+        android:layout_marginBottom="12dp">
+
+        <!-- Keyword -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Keyword / Name"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Words that must appear somewhere on the page"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <EditText
+            android:id="@+id/builderKeyword"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="e.g., John Smith"
+            android:textColor="#F8F8F2"
+            android:textColorHint="#44475A"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- inurl -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Must Contain in URL  (inurl:)"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only show pages where the web address contains this word"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <EditText
+            android:id="@+id/builderInurl"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="e.g., admin"
+            android:textColor="#F8F8F2"
+            android:textColorHint="#44475A"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- intitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Must Appear in Page Title  (intitle:)"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only show pages whose title bar contains this word"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <EditText
+            android:id="@+id/builderIntitle"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="e.g., login"
+            android:textColor="#F8F8F2"
+            android:textColorHint="#44475A"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- site -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Restrict to Website  (site:)"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only return results from this specific domain"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <EditText
+            android:id="@+id/builderSite"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="e.g., linkedin.com"
+            android:textColor="#F8F8F2"
+            android:textColorHint="#44475A"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:inputType="textUri"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- filetype -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="File Type  (filetype:)"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Only return this type of file"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <Spinner
+            android:id="@+id/builderFiletype"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- exclude -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exclude Term  (-keyword)"
+            android:textColor="#F8F8F2"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide results that contain this word (useful to filter out noise)"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:layout_marginBottom="4dp"/>
+        <EditText
+            android:id="@+id/builderExclude"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="e.g., jobs"
+            android:textColor="#F8F8F2"
+            android:textColorHint="#44475A"
+            android:background="#13111C"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:layout_marginBottom="4dp"/>
+
+    </LinearLayout>
+
+    <!-- Live Preview Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#1A1826"
+        android:padding="14dp"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LIVE QUERY PREVIEW"
+            android:textColor="#6272A4"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.1"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/builderPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="(start typing above to see your query build up here)"
+            android:textColor="#8BE9FD"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:background="#13111C"
+            android:padding="12dp"
+            android:minLines="2"
+            android:lineSpacingMultiplier="1.3"/>
+
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/builderCopy"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="COPY"
+            android:textColor="#8BE9FD"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="#8BE9FD"
+            app:strokeWidth="1dp"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/builderGoogle"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="GOOGLE"
+            android:textColor="#50FA7B"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="#50FA7B"
+            app:strokeWidth="1dp"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/builderBing"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="BING"
+            android:textColor="#FFB86C"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="#FFB86C"
+            app:strokeWidth="1dp"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/builderSave"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="SAVE"
+            android:textColor="#BD93F9"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:strokeColor="#BD93F9"
+            app:strokeWidth="1dp"
+            app:cornerRadius="4dp"
+            android:layout_marginStart="4dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

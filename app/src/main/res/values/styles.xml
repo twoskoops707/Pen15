@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Input fields -->
+    <style name="Widget.Pen15.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/border</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxBackgroundColor">@color/surface</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Pen15.SmallComponent</item>
+    </style>
+
+    <style name="ShapeAppearance.Pen15.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <!-- Chip / Badge -->
+    <style name="Widget.Pen15.Chip.Status" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:textSize">11sp</item>
+        <item name="chipMinHeight">28dp</item>
+        <item name="chipCornerRadius">14dp</item>
+        <item name="chipBackgroundColor">@color/surface_variant</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="chipStrokeColor">@color/border</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+
+    <!-- Dividers -->
+    <style name="Widget.Pen15.Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/border</item>
+        <item name="android:layout_marginVertical">8dp</item>
+    </style>
+
+    <!-- Toolbar -->
+    <style name="Widget.Pen15.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/background</item>
+        <item name="titleTextColor">@color/text_primary</item>
+        <item name="subtitleTextColor">@color/text_secondary</item>
+    </style>
+</resources>

@@ -2,7 +2,7 @@ name: Android Debug Build - Creates Release
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, awok-only ]
   workflow_dispatch:
 
 permissions:
@@ -38,23 +38,23 @@ jobs:
         if: success()
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: debug-v1.0.${{ github.run_number }}
-          name: Debug Build v1.0.${{ github.run_number }}
+          tag_name: v3.0.${{ github.run_number }}
+          name: Pen15 v3.0.${{ github.run_number }} (${{ github.ref_name }})
           body: |
-            ## Pentest Dashboard - Debug Build
+            ## Pen15 - Pentest Dashboard v3.0
 
-            **Auto-generated debug APK from latest commit**
+            **Branch:** `${{ github.ref_name }}`
+            **Commit:** `${{ github.sha }}`
 
             ### Download
             - app-debug.apk (Ready to install)
 
             ### Installation
             1. Download APK to phone
-            2. Enable "Install Unknown Apps" for your browser
+            2. Enable "Install Unknown Apps" for your browser/file manager
             3. Tap APK to install
 
-            **Flipper Zero USB support included**
-            **All fake results removed**
+            **Flipper Zero USB + AWOK GPIO bridge included**
 
             🤖 Auto-built by GitHub Actions
           files: app/build/outputs/apk/debug/app-debug.apk
