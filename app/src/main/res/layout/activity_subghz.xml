@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:orientation="horizontal"
-            android:background="#DD000000"
+            android:background="@color/surface"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:gravity="center_vertical"
@@ -28,7 +28,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_menu_revert"
-                android:tint="#00FFFF"
+                android:tint="@color/info"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"/>
 
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="SUB-GHZ"
-                android:textColor="#FF0055"
+                android:textColor="@color/danger"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="433.92"
-                android:textColor="#FFFF00"
+                android:textColor="@color/warning"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
@@ -73,28 +73,28 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn315"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
                 android:text="315"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
-                app:strokeColor="#00FFFF"
-                android:textColor="#00FFFF"
+                app:strokeColor="@color/info"
+                android:textColor="@color/info"
                 android:layout_marginEnd="4dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn390"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
                 android:text="390"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
-                app:strokeColor="#00FFFF"
-                android:textColor="#00FFFF"
+                app:strokeColor="@color/info"
+                android:textColor="@color/info"
                 android:layout_marginEnd="4dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -105,34 +105,34 @@
                 android:text="433"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
-                app:backgroundTint="#00FFFF"
+                app:backgroundTint="@color/info"
                 android:textColor="#000000"
                 android:layout_marginEnd="4dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn868"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
                 android:text="868"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
-                app:strokeColor="#00FFFF"
-                android:textColor="#00FFFF"
+                app:strokeColor="@color/info"
+                android:textColor="@color/info"
                 android:layout_marginEnd="4dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn915"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
                 android:text="915"
                 android:textSize="10sp"
                 android:fontFamily="monospace"
-                app:strokeColor="#00FFFF"
-                android:textColor="#00FFFF"/>
+                app:strokeColor="@color/info"
+                android:textColor="@color/info"/>
         </LinearLayout>
 
         <!-- CONTENT AREA WITH STATES -->
@@ -157,7 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TAP START TO SCAN"
-                    android:textColor="#00FFFF"
+                    android:textColor="@color/info"
                     android:textSize="14sp"
                     android:fontFamily="monospace"
                     android:textStyle="bold"/>
@@ -186,14 +186,14 @@
                     style="?android:attr/progressBarStyleLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:indeterminateTint="#00FFFF"/>
+                    android:indeterminateTint="@color/info"/>
 
                 <TextView
                     android:id="@+id/scanningText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Scanning..."
-                    android:textColor="#00FFFF"
+                    android:textColor="@color/info"
                     android:textSize="14sp"
                     android:fontFamily="monospace"
                     android:layout_marginTop="16dp"/>
@@ -203,7 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 SIGNALS DETECTED"
-                    android:textColor="#FFFF00"
+                    android:textColor="@color/warning"
                     android:textSize="12sp"
                     android:fontFamily="monospace"
                     android:layout_marginTop="8dp"/>
@@ -229,7 +229,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="SIGNALS FOUND"
-                        android:textColor="#00FF41"
+                        android:textColor="@color/success"
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:textStyle="bold"/>
@@ -239,7 +239,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#FFFF00"
+                        android:textColor="@color/warning"
                         android:textSize="14sp"
                         android:fontFamily="monospace"
                         android:textStyle="bold"/>
@@ -252,7 +252,7 @@
                     android:text="SAVE SIGNAL"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
-                    app:backgroundTint="#00FFFF"
+                    app:backgroundTint="@color/info"
                     android:textColor="#000000"
                     android:layout_marginBottom="8dp"/>
 
@@ -263,7 +263,7 @@
                     android:text="REPLAY SIGNAL"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
-                    app:backgroundTint="#00FF41"
+                    app:backgroundTint="@color/success"
                     android:textColor="#000000"
                     android:layout_marginBottom="8dp"/>
 
@@ -274,7 +274,7 @@
                     android:text="BRUTE FORCE"
                     android:textSize="10sp"
                     android:fontFamily="monospace"
-                    app:backgroundTint="#FFFF00"
+                    app:backgroundTint="@color/warning"
                     android:textColor="#000000"/>
             </LinearLayout>
         </FrameLayout>

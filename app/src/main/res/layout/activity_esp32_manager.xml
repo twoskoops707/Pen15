@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#DD000000"
+        android:background="@color/surface"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
@@ -23,7 +23,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#00FFFF"
+            android:tint="@color/info"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"/>
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="ESP32 / AWOK MANAGER"
-            android:textColor="#FF0055"
+            android:textColor="@color/danger"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="CONNECT TO ESP32"
-                app:backgroundTint="#00FF41"
+                app:backgroundTint="@color/success"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
@@ -81,7 +81,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="WIFI ATTACKS"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -91,7 +91,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="SCAN NETWORKS"
-                        app:backgroundTint="#00FFFF"
+                        app:backgroundTint="@color/info"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -102,7 +102,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="EVIL TWIN AP"
-                        app:backgroundTint="#FFFF00"
+                        app:backgroundTint="@color/warning"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -113,7 +113,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="DEAUTH ATTACK"
-                        app:backgroundTint="#FF0055"
+                        app:backgroundTint="@color/danger"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -124,7 +124,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="PACKET SNIFFING"
-                        app:backgroundTint="#00FF41"
+                        app:backgroundTint="@color/success"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
@@ -149,7 +149,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BLE ATTACKS"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -159,7 +159,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="BLE SCAN &amp; SPAM"
-                        app:backgroundTint="#00FFFF"
+                        app:backgroundTint="@color/info"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
@@ -174,7 +174,7 @@
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
-                app:backgroundTint="#FF0055"
+                app:backgroundTint="@color/danger"
                 android:layout_marginBottom="8dp"/>
 
             <androidx.cardview.widget.CardView
@@ -195,7 +195,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="ESP32/AWOK Manager ready..."
-                        android:textColor="#00FF41"
+                        android:textColor="@color/success"
                         android:fontFamily="monospace"
                         android:textSize="12sp"/>
                 </ScrollView>

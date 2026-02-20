@@ -121,7 +121,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBluetoothSettings"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="$ open bluetooth_config"
@@ -243,7 +243,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnInstallTermux"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="$ apt-get install termux"
@@ -314,7 +314,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnClearCache"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="$ rm -rf /cache/*"
@@ -328,7 +328,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAbout"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="$ cat /proc/version"

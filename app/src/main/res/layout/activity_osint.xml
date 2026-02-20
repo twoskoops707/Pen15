@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#DD000000"
+        android:background="@color/surface"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
@@ -23,7 +23,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#00FFFF"
+            android:tint="@color/info"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"/>
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="OSINT RECON"
-            android:textColor="#FF0055"
+            android:textColor="@color/danger"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -70,26 +70,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="WHAT ARE YOU RESEARCHING?"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="12dp"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/dropdownLayout"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:boxStrokeColor="#00FFFF"
-                        app:hintTextColor="#00FFFF">
+                        app:boxStrokeColor="@color/info"
+                        app:hintTextColor="@color/info">
 
                         <AutoCompleteTextView
                             android:id="@+id/spinnerType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Select target type"
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:fontFamily="monospace"
                             android:inputType="none"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -98,15 +98,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:boxStrokeColor="#00FFFF"
-                        app:hintTextColor="#00FFFF">
+                        app:boxStrokeColor="@color/info"
+                        app:hintTextColor="@color/info">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputTarget"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Enter target"
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:textColorHint="#808080"
                             android:fontFamily="monospace"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -116,7 +116,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:text="RUN RECON"
-                        app:backgroundTint="#00FF41"
+                        app:backgroundTint="@color/success"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -145,7 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TOOLS THAT WILL RUN"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:textSize="11sp"
@@ -179,7 +179,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="OUTPUT"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:textSize="11sp"
@@ -195,7 +195,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Ready for OSINT reconnaissance..."
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:fontFamily="monospace"
                             android:textSize="12sp"/>
                     </ScrollView>

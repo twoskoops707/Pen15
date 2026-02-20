@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#DD000000"
+        android:background="@color/surface"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
@@ -23,7 +23,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#00FFFF"
+            android:tint="@color/info"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"/>
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="PACKET SNIFFER"
-            android:textColor="#FF0055"
+            android:textColor="@color/danger"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -70,7 +70,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CAPTURE SETTINGS"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -86,7 +86,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Interface (e.g. wlan0)"
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:textColorHint="#808080"
                             android:fontFamily="monospace"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -101,7 +101,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Filter (e.g. port 80)"
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:textColorHint="#808080"
                             android:fontFamily="monospace"/>
                     </com.google.android.material.textfield.TextInputLayout>
@@ -127,7 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="START CAPTURE"
-                        app:backgroundTint="#00FF41"
+                        app:backgroundTint="@color/success"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -138,7 +138,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="STOP CAPTURE"
-                        app:backgroundTint="#FF0055"
+                        app:backgroundTint="@color/danger"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -149,7 +149,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="SAVE CAPTURE"
-                        app:backgroundTint="#FFFF00"
+                        app:backgroundTint="@color/warning"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -160,7 +160,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="ANALYZE CAPTURE"
-                        app:backgroundTint="#00FFFF"
+                        app:backgroundTint="@color/info"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
@@ -188,7 +188,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Capturing packets..."
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:fontFamily="monospace"
                         android:textSize="14sp"
                         android:layout_marginBottom="8dp"/>
@@ -199,14 +199,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:indeterminate="true"
-                        android:indeterminateTint="#00FFFF"/>
+                        android:indeterminateTint="@color/info"/>
 
                     <TextView
                         android:id="@+id/packetCount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Packets: 0"
-                        android:textColor="#00FF41"
+                        android:textColor="@color/success"
                         android:fontFamily="monospace"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp"/>
@@ -231,7 +231,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Ready to capture packets..."
-                        android:textColor="#00FF41"
+                        android:textColor="@color/success"
                         android:fontFamily="monospace"
                         android:textSize="12sp"/>
                 </ScrollView>

@@ -97,7 +97,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSniff"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="PACKET SNIFFER"
@@ -109,7 +109,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSpoof"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="MAC SPOOFING"
@@ -121,7 +121,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClearList"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="CLEAR LIST"

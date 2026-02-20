@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#DD000000"
+        android:background="@color/surface"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:gravity="center_vertical"
@@ -23,7 +23,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:tint="#00FFFF"
+            android:tint="@color/info"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"/>
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="RADIO SCANNER"
-            android:textColor="#FF0055"
+            android:textColor="@color/danger"
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -64,8 +64,8 @@
         android:layout_height="44dp"
         android:background="#44000000"
         app:tabTextColor="#808080"
-        app:tabSelectedTextColor="#00FFFF"
-        app:tabIndicatorColor="#00FFFF"
+        app:tabSelectedTextColor="@color/info"
+        app:tabIndicatorColor="@color/info"
         app:tabIndicatorHeight="2dp"
         app:tabMode="fixed"
         app:layout_constraintTop_toBottomOf="@id/header">
@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="START SCAN"
-                app:backgroundTint="#00FF41"
+                app:backgroundTint="@color/success"
                 android:textColor="#000000"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
@@ -129,7 +129,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:textSize="28sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -155,7 +155,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#FF0055"
+                            android:textColor="@color/danger"
                             android:textSize="28sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -181,7 +181,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textColor="#00FFFF"
+                            android:textColor="@color/info"
                             android:textSize="28sp"
                             android:textStyle="bold"
                             android:fontFamily="monospace"/>
@@ -214,7 +214,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="SCAN RESULTS"
-                        android:textColor="#00FFFF"
+                        android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:textSize="11sp"
@@ -230,7 +230,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Tap SCAN to begin..."
-                            android:textColor="#00FF41"
+                            android:textColor="@color/success"
                             android:fontFamily="monospace"
                             android:textSize="12sp"/>
                     </ScrollView>

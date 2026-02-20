@@ -154,7 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="STOP SCAN"
-                        android:backgroundTint="#FF0055"
+                        android:backgroundTint="@color/danger"
                         android:textColor="@color/white"
                         android:fontFamily="monospace"
                         android:enabled="false"
