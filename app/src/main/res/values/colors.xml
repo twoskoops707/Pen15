@@ -36,8 +36,33 @@
     <!-- Legacy name aliases (map old color names to new palette) -->
     <color name="electric_blue">#8BE9FD</color>
     <color name="neon_cyan">#8BE9FD</color>
+    <color name="neon_green">#50FA7B</color>
+    <color name="neon_red">#FF5555</color>
     <color name="text_dim">#6272A4</color>
+    <color name="text_gray">#6272A4</color>
+    <color name="text_muted">#6272A4</color>
+    <color name="text_white">#F8F8F2</color>
     <color name="status_scanning">#F1FA8C</color>
+    <color name="ic_launcher_background">#1A1826</color>
+
+    <!-- Background aliases -->
+    <color name="black_bg">#13111C</color>
+    <color name="dark_bg">#13111C</color>
+    <color name="dark_grey">#2A2840</color>
+    <color name="surface_bg">#1A1826</color>
+
+    <!-- Terminal color palette -->
+    <color name="terminal_black">#0D0C18</color>
+    <color name="terminal_green">#50FA7B</color>
+    <color name="terminal_cyan">#8BE9FD</color>
+    <color name="terminal_red">#FF5555</color>
+    <color name="terminal_yellow">#F1FA8C</color>
+    <color name="terminal_gray">#6272A4</color>
+    <color name="terminal_dark_gray">#44475A</color>
+
+    <!-- Function-specific module tints -->
+    <color name="func_nfc">#8BE9FD</color>
+    <color name="func_badusb">#FF5555</color>
 
     <!-- Legacy (keep for compat) -->
     <color name="colorPrimary">#BD93F9</color>
