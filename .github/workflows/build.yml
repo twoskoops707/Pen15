@@ -27,7 +27,14 @@ jobs:
           chmod +x gradlew || (wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip && unzip -q gradle-8.5-bin.zip && gradle-8.5/bin/gradle wrapper --gradle-version 8.5 && chmod +x gradlew)
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace 2>&1 | tee /tmp/build.log; exit ${PIPESTATUS[0]}
+
+      - name: Show Error Summary
+        if: failure()
+        run: |
+          echo "=== LAST 300 LINES OF BUILD LOG ==="
+          tail -300 /tmp/build.log
+          echo "=== END OF LOG ==="
 
       - name: Display APK Info
         run: |
