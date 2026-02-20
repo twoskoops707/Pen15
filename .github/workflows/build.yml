@@ -27,7 +27,14 @@ jobs:
           chmod +x gradlew || (wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip && unzip -q gradle-8.5-bin.zip && gradle-8.5/bin/gradle wrapper --gradle-version 8.5 && chmod +x gradlew)
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          ./gradlew assembleDebug --info --stacktrace 2>&1 | tee /tmp/build_full.log
+          BUILD_EXIT="${PIPESTATUS[0]}"
+          echo ""
+          echo "========== KOTLIN COMPILER ERRORS =========="
+          grep -E "^e: |: error:" /tmp/build_full.log | head -100 || echo "(no Kotlin error lines found in output)"
+          echo "============================================="
+          exit "$BUILD_EXIT"
 
       - name: Display APK Info
         run: |
