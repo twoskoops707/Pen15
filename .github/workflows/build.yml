@@ -41,6 +41,13 @@ jobs:
           echo "✅ BUILD COMPLETE"
           ls -lh app/build/outputs/apk/debug/
 
+      - name: Build Pen15 FAP (Flipper App Package)
+        uses: flipperdevices/flipperzero-ufbt-action@v0.1
+        id: build-fap
+        with:
+          sdk-channel: release
+          app-dir: fap/pen15_controller
+
       - name: Create GitHub Release
         if: success()
         uses: softprops/action-gh-release@v1
@@ -53,17 +60,25 @@ jobs:
             **Branch:** `${{ github.ref_name }}`
             **Commit:** `${{ github.sha }}`
 
-            ### Download
-            - app-debug.apk (Ready to install)
+            ### Downloads
+            - **app-debug.apk** — Install on phone
+            - **pen15_controller.fap** — Install on Flipper SD card
 
             ### Installation
-            1. Download APK to phone
+            **Phone (APK):**
+            1. Download app-debug.apk to phone
             2. Enable "Install Unknown Apps" for your browser/file manager
             3. Tap APK to install
 
-            **Flipper Zero USB + AWOK GPIO bridge included**
+            **Flipper Zero (FAP):**
+            1. Download pen15_controller.fap
+            2. Copy to Flipper SD card: `/apps/Tools/pen15_controller.fap`
+            3. On Flipper: Apps → Tools → Pen15 Controller
+            4. Then connect USB OTG and tap Connect in the phone app
 
             🤖 Auto-built by GitHub Actions
-          files: app/build/outputs/apk/debug/app-debug.apk
+          files: |
+            app/build/outputs/apk/debug/app-debug.apk
+            ${{ steps.build-fap.outputs.fap-artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
