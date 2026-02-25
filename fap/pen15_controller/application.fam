@@ -4,7 +4,7 @@ App(
     apptype=FlipperAppType.EXTERNAL,
     entry_point="pen15_app",
     requires=["gui"],
-    stack_size=2 * 1024,
+    stack_size=4 * 1024,
     fap_version=(1, 0),
     fap_category="Tools",
     fap_description="Phone-to-Flipper JSON control bridge for GPIO and AWOK",

@@ -186,7 +186,7 @@ static int json_int(const char* js, jsmntok_t* toks, int n,
 static void handle_json(Pen15App* app, const char* js, size_t len) {
     jsmn_parser  parser;
     jsmntok_t    toks[MAX_TOKENS];
-    char         resp[JSON_BUF_SZ];
+    static char  resp[JSON_BUF_SZ];
     char         action[32] = {0};
     char         id[16]     = {0};
 
@@ -315,7 +315,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
     /* ── uart_send ─────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
-        char data[128] = {0};
+        static char data[128];
+        memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
 
         if(!app->uart_ready) {
@@ -328,7 +329,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             furi_hal_serial_tx_wait_complete(app->serial);
 
             /* Collect AWOK response for UART_RX_WAIT_MS */
-            char     awok[200] = {0};
+            static char awok[200];
+            memset(awok, 0, sizeof(awok));
             size_t   awok_len  = 0;
             uint32_t deadline  = furi_get_tick() + furi_ms_to_ticks(UART_RX_WAIT_MS);
 
