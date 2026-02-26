@@ -446,7 +446,7 @@ static size_t parse_timings(const char* str, int32_t* out, size_t max) {
 static void handle_json(Pen15App* app, const char* js, size_t len) {
     jsmn_parser parser;
     jsmntok_t   toks[MAX_TOKENS];
-    static char resp[512];
+    static char resp[768];
     char action[32] = {0};
     char id[16]     = {0};
 
