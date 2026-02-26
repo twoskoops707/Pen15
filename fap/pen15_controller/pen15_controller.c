@@ -250,7 +250,7 @@ static int json_int(const char* js, jsmntok_t* toks, int n,
 static long long json_ll(const char* js, jsmntok_t* toks, int n,
                          const char* key, long long def) {
     char tmp[24] = {0};
-    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? atoll(tmp) : def;
+    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? strtoll(tmp, NULL, 10) : def;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
