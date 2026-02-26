@@ -7,7 +7,7 @@
 #include <cli/cli_vcp.h>
 #include <storage/storage.h>
 #include <lfrfid/lfrfid_worker.h>
-#include <lfrfid/protocols/lfrfid_protocol_dict.h>
+#include <lfrfid/protocols/lfrfid_protocols.h>
 #include <infrared_worker.h>
 #include <infrared.h>
 #include <ibutton/ibutton_worker.h>
@@ -15,6 +15,7 @@
 #include <ibutton/ibutton_key.h>
 #include <nfc/nfc.h>
 #include <nfc/nfc_scanner.h>
+#include <nfc/nfc_device.h>
 #include <subghz/subghz_worker.h>
 #include <string.h>
 #include <stdio.h>
@@ -333,12 +334,13 @@ static void rfid_cb(LFRFIDWorkerReadResult result, ProtocolId proto, void* ctx) 
     if(result == LFRFIDWorkerReadDone) {
         const char* name = protocol_dict_get_name(app->rfid_dict, proto);
 
-        uint8_t data[32]; size_t data_len = 0;
-        protocol_dict_get_data(app->rfid_dict, proto, data, sizeof(data));
-        data_len = protocol_dict_get_data_size(app->rfid_dict, proto);
+        uint8_t data[32]; memset(data, 0, sizeof(data));
+        size_t data_size = protocol_dict_get_data_size(app->rfid_dict, proto);
+        if(data_size > sizeof(data)) data_size = sizeof(data);
+        protocol_dict_get_data(app->rfid_dict, proto, data, data_size);
 
         char hex[65] = {0};
-        for(size_t i = 0; i < data_len && i < 32; i++)
+        for(size_t i = 0; i < data_size; i++)
             snprintf(hex + i * 2, 3, "%02X", data[i]);
 
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
@@ -370,14 +372,14 @@ static void ibutton_cb(void* ctx) {
     iButtonProtocolId pid = ibutton_key_get_protocol_id(app->ibutton_key);
     const char* name = ibutton_protocols_get_name(app->ibutton_protocols, pid);
 
-    char data_str[64] = {0};
-    ibutton_protocols_render_brief_data(app->ibutton_protocols, app->ibutton_key,
-                                        data_str, sizeof(data_str));
+    FuriString* data_str = furi_string_alloc();
+    ibutton_protocols_render_brief_data(app->ibutton_protocols, app->ibutton_key, data_str);
 
     snprintf(app->hw_result_json, sizeof(app->hw_result_json),
         "{\"status\":\"ok\",\"type\":\"%s\",\"data\":\"%s\",\"id\":\"%s\"}\n",
-        name ? name : "iButton", data_str, app->hw_id);
+        name ? name : "iButton", furi_string_get_cstr(data_str), app->hw_id);
 
+    furi_string_free(data_str);
     furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
 }
 
@@ -666,7 +668,15 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             .command  = (uint32_t)command,
             .repeat   = false,
         };
-        infrared_send(&msg, 1);
+
+        InfraredWorker* tx_worker = infrared_worker_alloc();
+        infrared_worker_set_decoded_signal(tx_worker, &msg);
+        infrared_worker_tx_set_get_signal_callback(
+            tx_worker, infrared_worker_tx_get_signal_steady_callback, tx_worker);
+        infrared_worker_tx_start(tx_worker);
+        furi_delay_ms(200);
+        infrared_worker_tx_stop(tx_worker);
+        infrared_worker_free(tx_worker);
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
@@ -710,7 +720,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_rx();
 
         app->subghz_worker = subghz_worker_alloc();
-        subghz_worker_set_pair_callback(app->subghz_worker, subghz_rx_pair_cb, app);
+        subghz_worker_set_pair_callback(app->subghz_worker, subghz_rx_pair_cb);
+        subghz_worker_set_context(app->subghz_worker, app);
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRx;
 
