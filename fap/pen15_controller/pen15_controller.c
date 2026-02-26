@@ -242,15 +242,22 @@ static bool json_str(const char* js, jsmntok_t* toks, int n,
     }
     return false;
 }
+static long long pen15_parse_ll(const char* s) {
+    long long r = 0; int sign = 1;
+    while(*s == ' ') s++;
+    if(*s == '-') { sign = -1; s++; } else if(*s == '+') s++;
+    while(*s >= '0' && *s <= '9') { r = r * 10 + (*s - '0'); s++; }
+    return sign * r;
+}
 static int json_int(const char* js, jsmntok_t* toks, int n,
                     const char* key, int def) {
     char tmp[24] = {0};
-    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? atoi(tmp) : def;
+    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? (int)pen15_parse_ll(tmp) : def;
 }
 static long long json_ll(const char* js, jsmntok_t* toks, int n,
                          const char* key, long long def) {
     char tmp[24] = {0};
-    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? strtoll(tmp, NULL, 10) : def;
+    return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? pen15_parse_ll(tmp) : def;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
