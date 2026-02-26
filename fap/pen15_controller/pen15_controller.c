@@ -470,7 +470,6 @@ int32_t pen15_app(void* p) {
 
     /* Release UART */
     if(app->uart_ready && app->serial) {
-        furi_hal_serial_dma_rx_stop(app->serial);
         furi_hal_serial_deinit(app->serial);
         furi_hal_serial_control_release(app->serial);
     }
