@@ -81,7 +81,11 @@
                             android:hint="IP or hostname (e.g. 192.168.1.1)"
                             android:textColor="@color/terminal_green"
                             android:textColorHint="@color/terminal_gray"
-                            android:fontFamily="monospace" />
+                            android:fontFamily="monospace"
+                            android:singleLine="true"
+                            android:scrollHorizontally="true"
+                            android:imeOptions="actionSearch"
+                            android:inputType="text" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

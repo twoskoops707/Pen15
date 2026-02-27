@@ -79,7 +79,11 @@
                             android:hint="Enter hash to crack"
                             android:textColor="@color/terminal_green"
                             android:textColorHint="@color/terminal_gray"
-                            android:fontFamily="monospace" />
+                            android:fontFamily="monospace"
+                            android:singleLine="true"
+                            android:scrollHorizontally="true"
+                            android:imeOptions="actionDone"
+                            android:inputType="textNoSuggestions" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

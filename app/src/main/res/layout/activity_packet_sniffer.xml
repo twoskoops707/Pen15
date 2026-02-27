@@ -31,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="PACKET SNIFFER"
+            android:text="NETWORK MONITOR"
             android:textColor="@color/danger"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="CAPTURE SETTINGS"
+                        android:text="HTTP INTERCEPT (mitmproxy)"
                         android:textColor="@color/info"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -78,32 +78,20 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
                         app:boxBackgroundColor="#22000000">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputInterface"
+                            android:id="@+id/inputProxyPort"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Interface (e.g. wlan0)"
+                            android:hint="Proxy port (default: 8080)"
+                            android:inputType="number"
                             android:textColor="@color/success"
                             android:textColorHint="#808080"
-                            android:fontFamily="monospace"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:boxBackgroundColor="#22000000">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/inputFilter"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Filter (e.g. port 80)"
-                            android:textColor="@color/success"
-                            android:textColorHint="#808080"
-                            android:fontFamily="monospace"/>
+                            android:fontFamily="monospace"
+                            android:singleLine="true"
+                            android:scrollHorizontally="true"
+                            android:imeOptions="actionDone" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -123,11 +111,44 @@
                     android:padding="16dp">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStartCapture"
+                        android:id="@+id/btnConnections"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="START CAPTURE"
+                        android:text="LIVE CONNECTIONS (ss)"
                         app:backgroundTint="@color/success"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnInterfaces"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="INTERFACES + ARP"
+                        app:backgroundTint="@color/info"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnHttpIntercept"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="HTTP INTERCEPT (mitmproxy)"
+                        app:backgroundTint="@color/warning"
+                        android:textColor="#000000"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNetStats"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="BANDWIDTH STATS"
+                        app:backgroundTint="@color/info"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
@@ -137,33 +158,12 @@
                         android:id="@+id/btnStopCapture"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="STOP CAPTURE"
+                        android:text="STOP"
                         app:backgroundTint="@color/danger"
                         android:textColor="#000000"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSaveCapture"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="SAVE CAPTURE"
-                        app:backgroundTint="@color/warning"
-                        android:textColor="#000000"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:layout_marginBottom="8dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnAnalyze"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="ANALYZE CAPTURE"
-                        app:backgroundTint="@color/info"
-                        android:textColor="#000000"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"/>
+                        android:enabled="false"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -187,10 +187,10 @@
                         android:id="@+id/statusText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Capturing packets..."
+                        android:text="Running..."
                         android:textColor="@color/info"
                         android:fontFamily="monospace"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:layout_marginBottom="8dp"/>
 
                     <ProgressBar
@@ -200,16 +200,6 @@
                         android:layout_height="wrap_content"
                         android:indeterminate="true"
                         android:indeterminateTint="@color/info"/>
-
-                    <TextView
-                        android:id="@+id/packetCount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Packets: 0"
-                        android:textColor="@color/success"
-                        android:fontFamily="monospace"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -230,7 +220,7 @@
                         android:id="@+id/logOutput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Ready to capture packets..."
+                        android:text="Select a tool above.\n\nNote: tcpdump requires root — this device is not rooted.\nUse mitmproxy for HTTP/HTTPS intercept (no root needed)."
                         android:textColor="@color/success"
                         android:fontFamily="monospace"
                         android:textSize="12sp"/>
