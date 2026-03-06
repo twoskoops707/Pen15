@@ -195,21 +195,61 @@
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
-                <ScrollView
-                    android:id="@+id/logScroll"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:padding="16dp">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/logOutput"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="ESP32/AWOK Manager ready..."
-                        android:textColor="@color/success"
-                        android:fontFamily="monospace"
-                        android:textSize="12sp"/>
-                </ScrollView>
+                        android:layout_height="36dp"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="8dp"
+                        android:gravity="center_vertical"
+                        android:background="#33000000">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="TERMINAL OUTPUT"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="monospace"
+                            android:textSize="11sp"
+                            android:textStyle="bold"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnScrollLock"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:text="AUTO-SCROLL"
+                            android:textSize="9sp"
+                            android:fontFamily="monospace"
+                            app:backgroundTint="@color/success"
+                            android:textColor="#000000"
+                            app:cornerRadius="4dp"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+                    </LinearLayout>
+
+                    <ScrollView
+                        android:id="@+id/logScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="380dp"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/logOutput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="ESP32/AWOK Manager ready..."
+                            android:textColor="@color/success"
+                            android:fontFamily="monospace"
+                            android:textSize="12sp"/>
+                    </ScrollView>
+
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
