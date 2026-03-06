@@ -34,13 +34,14 @@
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
-    EvtStop    = (1 << 0),
-    EvtUsbRx   = (1 << 1),
-    EvtUartRx  = (1 << 2),
-    EvtHwDone  = (1 << 3),
-    EvtTxDone  = (1 << 4),
+    EvtStop       = (1 << 0),
+    EvtUsbRx      = (1 << 1),
+    EvtUartRx     = (1 << 2),
+    EvtHwDone     = (1 << 3),
+    EvtTxDone     = (1 << 4),
+    EvtBridgeExit = (1 << 5),
 } Pen15Evt;
-#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone)
+#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit)
 
 /* ── Hardware state ───────────────────────────────────────────────── */
 typedef enum {
@@ -65,6 +66,7 @@ typedef struct {
     FuriHalSerialHandle* serial;
     FuriStreamBuffer*    uart_rx_buf;
     bool                 uart_ready;
+    volatile bool        bridge_mode;
 
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
@@ -158,7 +160,13 @@ static void cdc_on_tx_done(void* ctx) {
     furi_semaphore_release(app->tx_sem);
 }
 static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
-static void cdc_ctrl_cb(void* ctx, uint8_t s)                    { UNUSED(ctx); UNUSED(s); }
+static void cdc_ctrl_cb(void* ctx, uint8_t s) {
+    Pen15App* app = ctx;
+    if(app->bridge_mode && !(s & 0x01)) {
+        app->bridge_mode = false;
+        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
+    }
+}
 static void cdc_cfg_cb(void* ctx, struct usb_cdc_line_coding* c) { UNUSED(ctx); UNUSED(c); }
 
 static const CdcCallbacks CDC_CB = {
@@ -191,6 +199,14 @@ static void usb_send(Pen15App* app, const char* str) {
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
+    furi_mutex_release(app->usb_mtx);
+}
+
+static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
+    if(len == 0) return;
+    furi_semaphore_acquire(app->tx_sem, 300);
+    furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
+    furi_hal_cdc_send(0, (uint8_t*)data, len);
     furi_mutex_release(app->usb_mtx);
 }
 
@@ -540,21 +556,29 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     /* ── uart_init ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_init") == 0) {
         int baud = json_int(js, toks, n, "baud", 115200);
+        bool uart_ok = false;
         if(!app->uart_ready) {
             app->serial = furi_hal_serial_control_acquire(FuriHalSerialIdUsart);
             if(app->serial) {
                 furi_hal_serial_init(app->serial, (uint32_t)baud);
                 furi_hal_serial_dma_rx_start(app->serial, uart_rx_dma_cb, app, false);
                 app->uart_ready = true;
+                uart_ok = true;
                 snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
             } else {
                 snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_BUSY\",\"id\":\"%s\"}\n", id);
             }
         } else {
             furi_hal_serial_set_br(app->serial, (uint32_t)baud);
+            uart_ok = true;
             snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
         }
         app->progress = 100; usb_send(app, resp);
+        if(uart_ok) {
+            app->bridge_mode = true;
+            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
+            strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
+        }
 
     /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
@@ -886,7 +910,36 @@ int32_t pen15_app(void* p) {
 
         if(evts & EvtStop) break;
 
-        if(evts & EvtUsbRx) process_usb_rx(app);
+        if(evts & EvtUsbRx) {
+            if(app->bridge_mode) {
+                uint8_t usb_buf[USB_PKT_LEN];
+                furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
+                int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
+                furi_mutex_release(app->usb_mtx);
+                if(got > 0 && app->uart_ready)
+                    furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+            } else {
+                process_usb_rx(app);
+            }
+        }
+
+        if(evts & EvtUartRx) {
+            if(app->bridge_mode && app->uart_ready) {
+                uint8_t uart_buf[256];
+                size_t got;
+                do {
+                    got = furi_stream_buffer_receive(app->uart_rx_buf, uart_buf, sizeof(uart_buf), 0);
+                    if(got > 0) usb_send_raw(app, uart_buf, (uint16_t)got);
+                } while(got > 0);
+            }
+        }
+
+        if(evts & EvtBridgeExit) {
+            strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
+            strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
+            app->progress = 0;
+            view_port_update(app->vp);
+        }
 
         if(evts & EvtHwDone) {
             /* Hardware read completed — result already in hw_result_json */
