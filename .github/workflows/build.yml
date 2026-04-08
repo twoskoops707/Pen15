@@ -36,8 +36,11 @@ jobs:
           echo "============================================="
           exit "$BUILD_EXIT"
 
-      - name: Display APK Info
+      - name: Rename APK with commit SHA
         run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             app/build/outputs/apk/debug/pen15-v3.0.${{ github.run_number }}-${SHORT_SHA}.apk
           echo "✅ BUILD COMPLETE"
           ls -lh app/build/outputs/apk/debug/
 
@@ -53,20 +56,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v3.0.${{ github.run_number }}
-          name: Pen15 v3.0.${{ github.run_number }} (${{ github.ref_name }})
+          name: Pen15 v3.0.${{ github.run_number }} (${{ github.ref_name }}) [${{ github.sha }}]
           body: |
             ## Pen15 - Pentest Dashboard v3.0
 
             **Branch:** `${{ github.ref_name }}`
             **Commit:** `${{ github.sha }}`
+            **Build:** `#${{ github.run_number }}`
 
             ### Downloads
-            - **app-debug.apk** — Install on phone
+            - **pen15-v3.0.${{ github.run_number }}-*.apk** — Install on phone
             - **pen15_controller.fap** — Install on Flipper SD card
 
             ### Installation
             **Phone (APK):**
-            1. Download app-debug.apk to phone
+            1. Download the .apk to phone
             2. Enable "Install Unknown Apps" for your browser/file manager
             3. Tap APK to install
 
@@ -78,7 +82,7 @@ jobs:
 
             🤖 Auto-built by GitHub Actions
           files: |
-            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/debug/pen15-v3.0.${{ github.run_number }}-*.apk
             ${{ steps.build-fap.outputs.fap-artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
