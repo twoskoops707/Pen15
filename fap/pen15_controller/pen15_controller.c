@@ -427,7 +427,8 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     UNUSED(level); UNUSED(duration);
     Pen15App* app = ctx;
     app->subghz_rx_count++;
-    if(app->subghz_rx_count >= 50) {
+    if(app->subghz_rx_count >= 50 && app->hw_state == HwSubghzRx) {
+        app->hw_state = HwIdle;
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
             "{\"status\":\"ok\",\"count\":%u,\"id\":\"%s\"}\n",
             (unsigned)app->subghz_rx_count, app->hw_id);
