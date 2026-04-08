@@ -6,9 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         TOP APP BAR
-    ═══════════════════════════════════════════════════════════════ -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -35,19 +32,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PEN15"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.15" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pentest Dashboard"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.05" />
             </LinearLayout>
 
-            <!-- Settings icon pushed to right via layout_gravity -->
             <ImageView
                 android:id="@+id/btnSettings"
                 android:layout_width="40dp"
@@ -61,9 +61,7 @@
                 android:tint="@color/text_primary" />
         </com.google.android.material.appbar.MaterialToolbar>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             DUAL HARDWARE STATUS BAR
-        ═══════════════════════════════════════════════════════════════ -->
+        <!-- DUAL HARDWARE STATUS BAR -->
         <LinearLayout
             android:id="@+id/statusBar"
             android:layout_width="match_parent"
@@ -76,13 +74,7 @@
             android:paddingBottom="8dp"
             android:gravity="center_vertical">
 
-            <!-- Bottom border via foreground shape -->
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
-            <!-- Flipper Chip — tappable to reconnect -->
+            <!-- Flipper Chip -->
             <LinearLayout
                 android:id="@+id/chipFlipper"
                 android:layout_width="0dp"
@@ -93,8 +85,8 @@
                 android:background="@drawable/bg_chip"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:layout_marginEnd="6dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -108,11 +100,11 @@
 
                     <View
                         android:id="@+id/dotFlipper"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
                         android:background="@drawable/shape_status_dot"
                         android:backgroundTint="@color/status_disconnected"
-                        android:layout_marginEnd="6dp" />
+                        android:layout_marginEnd="7dp" />
 
                     <TextView
                         android:id="@+id/textFlipper"
@@ -121,7 +113,8 @@
                         android:text="FLIPPER: --"
                         android:textColor="@color/text_primary"
                         android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <TextView
@@ -131,10 +124,11 @@
                     android:text="TAP TO CONNECT"
                     android:textColor="@color/text_secondary"
                     android:textSize="9sp"
-                    android:layout_marginTop="2dp" />
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="3dp" />
             </LinearLayout>
 
-            <!-- AWOK Chip — tappable to reconnect -->
+            <!-- AWOK Chip -->
             <LinearLayout
                 android:id="@+id/chipAwok"
                 android:layout_width="0dp"
@@ -145,8 +139,8 @@
                 android:background="@drawable/bg_chip"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:layout_marginStart="6dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -160,11 +154,11 @@
 
                     <View
                         android:id="@+id/dotAwok"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
                         android:background="@drawable/shape_status_dot"
                         android:backgroundTint="@color/status_disconnected"
-                        android:layout_marginEnd="6dp" />
+                        android:layout_marginEnd="7dp" />
 
                     <TextView
                         android:id="@+id/textAwok"
@@ -173,7 +167,8 @@
                         android:text="AWOK: --"
                         android:textColor="@color/text_primary"
                         android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <TextView
@@ -183,11 +178,11 @@
                     android:text="TAP TO CONNECT"
                     android:textColor="@color/text_secondary"
                     android:textSize="9sp"
-                    android:layout_marginTop="2dp" />
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="3dp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Bottom border line for status bar -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -195,9 +190,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         MAIN SCROLL CONTENT
-    ═══════════════════════════════════════════════════════════════ -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -210,9 +202,7 @@
             android:orientation="vertical"
             android:paddingBottom="80dp">
 
-            <!-- ═══════════════════════════════════════════════════════
-                 MISSION WIZARD BANNER
-            ═══════════════════════════════════════════════════════════ -->
+            <!-- MISSION WIZARD BANNER -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardWizard"
                 android:layout_width="match_parent"
@@ -246,7 +236,8 @@
                             android:text="&#x2726;  MISSION WIZARD"
                             android:textColor="@color/primary"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:fontFamily="monospace" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -271,17 +262,32 @@
             <!-- ═══════════════════════════════════════════════════════
                  SECTION: FLIPPER ZERO HARDWARE
             ═══════════════════════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="22dp"
                 android:layout_marginBottom="8dp"
-                android:text="FLIPPER ZERO"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.12" />
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="16dp"
+                    android:background="@color/primary"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FLIPPER ZERO"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12" />
+            </LinearLayout>
 
             <!-- Row 1: RFID + NFC -->
             <LinearLayout
@@ -294,20 +300,21 @@
                 <LinearLayout
                     android:id="@+id/cardRFID"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4DF;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_rfid"
+                        android:tint="@color/primary"
+                        android:contentDescription="RFID" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -317,26 +324,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="125 KHz / LF"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardNFC"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4B3;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_nfc"
+                        android:tint="@color/primary"
+                        android:contentDescription="NFC" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -346,7 +364,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="13.56 MHz / HF"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -361,20 +389,21 @@
                 <LinearLayout
                     android:id="@+id/cardSubGHz"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4FB;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_subghz"
+                        android:tint="@color/primary"
+                        android:contentDescription="Sub-GHz" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -384,26 +413,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="315-915 MHz"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardIR"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F321;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_infrared"
+                        android:tint="@color/primary"
+                        android:contentDescription="Infrared" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -413,7 +453,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Rx / Replay"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -428,20 +478,21 @@
                 <LinearLayout
                     android:id="@+id/cardBadUSB"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_module_card_danger"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4BE;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_badusb"
+                        android:tint="@color/danger"
+                        android:contentDescription="Bad USB" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -451,26 +502,37 @@
                         android:textColor="@color/danger"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="HID Inject"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardIButton"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F518;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_ibutton"
+                        android:tint="@color/primary"
+                        android:contentDescription="iButton" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -480,7 +542,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="1-Wire Keys"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -495,20 +567,21 @@
                 <LinearLayout
                     android:id="@+id/cardBluetooth"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4F6;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_bluetooth_custom"
+                        android:tint="@color/info"
+                        android:contentDescription="Bluetooth" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -518,26 +591,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="BLE Scanner"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardGPIO"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_flipper"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x26A1;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_gpio"
+                        android:tint="@color/primary"
+                        android:contentDescription="GPIO" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -547,26 +631,51 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="UART Bridge"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
             <!-- ═══════════════════════════════════════════════════════
                  SECTION: AWOK MARAUDER
             ═══════════════════════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="22dp"
                 android:layout_marginBottom="8dp"
-                android:text="AWOK MARAUDER"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.12" />
+                android:gravity="center_vertical">
 
-            <!-- Row 1: WIFI DEAUTH + MARAUDER -->
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="16dp"
+                    android:background="@color/danger"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AWOK MARAUDER"
+                    android:textColor="@color/danger"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12" />
+            </LinearLayout>
+
+            <!-- Row: WIFI DEAUTH + MARAUDER -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -577,20 +686,21 @@
                 <LinearLayout
                     android:id="@+id/cardWifiDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_module_card_danger"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4E1;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_wifi_deauth"
+                        android:tint="@color/danger"
+                        android:contentDescription="WiFi Deauth" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -600,26 +710,37 @@
                         android:textColor="@color/danger"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="802.11 Attack"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardMarauder"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_awok"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F575;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_marauder"
+                        android:tint="@color/warning"
+                        android:contentDescription="Marauder" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -629,24 +750,49 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="ESP32 Suite"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
             <!-- ═══════════════════════════════════════════════════════
                  SECTION: RECON & TOOLS
             ═══════════════════════════════════════════════════════════ -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="22dp"
                 android:layout_marginBottom="8dp"
-                android:text="RECON &amp; TOOLS"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.12" />
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="16dp"
+                    android:background="@color/info"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RECON &amp; TOOLS"
+                    android:textColor="@color/info"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.12" />
+            </LinearLayout>
 
             <!-- Row 1: OSINT + GOOGLE DORKS -->
             <LinearLayout
@@ -659,20 +805,21 @@
                 <LinearLayout
                     android:id="@+id/cardOSINT"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F50D;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_osint"
+                        android:tint="@color/info"
+                        android:contentDescription="OSINT" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -682,26 +829,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Footprinting"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardDork"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F50E;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_dork"
+                        android:tint="@color/info"
+                        android:contentDescription="Google Dorks" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -711,7 +869,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Search Ops"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -726,20 +894,21 @@
                 <LinearLayout
                     android:id="@+id/cardNetScan"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F310;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_netscan"
+                        android:tint="@color/info"
+                        android:contentDescription="Network Scanner" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -749,26 +918,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="nmap / LAN"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardExploit"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4A3;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_exploit"
+                        android:tint="@color/info"
+                        android:contentDescription="Exploits" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -778,7 +958,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="CVE Lookup"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -793,20 +983,21 @@
                 <LinearLayout
                     android:id="@+id/cardPacket"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4E6;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_packet"
+                        android:tint="@color/info"
+                        android:contentDescription="Packet Sniffer" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -816,26 +1007,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="mitmproxy / ss"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardHash"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F513;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_hash_crack"
+                        android:tint="@color/info"
+                        android:contentDescription="Hash Cracker" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -845,7 +1047,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="MD5/SHA/bcrypt"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -860,20 +1072,21 @@
                 <LinearLayout
                     android:id="@+id/cardPhone"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_module_card_recon"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x1F4F1;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_phone_sensors"
+                        android:tint="@color/info"
+                        android:contentDescription="Phone Sensors" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -883,26 +1096,37 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="WiFi / BLE / NFC"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/cardSettings"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_module_card"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="&#x2699;"
-                        android:textSize="24sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_settings"
+                        android:tint="@color/text_secondary"
+                        android:contentDescription="Settings" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -912,7 +1136,17 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
+                        android:fontFamily="monospace"
                         android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Config"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
                 </LinearLayout>
             </LinearLayout>
 

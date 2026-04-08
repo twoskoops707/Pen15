@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Terminal/browser window -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M2,5 L22,5 L22,19 L2,19 Z" />
+    <!-- Window header divider -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:pathData="M2,9 L22,9" />
+    <!-- Window dots -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,7 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0
+                         M8.5,7 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0
+                         M12,7 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0" />
+    <!-- Code chevron prompt -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M5,12.5 L7.5,14.5 L5,16.5" />
+    <!-- Query text lines -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M9,13 L19,13" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M9,16 L15,16" />
+</vector>
