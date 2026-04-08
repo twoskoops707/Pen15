@@ -427,9 +427,12 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     UNUSED(level); UNUSED(duration);
     Pen15App* app = ctx;
     app->subghz_rx_count++;
-    /* Signal detected after enough transitions */
-    if(app->subghz_rx_count >= 50)
+    if(app->subghz_rx_count >= 50) {
+        snprintf(app->hw_result_json, sizeof(app->hw_result_json),
+            "{\"status\":\"ok\",\"count\":%u,\"id\":\"%s\"}\n",
+            (unsigned)app->subghz_rx_count, app->hw_id);
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
+    }
 }
 
 /* SubGHz TX ISR callback — ISR context, must be fast */
