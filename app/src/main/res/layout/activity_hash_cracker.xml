@@ -247,7 +247,8 @@
                         android:text="Enter a hash to crack..."
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
-                        android:textSize="12sp" />
+                        android:textSize="12sp" 
+                        android:textIsSelectable="true"/>
                 </ScrollView>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

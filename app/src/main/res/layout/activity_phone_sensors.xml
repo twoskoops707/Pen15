@@ -232,7 +232,8 @@
                             android:text="Tap SCAN to begin..."
                             android:textColor="@color/success"
                             android:fontFamily="monospace"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp"
+                            android:textIsSelectable="true"/>
                     </ScrollView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

@@ -264,7 +264,8 @@
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:padding="12dp"
-                        android:background="#22000000"/>
+                        android:background="#22000000"
+                        android:textIsSelectable="true"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

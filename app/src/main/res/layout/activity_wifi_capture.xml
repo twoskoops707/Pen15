@@ -98,7 +98,8 @@
                 android:textColor="@color/white"
                 android:textSize="13sp"
                 android:fontFamily="monospace"
-                android:lineSpacingExtra="2dp" />
+                android:lineSpacingExtra="2dp" 
+                android:textIsSelectable="true"/>
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>
 
