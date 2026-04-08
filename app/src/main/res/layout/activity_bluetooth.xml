@@ -105,31 +105,7 @@
                 android:textColor="@color/black_bg"
                 android:layout_marginBottom="12dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSniff"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="PACKET SNIFFER"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_bluetooth"
-                android:textColor="@color/func_bluetooth"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSpoof"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="MAC SPOOFING"
-                android:textSize="14sp"
-                android:letterSpacing="0.1"
-                app:strokeColor="@color/func_bluetooth"
-                android:textColor="@color/func_bluetooth"
-                android:layout_marginBottom="12dp"/>
-
-            <com.google.android.material.button.MaterialButton
+<com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClearList"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
