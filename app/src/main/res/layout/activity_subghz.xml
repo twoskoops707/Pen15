@@ -207,7 +207,8 @@
                     android:textColor="@color/info"
                     android:textSize="14sp"
                     android:fontFamily="monospace"
-                    android:layout_marginTop="16dp"/>
+                    android:layout_marginTop="16dp"
+                    android:textIsSelectable="true"/>
 
                 <TextView
                     android:id="@+id/signalCount"
@@ -253,7 +254,8 @@
                         android:textColor="@color/warning"
                         android:textSize="14sp"
                         android:fontFamily="monospace"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        android:textIsSelectable="true"/>
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton

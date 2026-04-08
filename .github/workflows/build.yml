@@ -2,7 +2,7 @@ name: Android Debug Build - Creates Release
 
 on:
   push:
-    branches: [ main, master, awok-only ]
+    branches: [ main, master, awok-only, ux-redesign ]
   workflow_dispatch:
 
 permissions:
@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4.7.1
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -50,7 +50,7 @@ jobs:
 
       - name: Create GitHub Release
         if: success()
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v3.0.${{ github.run_number }}
           name: Pen15 v3.0.${{ github.run_number }} (${{ github.ref_name }})

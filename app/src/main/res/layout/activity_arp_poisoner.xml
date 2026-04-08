@@ -210,7 +210,8 @@
                         android:text="Ready to perform MITM attack...\n\nThis requires:\n- Target device on same network\n- Termux with arpspoof installed\n- Root access (or use ESP32 for hardware attacks)"
                         android:textColor="@color/terminal_green"
                         android:fontFamily="monospace"
-                        android:textSize="12sp" />
+                        android:textSize="12sp" 
+                        android:textIsSelectable="true"/>
                 </ScrollView>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

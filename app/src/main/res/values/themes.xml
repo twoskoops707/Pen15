@@ -86,6 +86,15 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <!-- Alert dialog dark theme -->
+    <style name="AlertDialogDark" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@color/surface</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Pen15.Button</item>
+    </style>
+
     <!-- Status dot -->
     <style name="Widget.Pen15.StatusDot" parent="android:Widget">
         <item name="android:layout_width">8dp</item>

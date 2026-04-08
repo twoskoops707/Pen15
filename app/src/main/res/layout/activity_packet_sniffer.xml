@@ -223,7 +223,8 @@
                         android:text="Select a tool above.\n\nNote: tcpdump requires root — this device is not rooted.\nUse mitmproxy for HTTP/HTTPS intercept (no root needed)."
                         android:textColor="@color/success"
                         android:fontFamily="monospace"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:textIsSelectable="true"/>
                 </ScrollView>
             </androidx.cardview.widget.CardView>
         </LinearLayout>

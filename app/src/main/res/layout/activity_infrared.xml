@@ -233,7 +233,8 @@
                         android:layout_height="wrap_content"
                         android:textColor="#808080"
                         android:textSize="12sp"
-                        android:fontFamily="monospace"/>
+                        android:fontFamily="monospace"
+                        android:textIsSelectable="true"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>

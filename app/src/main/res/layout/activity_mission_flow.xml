@@ -203,7 +203,8 @@
                             android:textColor="@color/success"
                             android:fontFamily="monospace"
                             android:padding="12dp"
-                            android:lineSpacingMultiplier="1.3" />
+                            android:lineSpacingMultiplier="1.3" 
+                            android:textIsSelectable="true"/>
 
                     </ScrollView>
 

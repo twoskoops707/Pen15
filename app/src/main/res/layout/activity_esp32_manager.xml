@@ -277,7 +277,8 @@
                             android:text="ESP32/AWOK Manager ready..."
                             android:textColor="@color/success"
                             android:fontFamily="monospace"
-                            android:textSize="12sp"/>
+                            android:textSize="12sp"
+                            android:textIsSelectable="true"/>
                     </ScrollView>
 
                 </LinearLayout>
