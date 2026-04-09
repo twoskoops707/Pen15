@@ -69,6 +69,13 @@
             android:contentDescription="Help"/>
     </LinearLayout>
 
+    <include
+        android:id="@+id/dataFlow"
+        layout="@layout/view_data_flow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/statusBar"/>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
@@ -80,7 +87,7 @@
         app:tabIndicatorHeight="2dp"
         app:tabMode="fixed"
         app:tabTextAppearance="@android:style/TextAppearance.Small"
-        app:layout_constraintTop_toBottomOf="@id/statusBar">
+        app:layout_constraintTop_toBottomOf="@id/dataFlow">
 
         <com.google.android.material.tabs.TabItem
             android:text="LEARN"/>
