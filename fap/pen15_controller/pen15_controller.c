@@ -330,7 +330,7 @@ static void hw_stop_all(Pen15App* app) {
         ibutton_worker_free(app->ibutton_worker);
         app->ibutton_worker = NULL;
         if(app->ibutton_protocols) { ibutton_protocols_free(app->ibutton_protocols); app->ibutton_protocols = NULL; }
-        if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
+        /* ibutton_key is kept alive after read so ikey_emulate can reuse it */
     }
     if(app->hw_state == HwNfcDetect && app->nfc_scanner) {
         nfc_scanner_stop(app->nfc_scanner);
@@ -783,6 +783,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
 
+        if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
         app->ibutton_protocols = ibutton_protocols_alloc();
         app->ibutton_key       = ibutton_key_alloc(64);
         app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
@@ -964,29 +965,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp); return;
         }
-        char type_str[32] = {0};
-        char data_hex[65] = {0};
-        json_str(js, toks, n, "type", type_str, sizeof(type_str));
-        json_str(js, toks, n, "data", data_hex, sizeof(data_hex));
-
-        app->ibutton_protocols = ibutton_protocols_alloc();
-        app->ibutton_key       = ibutton_key_alloc(64);
-        app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
-
-        iButtonProtocolId pid = ibutton_protocols_get_id_by_name(app->ibutton_protocols, type_str);
-        ibutton_key_set_protocol_id(app->ibutton_key, pid);
-
-        size_t key_sz = ibutton_protocols_get_max_data_size(app->ibutton_protocols, pid);
-        uint8_t raw[16]; memset(raw, 0, sizeof(raw));
-        size_t hex_len = strlen(data_hex);
-        for(size_t i = 0; i + 1 < hex_len && i/2 < sizeof(raw); i += 2) {
-            char byte_str[3] = { data_hex[i], data_hex[i+1], '\0' };
-            raw[i/2] = (uint8_t)strtol(byte_str, NULL, 16);
+        if(!app->ibutton_key) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"NO_KEY\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp); return;
         }
-        size_t copy_sz = key_sz < sizeof(raw) ? key_sz : sizeof(raw);
-        memcpy(ibutton_key_get_data(app->ibutton_key), raw, copy_sz);
-        ibutton_key_set_data_size(app->ibutton_key, copy_sz);
-
+        app->ibutton_protocols = ibutton_protocols_alloc();
+        app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         ibutton_worker_emulate_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyEmulate;
@@ -1155,6 +1139,7 @@ int32_t pen15_app(void* p) {
 
     /* ── Cleanup ──────────────────────────────────────────────────── */
     hw_stop_all(app);
+    if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
 
     furi_hal_cdc_set_callbacks(0, NULL, NULL);
     cli_vcp_enable(app->cli_vcp);
