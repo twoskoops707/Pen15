@@ -244,6 +244,33 @@ static void input_cb(InputEvent* ev, void* ctx) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   JSON string unescape (in-place: \\n→\n, \\r→\r, \\t→\t, etc.)
+   Required because jsmn returns raw JSON token bytes without unescaping.
+   ═══════════════════════════════════════════════════════════════════ */
+static void json_unescape(char* s) {
+    char* r = s;
+    char* w = s;
+    while(*r) {
+        if(*r == '\\' && *(r + 1)) {
+            r++;
+            switch(*r) {
+                case 'n':  *w++ = '\n'; break;
+                case 'r':  *w++ = '\r'; break;
+                case 't':  *w++ = '\t'; break;
+                case '"':  *w++ = '"';  break;
+                case '\\': *w++ = '\\'; break;
+                case '/':  *w++ = '/';  break;
+                default:   *w++ = '\\'; *w++ = *r; break;
+            }
+        } else {
+            *w++ = *r;
+        }
+        r++;
+    }
+    *w = '\0';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    jsmn helpers
    ═══════════════════════════════════════════════════════════════════ */
 static bool tok_eq(const char* js, const jsmntok_t* t, const char* s) {
@@ -861,6 +888,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         static char content[1024]; memset(content, 0, sizeof(content));
         json_str(js, toks, n, "path",    path,    sizeof(path));
         json_str(js, toks, n, "content", content, sizeof(content));
+        json_unescape(content);
 
         bool ok = storage_write_file(path, content, strlen(content));
         snprintf(resp, sizeof(resp), "{\"status\":\"%s\",\"id\":\"%s\"}\n",
