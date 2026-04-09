@@ -47,10 +47,13 @@ typedef enum {
 typedef enum {
     HwIdle,
     HwRfidRead,
+    HwRfidEmulate,
     HwNfcDetect,
     HwIrRx,
     HwIkeyRead,
+    HwIkeyEmulate,
     HwSubghzRx,
+    HwSubghzRecord,
     HwSubghzTx,
 } HwState;
 
@@ -104,9 +107,12 @@ typedef struct {
     Nfc*        nfc;
     NfcScanner* nfc_scanner;
 
-    /* SubGHz RX */
+    /* SubGHz RX / Record */
     SubGhzWorker* subghz_worker;
     uint32_t      subghz_rx_count;
+    bool          subghz_record_mode;
+    int32_t       rx_timings[TX_MAX_TIMES];
+    size_t        rx_timings_count;
 
     /* SubGHz TX */
     int32_t  tx_timings[TX_MAX_TIMES];
@@ -280,7 +286,7 @@ static long long json_ll(const char* js, jsmntok_t* toks, int n,
    Hardware stop-all
    ═══════════════════════════════════════════════════════════════════ */
 static void hw_stop_all(Pen15App* app) {
-    if(app->hw_state == HwRfidRead && app->rfid_worker) {
+    if((app->hw_state == HwRfidRead || app->hw_state == HwRfidEmulate) && app->rfid_worker) {
         lfrfid_worker_stop(app->rfid_worker);
         lfrfid_worker_free(app->rfid_worker);
         app->rfid_worker = NULL;
@@ -291,7 +297,7 @@ static void hw_stop_all(Pen15App* app) {
         infrared_worker_free(app->ir_worker);
         app->ir_worker = NULL;
     }
-    if(app->hw_state == HwIkeyRead && app->ibutton_worker) {
+    if((app->hw_state == HwIkeyRead || app->hw_state == HwIkeyEmulate) && app->ibutton_worker) {
         ibutton_worker_stop(app->ibutton_worker);
         ibutton_worker_free(app->ibutton_worker);
         app->ibutton_worker = NULL;
@@ -304,7 +310,7 @@ static void hw_stop_all(Pen15App* app) {
         app->nfc_scanner = NULL;
         if(app->nfc) { nfc_free(app->nfc); app->nfc = NULL; }
     }
-    if(app->hw_state == HwSubghzRx && app->subghz_worker) {
+    if((app->hw_state == HwSubghzRx || app->hw_state == HwSubghzRecord) && app->subghz_worker) {
         subghz_worker_stop(app->subghz_worker);
         subghz_worker_free(app->subghz_worker);
         app->subghz_worker = NULL;
@@ -424,13 +430,36 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
 
 /* SubGHz RX pair callback */
 static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
-    UNUSED(level); UNUSED(duration);
     Pen15App* app = ctx;
     app->subghz_rx_count++;
+
+    if(app->hw_state == HwSubghzRecord) {
+        if(app->rx_timings_count < TX_MAX_TIMES) {
+            app->rx_timings[app->rx_timings_count++] = level ? (int32_t)duration : -(int32_t)duration;
+        }
+        if(app->rx_timings_count >= TX_MAX_TIMES) {
+            app->hw_state = HwIdle;
+            /* Format timings as comma-separated signed ints */
+            char* p = app->hw_result_json;
+            int remaining = (int)sizeof(app->hw_result_json);
+            int written = snprintf(p, (size_t)remaining,
+                "{\"status\":\"ok\",\"count\":%zu,\"timings\":\"", app->rx_timings_count);
+            p += written; remaining -= written;
+            for(size_t i = 0; i < app->rx_timings_count && remaining > 16; i++) {
+                written = snprintf(p, (size_t)remaining, i == 0 ? "%ld" : ",%ld",
+                    (long)app->rx_timings[i]);
+                p += written; remaining -= written;
+            }
+            written = snprintf(p, (size_t)remaining, "\",\"id\":\"%s\"}\n", app->hw_id);
+            furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
+        }
+        return;
+    }
+
     if(app->subghz_rx_count >= 50 && app->hw_state == HwSubghzRx) {
         app->hw_state = HwIdle;
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"count\":%u,\"id\":\"%s\"}\n",
+            "{\"status\":\"ok\",\"count\":%u,\"timings\":\"\",\"id\":\"%s\"}\n",
             (unsigned)app->subghz_rx_count, app->hw_id);
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
@@ -765,6 +794,35 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         strncpy(app->status, "RF RX", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
 
+    /* ── subghz_record ────────────────────────────────────────────── */
+    } else if(strcmp(action, "subghz_record") == 0) {
+        if(app->hw_state != HwIdle) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp); return;
+        }
+        long long freq = json_ll(js, toks, n, "freq", 433920000LL);
+        strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->subghz_rx_count   = 0;
+        app->rx_timings_count  = 0;
+        app->subghz_record_mode = true;
+
+        furi_hal_subghz_reset();
+        furi_hal_subghz_load_custom_preset(OOK650_PRESET);
+        furi_hal_subghz_set_frequency_and_path((uint32_t)freq);
+        furi_hal_subghz_rx();
+
+        app->subghz_worker = subghz_worker_alloc();
+        subghz_worker_set_pair_callback(app->subghz_worker, subghz_rx_pair_cb);
+        subghz_worker_set_context(app->subghz_worker, app);
+        subghz_worker_start(app->subghz_worker);
+        app->hw_state = HwSubghzRecord;
+
+        snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
+        strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
+
     /* ── subghz_tx_raw ─────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_tx_raw") == 0) {
         if(app->hw_state != HwIdle) {
@@ -830,6 +888,100 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"%s\",\"content\":\"%s\",\"id\":\"%s\"}\n",
             got > 0 ? "ok" : "error", escaped, id);
         app->progress = 100; usb_send(app, resp);
+
+    /* ── rfid_emulate ─────────────────────────────────────────────── */
+    } else if(strcmp(action, "rfid_emulate") == 0) {
+        if(app->hw_state != HwIdle) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp); return;
+        }
+        char type_str[32] = {0};
+        char data_hex[65] = {0};
+        json_str(js, toks, n, "type", type_str, sizeof(type_str));
+        json_str(js, toks, n, "data", data_hex, sizeof(data_hex));
+
+        app->rfid_dict   = protocol_dict_alloc(lfrfid_protocols, LFRFIDProtocolMax);
+        app->rfid_worker = lfrfid_worker_alloc(app->rfid_dict);
+
+        ProtocolId proto = PROTOCOL_NO;
+        for(ProtocolId p = 0; p < LFRFIDProtocolMax; p++) {
+            if(strcmp(protocol_dict_get_name(app->rfid_dict, p), type_str) == 0) {
+                proto = p; break;
+            }
+        }
+        if(proto == PROTOCOL_NO) proto = 0;
+
+        size_t data_sz = protocol_dict_get_data_size(app->rfid_dict, proto);
+        uint8_t raw[32]; memset(raw, 0, sizeof(raw));
+        size_t hex_len = strlen(data_hex);
+        for(size_t i = 0; i + 1 < hex_len && i/2 < sizeof(raw); i += 2) {
+            char byte_str[3] = { data_hex[i], data_hex[i+1], '\0' };
+            raw[i/2] = (uint8_t)strtol(byte_str, NULL, 16);
+        }
+        protocol_dict_set_data(app->rfid_dict, proto, raw, data_sz);
+
+        strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        lfrfid_worker_emulate_start(app->rfid_worker, proto);
+        app->hw_state = HwRfidEmulate;
+
+        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
+        app->progress = 100; usb_send(app, resp);
+        strncpy(app->status,  "RFID EM", sizeof(app->status)  - 1);
+        strncpy(app->rx_disp, "rfid emulate", sizeof(app->rx_disp) - 1);
+
+    /* ── ikey_emulate ─────────────────────────────────────────────── */
+    } else if(strcmp(action, "ikey_emulate") == 0) {
+        if(app->hw_state != HwIdle) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp); return;
+        }
+        char type_str[32] = {0};
+        char data_hex[65] = {0};
+        json_str(js, toks, n, "type", type_str, sizeof(type_str));
+        json_str(js, toks, n, "data", data_hex, sizeof(data_hex));
+
+        app->ibutton_protocols = ibutton_protocols_alloc();
+        app->ibutton_key       = ibutton_key_alloc(64);
+        app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
+
+        iButtonProtocolId pid = ibutton_protocols_get_id_by_name(app->ibutton_protocols, type_str);
+        ibutton_key_set_protocol_id(app->ibutton_key, pid);
+
+        size_t key_sz = ibutton_protocols_get_data_size(app->ibutton_protocols, pid);
+        uint8_t raw[16]; memset(raw, 0, sizeof(raw));
+        size_t hex_len = strlen(data_hex);
+        for(size_t i = 0; i + 1 < hex_len && i/2 < sizeof(raw); i += 2) {
+            char byte_str[3] = { data_hex[i], data_hex[i+1], '\0' };
+            raw[i/2] = (uint8_t)strtol(byte_str, NULL, 16);
+        }
+        ibutton_protocols_set_data(app->ibutton_protocols, app->ibutton_key, raw, key_sz);
+
+        strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        ibutton_worker_emulate_start(app->ibutton_worker, app->ibutton_key);
+        app->hw_state = HwIkeyEmulate;
+
+        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
+        app->progress = 100; usb_send(app, resp);
+        strncpy(app->status,  "KEY EM", sizeof(app->status)  - 1);
+        strncpy(app->rx_disp, "ikey emulate", sizeof(app->rx_disp) - 1);
+
+    /* ── nfc_emulate ──────────────────────────────────────────────── */
+    } else if(strcmp(action, "nfc_emulate") == 0) {
+        char uid_hex[32] = {0};
+        char type_str[32] = {0};
+        json_str(js, toks, n, "uid",  uid_hex,  sizeof(uid_hex));
+        json_str(js, toks, n, "type", type_str, sizeof(type_str));
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
+            "\"message\":\"nfc_emulate requires NFC app\",\"id\":\"%s\"}\n", id);
+        app->progress = 0; usb_send(app, resp);
+
+    /* ── nfc_write ────────────────────────────────────────────────── */
+    } else if(strcmp(action, "nfc_write") == 0) {
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
+            "\"message\":\"nfc_write requires NFC app\",\"id\":\"%s\"}\n", id);
+        app->progress = 0; usb_send(app, resp);
 
     /* ── unknown ───────────────────────────────────────────────────── */
     } else {
