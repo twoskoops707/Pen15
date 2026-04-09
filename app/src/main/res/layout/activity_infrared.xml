@@ -90,7 +90,147 @@
             android:text="LIBRARY"/>
     </com.google.android.material.tabs.TabLayout>
 
+    <!-- TRANSMIT TAB CONTENT -->
+    <LinearLayout
+        android:id="@+id/transmitTabContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TRANSMIT IR SIGNAL"
+            android:textColor="@color/info"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:boxStrokeColor="@color/info"
+            app:hintTextColor="@color/info">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputTxProtocol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Protocol (e.g. NECext, Samsung32)"
+                android:textColor="@color/success"
+                android:fontFamily="monospace"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:boxStrokeColor="@color/info"
+            app:hintTextColor="@color/info">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputTxAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Address (hex, e.g. 0xA1)"
+                android:textColor="@color/success"
+                android:fontFamily="monospace"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:boxStrokeColor="@color/info"
+            app:hintTextColor="@color/info">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputTxCommand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Command (hex, e.g. 0x09)"
+                android:textColor="@color/success"
+                android:fontFamily="monospace"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTransmit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="TRANSMIT"
+            app:backgroundTint="@color/info"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:fontFamily="monospace"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLoadLastSignal"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="LOAD LAST CAPTURED SIGNAL"
+            android:textColor="@color/success"
+            app:strokeColor="@color/success"
+            android:fontFamily="monospace"
+            android:textSize="11sp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/txStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enter signal details and press TRANSMIT"
+            android:textColor="#808080"
+            android:fontFamily="monospace"
+            android:textSize="11sp"
+            android:layout_marginTop="12dp"/>
+    </LinearLayout>
+
+    <!-- LIBRARY TAB CONTENT -->
+    <LinearLayout
+        android:id="@+id/libraryTabContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="IR SIGNAL LIBRARY"
+            android:textColor="@color/info"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="12dp"/>
+
+        <TextView
+            android:id="@+id/noSavedIrText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No saved signals.\nCapture a signal in LEARN tab first."
+            android:textColor="#808080"
+            android:fontFamily="monospace"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginTop="48dp"/>
+
+        <ListView
+            android:id="@+id/savedIrList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"/>
+    </LinearLayout>
+
     <ScrollView
+        android:id="@+id/learnScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"

@@ -110,6 +110,115 @@
             app:layout_constraintTop_toBottomOf="@id/tabLayout"
             app:layout_constraintBottom_toBottomOf="parent">
 
+            <!-- WRITE TAB CONTENT -->
+            <LinearLayout
+                android:id="@+id/writeTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="WRITE TO NFC TAG"
+                    android:textColor="@color/info"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="16dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:boxStrokeColor="@color/info"
+                    app:hintTextColor="@color/info">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputWriteUid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Target UID (hex, e.g. 04:A1:2B:3C)"
+                        android:textColor="@color/success"
+                        android:fontFamily="monospace"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="@color/info"
+                    app:hintTextColor="@color/info">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputWriteData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Data to write (hex bytes)"
+                        android:textColor="@color/success"
+                        android:fontFamily="monospace"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDoWrite"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="WRITE TO TAG"
+                    app:backgroundTint="@color/danger"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="monospace"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/writeStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hold tag near Flipper then press WRITE"
+                    android:textColor="#808080"
+                    android:fontFamily="monospace"
+                    android:textSize="11sp"
+                    android:layout_marginTop="12dp"/>
+            </LinearLayout>
+
+            <!-- EMULATE TAB CONTENT (saved tags) -->
+            <LinearLayout
+                android:id="@+id/emulateTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/emulateTabLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SAVED TAGS — TAP TO EMULATE"
+                    android:textColor="@color/info"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:id="@+id/noSavedTagsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No saved tags.\nGo to READ tab and scan a tag first."
+                    android:textColor="#808080"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp"/>
+
+                <ListView
+                    android:id="@+id/savedTagsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
             <!-- IDLE STATE - Instructions -->
             <LinearLayout
                 android:id="@+id/idleState"

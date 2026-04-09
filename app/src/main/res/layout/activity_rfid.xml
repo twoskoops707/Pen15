@@ -124,6 +124,46 @@
             app:layout_constraintTop_toBottomOf="@id/tabLayout"
             app:layout_constraintBottom_toBottomOf="parent">
 
+            <!-- SAVED/EMULATE TAB CONTENT -->
+            <LinearLayout
+                android:id="@+id/savedCardsContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/savedCardsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SAVED CARDS"
+                    android:textColor="@color/info"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:id="@+id/noSavedCardsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No saved cards.\nGo to READ tab and scan a card first."
+                    android:textColor="#808080"
+                    android:fontFamily="monospace"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:layout_marginTop="48dp"
+                    android:visibility="visible"/>
+
+                <ListView
+                    android:id="@+id/savedCardsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
             <!-- IDLE STATE - Instructions -->
             <LinearLayout
                 android:id="@+id/idleState"
