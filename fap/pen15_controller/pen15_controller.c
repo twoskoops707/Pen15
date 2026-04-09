@@ -31,6 +31,7 @@
 #define UART_RX_WAIT  500
 #define HW_TIMEOUT_MS 30000
 #define TX_MAX_TIMES  512
+#define RX_MAX_TIMES  64
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -88,7 +89,7 @@ typedef struct {
     /* ── Hardware state ─── */
     HwState  hw_state;
     char     hw_id[16];
-    char     hw_result_json[512];
+    char     hw_result_json[1024];
     uint32_t hw_deadline_tick;
 
     /* RFID */
@@ -111,7 +112,7 @@ typedef struct {
     SubGhzWorker* subghz_worker;
     uint32_t      subghz_rx_count;
     bool          subghz_record_mode;
-    int32_t       rx_timings[TX_MAX_TIMES];
+    int32_t       rx_timings[RX_MAX_TIMES];
     size_t        rx_timings_count;
 
     /* SubGHz TX */
@@ -461,10 +462,10 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     app->subghz_rx_count++;
 
     if(app->hw_state == HwSubghzRecord) {
-        if(app->rx_timings_count < TX_MAX_TIMES) {
+        if(app->rx_timings_count < RX_MAX_TIMES) {
             app->rx_timings[app->rx_timings_count++] = level ? (int32_t)duration : -(int32_t)duration;
         }
-        if(app->rx_timings_count >= TX_MAX_TIMES) {
+        if(app->rx_timings_count >= RX_MAX_TIMES) {
             app->hw_state = HwIdle;
             /* Format timings as comma-separated signed ints */
             char* p = app->hw_result_json;
