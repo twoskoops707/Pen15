@@ -976,14 +976,16 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         iButtonProtocolId pid = ibutton_protocols_get_id_by_name(app->ibutton_protocols, type_str);
         ibutton_key_set_protocol_id(app->ibutton_key, pid);
 
-        size_t key_sz = ibutton_protocols_get_data_size(app->ibutton_protocols, pid);
+        size_t key_sz = ibutton_protocols_get_max_data_size(app->ibutton_protocols, pid);
         uint8_t raw[16]; memset(raw, 0, sizeof(raw));
         size_t hex_len = strlen(data_hex);
         for(size_t i = 0; i + 1 < hex_len && i/2 < sizeof(raw); i += 2) {
             char byte_str[3] = { data_hex[i], data_hex[i+1], '\0' };
             raw[i/2] = (uint8_t)strtol(byte_str, NULL, 16);
         }
-        ibutton_protocols_set_data(app->ibutton_protocols, app->ibutton_key, raw, key_sz);
+        size_t copy_sz = key_sz < sizeof(raw) ? key_sz : sizeof(raw);
+        memcpy(ibutton_key_get_data(app->ibutton_key), raw, copy_sz);
+        ibutton_key_set_data_size(app->ibutton_key, copy_sz);
 
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         ibutton_worker_emulate_start(app->ibutton_worker, app->ibutton_key);
