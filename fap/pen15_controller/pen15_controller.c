@@ -65,9 +65,18 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
-typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
+/* App modes */
+typedef enum {
+    ModeMenu,
+    ModeBridge,
+    ModeJson,
+} AppMode;
 
-/* ── App context ──────────────────────────────────────────────────── */
+typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
+    /* App mode */
+    AppMode  app_mode;
+    uint32_t bridge_exit_tick;
+── App context ──────────────────────────────────────────────────── */
 typedef struct {
     FuriThread*          thread;
     FuriMutex*           usb_mtx;
@@ -143,6 +152,22 @@ static const GpioPin* const EXT_PINS[8] = {
 };
 
 static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
+/* Menu for ModeMenu */
+typedef struct { const char* title; const char* hint; } MenuItem;
+static const MenuItem MENU_ITEMS[] = {
+    { "RFID Read",    "HOLD NEAR" },
+    { "RFID Emulate", "EMULATE" },
+    { "NFC Detect",   "TAP NFC" },
+    { "IR RX",        "AIM IR" },
+    { "iButton Read", "TOUCH KEY" },
+    { "iButton EM",   "EMULATE" },
+    { "SubGHz RX",    "SCAN" },
+    { "SubGHz Rec",   "RECORD" },
+    { "SubGHz TX",    "TX LIVE" },
+    { "IR TX",        "SEND" },
+    { "GPIO",         "PINS" },
+};
+
 
 /* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
 static const uint8_t OOK650_PRESET[] = {
@@ -720,6 +745,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         if(uart_ok) {
             app->bridge_mode = true;
             app->app_mode = ModeBridge;
+            app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000);       app->app_mode = ModeBridge;
             app->bridge_exit_tick = furi_get_tick();
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
@@ -1171,8 +1197,8 @@ int32_t pen15_app(void* p) {
         if(evts & EvtStop) break;
 
         if(evts & EvtUsbRx) {
-            if(app->bridge_mode) {
-                uint8_t usb_buf[USB_PKT_LEN];
+            if(app->app_mode == ModeBridge && app->bridge_exit_tick > 0 &&
+       furi_get_tick() > app->bridge_exit_tick) {         uint8_t usb_buf[USB_PKT_LEN];
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
