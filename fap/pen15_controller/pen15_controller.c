@@ -44,6 +44,13 @@ typedef enum {
 } Pen15Evt;
 #define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit)
 
+/* ── App modes ─────────────────────────────────────────────────────── */
+typedef enum {
+    ModeMenu,
+    ModeBridge,
+    ModeJson,
+} AppMode;
+
 /* ── Hardware state ───────────────────────────────────────────────── */
 typedef enum {
     HwIdle,
@@ -71,6 +78,11 @@ typedef struct {
     FuriStreamBuffer*    uart_rx_buf;
     bool                 uart_ready;
     volatile bool        bridge_mode;
+
+    AppMode  app_mode;
+    uint32_t bridge_exit_tick;
+    uint8_t  menu_index;
+    uint8_t  menu_count;
 
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
@@ -169,8 +181,9 @@ static void cdc_on_tx_done(void* ctx) {
 static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
-    if(app->bridge_mode && !(s & 0x01)) {
+    if(app->app_mode == ModeBridge && !(s & 0x01)) {
         app->bridge_mode = false;
+        app->app_mode = ModeMenu;
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
     }
 }
@@ -220,28 +233,97 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 /* ═══════════════════════════════════════════════════════════════════
    GUI
    ═══════════════════════════════════════════════════════════════════ */
+/* Draw: 3-mode UI (Menu / Bridge / JSON) */
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
-    canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+
+    if(app->app_mode == ModeMenu) {
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 2, 10, "PEN15");
+        canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
+        canvas_draw_str(canvas, 74, 10, app->status);
+        canvas_set_font(canvas, FontSecondary);
+        uint8_t i = app->menu_index;
+        canvas_draw_str(canvas, 2, 22, MENU_ITEMS[i].title);
+        canvas_set_color(canvas, ColorBlack);
+        canvas_draw_frame(canvas, 2, 26, 124, 18);
+        canvas_draw_str(canvas, 5, 37, MENU_ITEMS[i].hint);
+        canvas_draw_str(canvas, 2, 56, "OK=SELECT  BACK=EXIT");
+        canvas_set_color(canvas, ColorBlack);
+        canvas_draw_frame(canvas, 2, 58, 124, 6);
+        uint8_t pct = (uint8_t)(app->progress * 124 / 100);
+        if(pct > 0) canvas_draw_box(canvas, 2, 58, pct, 6);
+    } else if(app->app_mode == ModeBridge) {
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 2, 10, "BRIDGE");
+        canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
+        uint32_t elapsed = (furi_get_tick() - app->bridge_exit_tick) / 1000;
+        char sec[8];
+        snprintf(sec, sizeof(sec), "%lus", (unsigned long)elapsed);
+        canvas_draw_str(canvas, 80, 10, sec);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 2, 28, "USB -> GPIO UART");
+        canvas_draw_str(canvas, 2, 42, "TX: AWOK -> PHONE");
+        canvas_draw_str(canvas, 2, 56, "[BACK] EXIT BRIDGE");
+    } else {
+        canvas_set_color(canvas, ColorBlack);
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 2, 10, "PEN15 v2");
+        canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
+        canvas_draw_str(canvas, 74, 10, app->status);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 2, 22, "CMD:");
+        canvas_draw_str(canvas, 30, 22, app->cmd_disp);
+        canvas_draw_frame(canvas, 2, 27, 124, 5);
+        uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
+        if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
+        canvas_draw_str(canvas, 2, 42, "RX:");
+        canvas_draw_str(canvas, 22, 42, app->rx_disp);
+        canvas_draw_str(canvas, 2, 62, "[BACK] exit");
+    }
 }
+
+/* Input: ModeMenu=nav+select, ModeJson=back exit */
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
-    if(ev->type == InputTypeShort && ev->key == InputKeyBack)
-        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+    if(app->app_mode == ModeMenu) {
+        if(ev->type == InputTypeShort || ev->type == InputTypeRepeat) {
+            if(ev->key == InputKeyUp || ev->key == InputKeyLeft) {
+                if(app->menu_index > 0) app->menu_index--;
+                else app->menu_index = app->menu_count - 1;
+            } else if(ev->key == InputKeyDown || ev->key == InputKeyRight) {
+                app->menu_index++;
+                if(app->menu_index >= app->menu_count) app->menu_index = 0;
+            }
+        }
+        if((ev->type == InputTypeShort || ev->type == InputTypeRepeat) && ev->key == InputKeyOk) {
+            const char* cmds[] = {
+                "{\"action\":\"rfid_read\",\"id\":\"m0\"}",
+                "{\"action\":\"rfid_emulate\",\"id\":\"m1\"}",
+                "{\"action\":\"nfc_detect\",\"id\":\"m2\"}",
+                "{\"action\":\"ir_rx\",\"id\":\"m3\"}",
+                "{\"action\":\"ikey_read\",\"id\":\"m4\"}",
+                "{\"action\":\"ikey_emulate\",\"id\":\"m5\"}",
+                "{\"action\":\"subghz_rx\",\"id\":\"m6\"}",
+                "{\"action\":\"subghz_rx\",\"id\":\"m7\"}",
+                "{\"action\":\"subghz_tx_raw\",\"id\":\"m8\"}",
+                "{\"action\":\"ir_tx\",\"id\":\"m9\"}",
+                "{\"action\":\"gpio_mode\",\"id\":\"m10\"}",
+            };
+            app->app_mode = ModeJson;
+            usb_send(app, cmds[app->menu_index]);
+            strncpy(app->cmd_disp, MENU_ITEMS[app->menu_index].title, sizeof(app->cmd_disp)-1);
+            app->progress = 0;
+        }
+        if(ev->type == InputTypeShort && ev->key == InputKeyBack)
+            furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+    } else {
+        if(ev->type == InputTypeShort && ev->key == InputKeyBack)
+            furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -637,6 +719,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
             app->bridge_mode = true;
+            app->app_mode = ModeBridge;
+            app->bridge_exit_tick = furi_get_tick();
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
@@ -682,6 +766,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     /* ── hw_stop ───────────────────────────────────────────────────── */
     } else if(strcmp(action, "hw_stop") == 0) {
         hw_stop_all(app);
+        app->app_mode = ModeMenu;
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
         strncpy(app->rx_disp, "hw stop", sizeof(app->rx_disp) - 1);
@@ -1022,6 +1107,7 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
+            if(app->app_mode == ModeMenu) app->app_mode = ModeJson;
                 handle_json(app, app->json_buf, app->json_len);
                 app->json_len = 0;
             }
@@ -1043,6 +1129,9 @@ int32_t pen15_app(void* p) {
     app->tx_sem      = furi_semaphore_alloc(1, 1);
     app->uart_rx_buf = furi_stream_buffer_alloc(UART_RX_BUF, 1);
     app->hw_state    = HwIdle;
+    app->app_mode      = ModeMenu;
+    app->menu_index    = 0;
+    app->menu_count    = 11;
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
