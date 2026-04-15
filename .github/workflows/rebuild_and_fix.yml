@@ -24,11 +24,48 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Build Pen15 FAP (Flipper App Package)
+        uses: flipperdevices/flipperzero-ufbt-action@v0.1
+        id: build-fap
+        with:
+          sdk-channel: release
+          app-dir: fap/pen15_controller
+
+      - name: Rename APK with commit SHA
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             app/build/outputs/apk/debug/pen15-v3.0.${{ github.run_number }}-${SHORT_SHA}.apk
+          echo "✅ APK BUILD COMPLETE"
+          ls -lh app/build/outputs/apk/debug/
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Build ${{ github.run_number }}
-          files: "**/*.apk"
+          name: Build ${{ github.run_number }} - dolphin-rewrite
+          body: |
+            ## Pen15 v3.0 - dolphin-rewrite branch
+            **Commit:** `${{ github.sha }}`
+            **Branch:** `dolphin-rewrite`
+            
+            ### Downloads
+            - **pen15-v3.0.*.apk** — Install on phone
+            - **pen15_controller.fap** — Install on Flipper SD card
+
+            ### Installation
+            **Phone (APK):**
+            1. Download the .apk to phone
+            2. Enable "Install Unknown Apps" for your browser/file manager
+            3. Tap APK to install
+
+            **Flipper Zero (FAP):**
+            1. Download pen15_controller.fap
+            2. Copy to Flipper SD card: `/apps/Tools/pen15_controller.fap`
+            3. On Flipper: Apps → Tools → Pen15 Controller
+            4. Then connect USB OTG and tap Connect in the phone app
+          files: |
+            app/build/outputs/apk/debug/pen15-v3.0.*.apk
+            ${{ steps.build-fap.outputs.fap-artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
