@@ -14,8 +14,18 @@ Violating these rules wastes the user's time and money. Do not do it.
 | Branch | Purpose | Status |
 |--------|---------|--------|
 | main | Stable release | v1.0.129 |
+| dolphin-rewrite | Review + rewrite with dolphin-mistral model | Active - primary dev |
 | recon-tools | OSINT, Google Dork, Phone Sensors, Termux fixes | Active |
-| awok-only | Direct AWOK/ESP32 USB serial (no Termux dependency) | Active - primary dev |
+| awok-only | Direct AWOK/ESP32 USB serial (no Termux dependency) | Active |
+
+## Active Branch: dolphin-rewrite
+- Branch created from fap-patch for code review and rewrite
+- GitHub Actions workflow: Emergency Build & Release (APK only, no FAP due to token scope)
+- Build: GitHub Actions run 24451615544 (in progress)
+- All 47 .kt files compile clean (only deprecation warnings, zero errors)
+- btnScrollLock wired in ESP32ManagerActivity (auto-scroll toggle) — fixed in d9dcce2
+- FAP build pending: needs `workflow` scope to push workflow changes
+- APK download: https://github.com/twoskoops707/Pen15/releases/tag/build-202
 
 ## USB Serial Communication
 
