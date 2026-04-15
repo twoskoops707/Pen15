@@ -64,22 +64,19 @@ typedef enum {
     ModeJson,    /* JSON protocol (default) */
 } AppMode;
 
-typedef struct { const char* title; const char* hint; } MenuItem;
-#define MENU_ITEMS \
-    { "RFID Read",   "READ TAGS"}, \
-    { "RFID Emu",    "EMULATE"}, \
-    { "NFC Detect",  "SCAN NFC"}, \
-    { "IR RX",       "LEARN"}, \
-    { "IR TX",       "SEND"}, \
-    { "iKey Read",   "READ KEY"}, \
-    { "iKey Emu",    "EMULATE"}, \
-    { "SubGHz RX",   "RECEIVE"}, \
-    { "SubGHz Rec",  "RECORD"}, \
-    { "SubGHz TX",   "TX RAW"}, \
-    { "GPIO",        "UART"}, \
-    { "Bridge AWOK","WIFI SCAN"}, \
-    { "Stop All",    "HW STOP"}, \
-    { "Exit",        "QUIT"}
+/* Menu strings for ModeMenu */
+static const char* MENU_TITLES[] = {
+    "RFID Read", "RFID Emu", "NFC Detect", "IR RX",
+    "IR TX", "iKey Read", "iKey Emu", "SubGHz RX",
+    "SubGHz Rec", "SubGHz TX", "GPIO", "Bridge AWOK",
+    "Stop All", "Exit"
+};
+static const char* MENU_HINTS[] = {
+    "READ TAGS", "EMULATE", "SCAN NFC", "LEARN",
+    "SEND", "READ KEY", "EMULATE", "RECEIVE",
+    "RECORD", "TX RAW", "UART", "WIFI SCAN",
+    "HW STOP", "QUIT"
+};
 enum { MENU_COUNT = 14 };
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
@@ -259,13 +256,9 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
     if(app->app_mode == ModeMenu) {
-        static char mline[32];
-        snprintf(mline, sizeof(mline), ">[%d/%d] %s", app->menu_index+1, MENU_COUNT, (const char*[]){MENU_ITEMS}[app->menu_index*2]);
-        canvas_draw_str(canvas, 2, 14, mline);
-        snprintf(mline, sizeof(mline), "  %s", (const char*[]){MENU_ITEMS}[app->menu_index*2+1]);
-        canvas_draw_str(canvas, 2, 26, mline);
-    } else if(app->app_mode == ModeBridge) {
-        canvas_draw_str(canvas, 60, 10, "BRIDGE");
+        canvas_draw_str(canvas, 2, 14, ">");
+        canvas_draw_str(canvas, 14, 14, MENU_TITLES[app->menu_index]);
+        canvas_draw_str(canvas, 2, 26, MENU_HINTS[app->menu_index]);
     }
     canvas_draw_str(canvas, 2,  10, "PEN15 v2");
     canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
