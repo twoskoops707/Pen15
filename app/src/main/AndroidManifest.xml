@@ -201,6 +201,12 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".PhoneInfogaActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity" />
+
         <!-- Wizard Activities -->
         <activity
             android:name=".WizardActivity"

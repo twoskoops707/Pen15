@@ -1150,6 +1150,62 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Row 5: PHONEINFOGA (full-width) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <LinearLayout
+                    android:id="@+id/cardPhoneInfoga"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_module_card_recon"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_osint"
+                        android:tint="@color/info"
+                        android:contentDescription="PhoneInfoga" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PHONEINFOGA"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:fontFamily="monospace"
+                            android:letterSpacing="0.05" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Scan any phone number — carrier, country, line type, social media &amp; reputation via OSINT"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:fontFamily="monospace"
+                            android:lineSpacingMultiplier="1.3" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
