@@ -59,12 +59,11 @@ typedef enum {
 } HwState;
 
 typedef enum {
-    ModeMenu,     /* Interactive menu on Flipper screen */
-    ModeBridge,   /* UART bridge to AWOK */
-    ModeJson,     /* JSON protocol (default) */
+    ModeMenu,     /* Interactive menu */
+    ModeBridge,  /* UART bridge to AWOK */
+    ModeJson,    /* JSON protocol (default) */
 } AppMode;
 
-/* Menu for ModeMenu */
 typedef struct { const char* title; const char* hint; } MenuItem;
 #define MENU_ITEMS \
     { "RFID Read",   "READ TAGS"}, \
@@ -81,14 +80,8 @@ typedef struct { const char* title; const char* hint; } MenuItem;
     { "Bridge AWOK","WIFI SCAN"}, \
     { "Stop All",    "HW STOP"}, \
     { "Exit",        "QUIT"}
-
 enum { MENU_COUNT = 14 };
 
-
-    AppMode         app_mode;
-    uint8_t         menu_index;
-    uint32_t        bridge_exit_tick;
-    bool            init_done;
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
 /* ── App context ──────────────────────────────────────────────────── */
@@ -102,6 +95,10 @@ typedef struct {
     FuriStreamBuffer*    uart_rx_buf;
     bool                 uart_ready;
     volatile bool        bridge_mode;
+    AppMode         app_mode;
+    uint8_t         menu_index;
+    uint32_t        bridge_exit_tick;
+    bool            init_done;
 
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
@@ -200,11 +197,9 @@ static void cdc_on_tx_done(void* ctx) {
 static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
-        /* Auto-timeout bridge back to JSON after 3s of no activity */
         if(app->app_mode == ModeBridge && app->bridge_exit_tick &&
            furi_get_tick() > app->bridge_exit_tick) {
-            app->bridge_mode = false;
-            app->app_mode = ModeJson;
+            app->bridge_mode = false; app->app_mode = ModeJson;
             furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
         }
     if(app->bridge_mode && !(s & 0x01)) {
@@ -263,19 +258,15 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-        /* Menu or bridge display instead of default */
-        if(app->app_mode == ModeMenu) {
-            static char mline[64];
-            snprintf(mline, sizeof(mline), "[%d/%d] %s",
-                app->menu_index + 1, MENU_COUNT,
-                MENU_ITEMS[app->menu_index].title);
-            canvas_draw_str(canvas, 2, 14, mline);
-            snprintf(mline, sizeof(mline), "%s",
-                MENU_ITEMS[app->menu_index].hint);
-            canvas_draw_str(canvas, 2, 26, mline);
-        } else if(app->app_mode == ModeBridge) {
-            canvas_draw_str(canvas, 60, 10, "BRIDGE OK");
-        }
+    if(app->app_mode == ModeMenu) {
+        static char mline[32];
+        snprintf(mline, sizeof(mline), ">[%d/%d] %s", app->menu_index+1, MENU_COUNT, (const char*[]){MENU_ITEMS}[app->menu_index*2]);
+        canvas_draw_str(canvas, 2, 14, mline);
+        snprintf(mline, sizeof(mline), "  %s", (const char*[]){MENU_ITEMS}[app->menu_index*2+1]);
+        canvas_draw_str(canvas, 2, 26, mline);
+    } else if(app->app_mode == ModeBridge) {
+        canvas_draw_str(canvas, 60, 10, "BRIDGE");
+    }
     canvas_draw_str(canvas, 2,  10, "PEN15 v2");
     canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
     canvas_draw_str(canvas, 74, 10, app->status);
@@ -290,32 +281,23 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_draw_str(canvas, 2,  62, "[BACK] exit");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
-    if(app->init_done && ev->type == InputTypeShort) {
-        if(ev->key == InputKeyUp) {
-            if(app->app_mode == ModeMenu) {
-                if(app->menu_index == 0) app->menu_index = MENU_COUNT - 1;
-                else app->menu_index--;
-            }
-        } else if(ev->key == InputKeyDown) {
-            if(app->app_mode == ModeMenu) {
-                app->menu_index = (app->menu_index + 1) % MENU_COUNT;
-            }
-        } else if(ev->key == InputKeyOk) {
-            if(app->app_mode == ModeBridge) {
-                app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000);
-            } else if(app->app_mode == ModeMenu) {
-                /* Menu item selected - will be handled in EvtUsbRx */
-                app->app_mode = ModeJson;
-            }
-        } else if(ev->key == InputKeyBack) {
-            if(app->app_mode != ModeMenu) {
-                app->app_mode = ModeMenu;
-                app->menu_index = 0;
-            } else {
-                furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
-            }
-        }
+    Pen15App* app = ctx;
+    if(!app->init_done || ev->type != InputTypeShort) return;
+    if(ev->key == InputKeyUp) {
+        if(app->app_mode == ModeMenu) app->menu_index = (app->menu_index + MENU_COUNT - 1) % MENU_COUNT;
+    } else if(ev->key == InputKeyDown) {
+        if(app->app_mode == ModeMenu) app->menu_index = (app->menu_index + 1) % MENU_COUNT;
+    } else if(ev->key == InputKeyOk) {
+        if(app->app_mode == ModeBridge) { app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000); }
+        else if(app->app_mode == ModeMenu) { app->app_mode = ModeJson; }
+    } else if(ev->key == InputKeyBack) {
+        if(app->app_mode != ModeMenu) { app->app_mode = ModeMenu; app->menu_index = 0; }
+        else { furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop); }
     }
+}
+    if(ev->type == InputTypeShort && ev->key == InputKeyBack)
+        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    JSON string unescape (in-place: \\n→\n, \\r→\r, \\t→\t, etc.)
@@ -1119,6 +1101,8 @@ int32_t pen15_app(void* p) {
     app->hw_state    = HwIdle;
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
+    app->app_mode = ModeJson;
+    app->menu_index = 0;
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
 
