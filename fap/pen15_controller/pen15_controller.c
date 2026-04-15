@@ -61,8 +61,8 @@ typedef enum {
 typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
 
 #define MENU_COUNT 9
-static const char* MENU_TITLES[MENU_COUNT] = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
-static const char* MENU_HINTS[MENU_COUNT] = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
+static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
+static const char* MENU_HINTS[MENU_COUNT] __attribute__((unused)) = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
 
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
