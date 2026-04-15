@@ -58,6 +58,13 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
+typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
+
+#define MENU_COUNT 9
+static const char* MENU_TITLES[MENU_COUNT] = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
+static const char* MENU_HINTS[MENU_COUNT] = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
+
+
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
 /* ── App context ──────────────────────────────────────────────────── */
@@ -82,6 +89,11 @@ typedef struct {
     uint8_t spin;
 
     PinMode pin_mode[8];
+
+    AppMode    app_mode;
+    uint8_t    menu_index;
+    uint32_t   bridge_exit_tick;
+    bool       init_done;
 
     Gui*      gui;
     ViewPort* vp;
@@ -170,6 +182,7 @@ static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); 
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
     if(app->bridge_mode && !(s & 0x01)) {
+        app->app_mode = ModeJson;
         app->bridge_mode = false;
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
     }
@@ -636,7 +649,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-            app->bridge_mode = true;
+        app->app_mode = ModeBridge;
+        app->bridge_exit_tick = 0;
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
@@ -1022,8 +1036,10 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
+        if(app->app_mode == ModeJson) {
                 handle_json(app, app->json_buf, app->json_len);
-                app->json_len = 0;
+            app->json_len = 0;
+        }
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1037,6 +1053,10 @@ int32_t pen15_app(void* p) {
 
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
+
+    app->app_mode = ModeMenu;
+    app->menu_index = 0;
+    app->init_done = true;
 
     app->thread      = furi_thread_get_current();
     app->usb_mtx     = furi_mutex_alloc(FuriMutexTypeNormal);
