@@ -143,6 +143,28 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
+/* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
+static const uint8_t OOK650_PRESET[] = {
+    0x02, 0x0D,
+    0x03, 0x07,
+    0x08, 0x32,
+    0x0B, 0x06,
+    0x10, 0x17,
+    0x11, 0x32,
+    0x12, 0x30,
+    0x13, 0x00,
+    0x14, 0x00,
+    0x18, 0x18,
+    0x19, 0x18,
+    0x1B, 0x07,
+    0x1C, 0x00,
+    0x1D, 0x91,
+    0x20, 0xFB,
+    0x21, 0xB6,
+    0x22, 0x11,
+    0x00, 0x00,
+    0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
 
 /* ═══════════════════════════════════════════════════════════════════
    CDC callbacks
@@ -295,9 +317,6 @@ static void input_cb(InputEvent* ev, void* ctx) {
         if(app->app_mode != ModeMenu) { app->app_mode = ModeMenu; app->menu_index = 0; }
         else { furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop); }
     }
-}
-    if(ev->type == InputTypeShort && ev->key == InputKeyBack)
-        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
