@@ -1,3 +1,4 @@
+#include <stdint.h>
 /* ═══════════════════════════════════════════════════════════════════
    PEN15 Controller — Modern Flipper UI
    Cyberpunk aesthetic on 128x64 monochrome LCD
