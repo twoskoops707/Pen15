@@ -15,8 +15,8 @@ static const uint8_t GLYPH_6[] = {0x1F,0x10,0x1F,0x11,0x1F}; // 6
 static const uint8_t GLYPH_7[] = {0x1F,0x01,0x02,0x04,0x08}; // 7
 static const uint8_t GLYPH_8[] = {0x1F,0x11,0x1F,0x11,0x1F}; // 8
 static const uint8_t GLYPH_9[] = {0x1F,0x11,0x1F,0x02,0x1F}; // 9
-static const uint8_t GLYPH_COLON[] = {0x04,0x04,0x00,0x04,0x04}; // :
-static const uint8_t GLYPH_DASH[] = {0x08,0x08,0x08,0x08,0x08}; // -
+ // :
+ // -
 
 static const uint8_t* GLYPHS[] = {
     GLYPH_0, GLYPH_1, GLYPH_2, GLYPH_3, GLYPH_4,
@@ -177,15 +177,15 @@ static const uint8_t* GLYPHS[] = {
     GLYPH_5,GLYPH_6,GLYPH_7,GLYPH_8,GLYPH_9};
 
 /* ── Mode badge strings ───────────────────────────────────────────── */
-static const char* IDLE_STR     = "IDLE";
-static const char* RFID_STR     = "RFID";
-static const char* RFID_EM_STR  = "RFID_EM";
-static const char* NFC_STR      = "NFC";
-static const char* IR_STR       = "IR";
-static const char* KEY_STR      = "KEY";
-static const char* KEY_EM_STR   = "KEY_EM";
-static const char* RF_STR       = "RF";
-static const char* BRIDGE_STR   = "BRIDGE";
+
+
+
+
+
+
+
+
+
 
 static const char* mode_label(Pen15App* app) {
     if(app->app_mode == ModeBridge) return BRIDGE_STR;
