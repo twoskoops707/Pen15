@@ -254,7 +254,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
 
-    /* ── Top bar with gradient dots ───────────────────────── */
+    /* Top bar: gradient dots */
     for(int x = 0; x < 128; x += 2) {
         canvas_draw_dot(canvas, (uint8_t)x, 1);
         canvas_draw_dot(canvas, (uint8_t)(x+1), 2);
@@ -281,7 +281,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     /* Divider */
     for(int x = 0; x < 128; x += 3) canvas_draw_dot(canvas, (uint8_t)x, 12);
 
-    /* Status */
+    /* Status row */
     canvas_set_font(canvas, FontPrimary);
     canvas_draw_str(canvas, 2, 22, "STATUS");
     canvas_set_font(canvas, FontSecondary);
@@ -304,7 +304,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 26, 46, app->cmd_disp[0] ? app->cmd_disp : "---");
 
-    /* RX preview */
+    /* RX */
     canvas_draw_str(canvas, 2, 54, "RX");
     canvas_draw_str(canvas, 20, 54, app->rx_disp[0] ? app->rx_disp : "---");
 
@@ -313,7 +313,6 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 2, 63, "[BACK]");
 }
-
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
     if(!app->init_done || ev->type != InputTypeShort) return;
