@@ -65,18 +65,6 @@ typedef enum {
 } AppMode;
 
 /* Menu strings for ModeMenu */
-static const char* MENU_TITLES[] = {
-    "RFID Read", "RFID Emu", "NFC Detect", "IR RX",
-    "IR TX", "iKey Read", "iKey Emu", "SubGHz RX",
-    "SubGHz Rec", "SubGHz TX", "GPIO", "Bridge AWOK",
-    "Stop All", "Exit"
-};
-static const char* MENU_HINTS[] = {
-    "READ TAGS", "EMULATE", "SCAN NFC", "LEARN",
-    "SEND", "READ KEY", "EMULATE", "RECEIVE",
-    "RECORD", "TX RAW", "UART", "WIFI SCAN",
-    "HW STOP", "QUIT"
-};
 enum { MENU_COUNT = 14 };
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
@@ -155,30 +143,6 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
-static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
-
-/* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
-static const uint8_t OOK650_PRESET[] = {
-    0x02, 0x0D,
-    0x03, 0x07,
-    0x08, 0x32,
-    0x0B, 0x06,
-    0x10, 0x17,
-    0x11, 0x32,
-    0x12, 0x30,
-    0x13, 0x00,
-    0x14, 0x00,
-    0x18, 0x18,
-    0x19, 0x18,
-    0x1B, 0x07,
-    0x1C, 0x00,
-    0x1D, 0x91,
-    0x20, 0xFB,
-    0x21, 0xB6,
-    0x22, 0x11,
-    0x00, 0x00,
-    0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 /* ═══════════════════════════════════════════════════════════════════
    CDC callbacks
