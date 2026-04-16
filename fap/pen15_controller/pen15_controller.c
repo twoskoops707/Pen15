@@ -225,17 +225,18 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_draw_box(canvas, 0, 0, 128, 14);
     canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 4, 10, PEN15);
+    canvas_draw_str(canvas, 4, 10, "PEN15");
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 62, 10, v3.0);
+    canvas_draw_str(canvas, 62, 10, "v3.0");
 
-    // Spinner char
-    const char* sp = (app->spin & 2) ? (app->spin & 1 ? (char*)92 : (char*)45) : (app->spin & 1 ? (char*)47 : (char*)124);
+    // Spinner
+    const char* sp = (app->spin & 2) ? ((app->spin & 1) ? "\\" : "-") : ((app->spin & 1) ? "/" : "|");
     canvas_draw_str(canvas, 96, 10, sp);
 
     // Mode badge
-    const char* ml = (app->app_mode == 2) ? (char*)66 : (app->app_mode == 1) ? (char*)77 : (char*)74;
-    canvas_set_color(canvas, (app->app_mode == 2) ? 0x50 : (app->app_mode == 1) ? 0xF1 : 0xBD);
+    const char* ml = (app->app_mode == 2) ? "BRIDGE" : (app->app_mode == 1) ? "MENU" : "JSON";
+    Color mc = (app->app_mode == 2) ? 0x50 : (app->app_mode == 1) ? 0xF1 : 0xBD;
+    canvas_set_color(canvas, mc);
     canvas_draw_box(canvas, 108, 3, 18, 9);
     canvas_set_color(canvas, ColorBlack);
     canvas_draw_str(canvas, 110, 10, ml);
@@ -246,9 +247,9 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     // Status
     canvas_set_color(canvas, 0xFF);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2, 24, STATUS);
+    canvas_draw_str(canvas, 2, 24, "STATUS");
     canvas_set_color(canvas, 0xF8);
-    canvas_draw_str(canvas, 2, 33, app->status[0] ? app->status : idle);
+    canvas_draw_str(canvas, 2, 33, app->status[0] ? app->status : "idle");
 
     // Progress bar
     if(app->progress > 0) {
@@ -261,9 +262,9 @@ static void draw_cb(Canvas* canvas, void* ctx) {
 
     // RX
     canvas_set_color(canvas, 0x44);
-    canvas_draw_str(canvas, 62, 50, RX);
+    canvas_draw_str(canvas, 62, 50, "RX");
     canvas_set_color(canvas, 0x8B);
-    canvas_draw_str(canvas, 62, 59, app->rx_disp[0] ? app->rx_disp : (char*)45);
+    canvas_draw_str(canvas, 62, 59, app->rx_disp[0] ? app->rx_disp : "-");
 
     // Signal bars
     int8_t r = (int8_t)(app->progress < 100 ? app->progress : 100);
@@ -276,8 +277,9 @@ static void draw_cb(Canvas* canvas, void* ctx) {
 
     // Bottom hint
     canvas_set_color(canvas, 0x62);
-    canvas_draw_str(canvas, 2, 59, (char*)45);
+    canvas_draw_str(canvas, 2, 59, "[BACK] exit");
 }
+
 
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
