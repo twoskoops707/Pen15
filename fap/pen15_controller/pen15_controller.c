@@ -253,66 +253,68 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 0, 128, 64);
 
-    /* Top bar: gradient dots */
-    for(int x = 0; x < 128; x += 2) {
-        canvas_draw_dot(canvas, (uint8_t)x, 1);
-        canvas_draw_dot(canvas, (uint8_t)(x+1), 2);
+    // Top bar - purple
+    canvas_set_color(canvas, 0xBD);
+    canvas_draw_box(canvas, 0, 0, 128, 14);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str(canvas, 4, 10, PEN15);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 62, 10, v3.0);
+
+    // Spinner char
+    const char* sp = (app->spin & 2) ? (app->spin & 1 ? (char*)92 : (char*)45) : (app->spin & 1 ? (char*)47 : (char*)124);
+    canvas_draw_str(canvas, 96, 10, sp);
+
+    // Mode badge
+    const char* ml = (app->app_mode == 2) ? (char*)66 : (app->app_mode == 1) ? (char*)77 : (char*)74;
+    canvas_set_color(canvas, (app->app_mode == 2) ? 0x50 : (app->app_mode == 1) ? 0xF1 : 0xBD);
+    canvas_draw_box(canvas, 108, 3, 18, 9);
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_str(canvas, 110, 10, ml);
+
+    canvas_set_color(canvas, 0x44);
+    canvas_draw_box(canvas, 0, 14, 128, 1);
+
+    // Status
+    canvas_set_color(canvas, 0xFF);
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 2, 24, STATUS);
+    canvas_set_color(canvas, 0xF8);
+    canvas_draw_str(canvas, 2, 33, app->status[0] ? app->status : idle);
+
+    // Progress bar
+    if(app->progress > 0) {
+        uint8_t bw = (app->progress > 100) ? 120 : (uint8_t)((app->progress * 120) / 100);
+        canvas_set_color(canvas, 0x44);
+        canvas_draw_box(canvas, 2, 38, 120, 5);
+        canvas_set_color(canvas, 0x50);
+        canvas_draw_box(canvas, 2, 38, bw, 5);
     }
 
-    /* Title */
-    canvas_set_color(canvas, ColorXOR);
-    canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 4, 10, "PEN15");
-    canvas_set_color(canvas, ColorBlack);
-    canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 46, 10, "v2.0");
-    canvas_draw_str(canvas, 80, 10, SPIN_CHARS[app->spin & 3]);
+    // RX
+    canvas_set_color(canvas, 0x44);
+    canvas_draw_str(canvas, 62, 50, RX);
+    canvas_set_color(canvas, 0x8B);
+    canvas_draw_str(canvas, 62, 59, app->rx_disp[0] ? app->rx_disp : (char*)45);
 
-    /* Mode badge */
-    const char* mode_str = "JSON";
-    Color mode_color = ColorBlack;
-    if(app->app_mode == ModeBridge) { mode_str = "BRIDGE"; mode_color = ColorXOR; }
-    else if(app->app_mode == ModeMenu) { mode_str = "MENU"; mode_color = ColorBlack; }
-    canvas_set_color(canvas, mode_color);
-    canvas_draw_str(canvas, 100, 10, mode_str);
-    canvas_set_color(canvas, ColorBlack);
-
-    /* Divider */
-    for(int x = 0; x < 128; x += 3) canvas_draw_dot(canvas, (uint8_t)x, 12);
-
-    /* Status row */
-    canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2, 22, "STATUS");
-    canvas_set_font(canvas, FontSecondary);
-    canvas_set_color(canvas, ColorXOR);
-    canvas_draw_str(canvas, 2, 30, app->status[0] ? app->status : "---");
-    canvas_set_color(canvas, ColorBlack);
-
-    /* Progress bar */
-    canvas_draw_frame(canvas, 2, 34, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) {
-        canvas_set_color(canvas, ColorXOR);
-        canvas_draw_box(canvas, 2, 34, fill, 5);
-        canvas_set_color(canvas, ColorBlack);
+    // Signal bars
+    int8_t r = (int8_t)(app->progress < 100 ? app->progress : 100);
+    if(r < 0) r = 0;
+    for(int i = 0; i < 4; i++) {
+        uint8_t bh = 6 + i * 4;
+        canvas_set_color(canvas, (i < (r / 25)) ? 0x50 : 0x44);
+        canvas_draw_box(canvas, 109 + i*4, 55 - bh, 3, bh);
     }
 
-    /* Command */
-    canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2, 46, "CMD");
-    canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 26, 46, app->cmd_disp[0] ? app->cmd_disp : "---");
-
-    /* RX */
-    canvas_draw_str(canvas, 2, 54, "RX");
-    canvas_draw_str(canvas, 20, 54, app->rx_disp[0] ? app->rx_disp : "---");
-
-    /* Bottom bar */
-    for(int x = 0; x < 128; x += 3) canvas_draw_dot(canvas, (uint8_t)x, 62);
-    canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2, 63, "[BACK]");
+    // Bottom hint
+    canvas_set_color(canvas, 0x62);
+    canvas_draw_str(canvas, 2, 59, (char*)45);
 }
+
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
     if(!app->init_done || ev->type != InputTypeShort) return;
