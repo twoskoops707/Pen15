@@ -66,6 +66,23 @@ typedef enum {
 
 /* Menu strings for ModeMenu */
 enum { MENU_COUNT = 14 };
+static const char* SPIN_CHARS[4] = {"|", "/", "-", "\\"};
+static const char* MENU_TITLES[MENU_COUNT] = {
+    "RFID Read",
+    "RFID Emulate",
+    "NFC Detect",
+    "NFC Emulate",
+    "SubGHz RX",
+    "SubGHz Record",
+    "SubGHz TX",
+    "IR Learn",
+    "IR Transmit",
+    "iButton Read",
+    "iButton Emulate",
+    "GPIO Control",
+    "UART Bridge",
+    "Exit",
+};
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
