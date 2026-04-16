@@ -10,311 +10,289 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/surface"
+        android:background="@color/background"
         app:elevation="0dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <!-- HEADER -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:background="@color/surface"
-            app:titleTextColor="@color/text_primary"
-            app:subtitleTextColor="@color/text_secondary">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PEN15"
                     android:textColor="@color/primary"
-                    android:textSize="20sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.15" />
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pentest Dashboard"
                     android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.05" />
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif"
+                    android:layout_marginTop="2dp" />
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/btnSettings"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_hardware_card_default"
+                android:padding="10dp"
                 android:contentDescription="Settings"
-                android:padding="8dp"
                 android:src="@drawable/ic_settings"
-                android:tint="@color/text_primary" />
-        </com.google.android.material.appbar.MaterialToolbar>
+                app:tint="@color/text_secondary" />
+        </LinearLayout>
 
-        <!-- DUAL HARDWARE STATUS BAR -->
+        <!-- STATUS CHIPS -->
         <LinearLayout
-            android:id="@+id/statusBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/surface"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
             android:gravity="center_vertical">
 
-            <!-- Flipper Chip -->
+            <!-- FLIPPER -->
             <LinearLayout
                 android:id="@+id/chipFlipper"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_chip"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:layout_marginEnd="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_chip_flipper"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/glow_dot">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_flipper"
+                        app:tint="@color/primary" />
+                </FrameLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <View
-                        android:id="@+id/dotFlipper"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:background="@drawable/shape_status_dot"
-                        android:backgroundTint="@color/status_disconnected"
-                        android:layout_marginEnd="7dp" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/textFlipper"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="FLIPPER: --"
+                        android:text="FLIPPER"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/textFlipperHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TAP TO CONNECT"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp"
+                        android:layout_marginTop="1dp" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/textFlipperHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TAP TO CONNECT"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="9sp"
-                    android:fontFamily="monospace"
-                    android:layout_marginTop="3dp" />
+                <View
+                    android:id="@+id/dotFlipper"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/glow_dot_red" />
             </LinearLayout>
 
-            <!-- AWOK Chip -->
+            <!-- AWOK -->
             <LinearLayout
                 android:id="@+id/chipAwok"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_chip"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:layout_marginStart="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_chip_awok"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/glow_dot">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_awok"
+                        app:tint="@color/danger" />
+                </FrameLayout>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <View
-                        android:id="@+id/dotAwok"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:background="@drawable/shape_status_dot"
-                        android:backgroundTint="@color/status_disconnected"
-                        android:layout_marginEnd="7dp" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/textAwok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AWOK: --"
+                        android:text="AWOK"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace" />
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/textAwokHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TAP TO CONNECT"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="10sp"
+                        android:layout_marginTop="1dp" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/textAwokHint"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TAP TO CONNECT"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="9sp"
-                    android:fontFamily="monospace"
-                    android:layout_marginTop="3dp" />
+                <View
+                    android:id="@+id/dotAwok"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/glow_dot_red" />
             </LinearLayout>
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/border" />
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <!-- MAIN CONTENT -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="false"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="80dp">
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="100dp">
 
-            <!-- MISSION WIZARD BANNER -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- MISSION WIZARD -->
+            <LinearLayout
                 android:id="@+id/cardWizard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginTop="12dp"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/primary"
-                app:strokeWidth="2dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_hardware_card"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="&#x2726;  MISSION WIZARD"
-                            android:textColor="@color/primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:fontFamily="monospace" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="What are we testing today? I&#x2019;ll walk you through it."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-                    </LinearLayout>
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="&#x203A;"
+                        android:text="MISSION WIZARD"
                         android:textColor="@color/primary"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.06" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Guided attack workflow"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- ═══════════════════════════════════════════════════════
-                 SECTION: FLIPPER ZERO HARDWARE
-            ═══════════════════════════════════════════════════════════ -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="22dp"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/primary"
-                    android:layout_marginEnd="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FLIPPER ZERO"
-                    android:textColor="@color/primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.12" />
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_arrow_right"
+                    app:tint="@color/primary" />
             </LinearLayout>
 
-            <!-- Row 1: RFID + NFC -->
+
+            <!-- SECTION: FLIPPER ZERO -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FLIPPER ZERO"
+                android:textColor="@color/primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="4dp" />
+            
+            <!-- FLIPPER ZERO ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardRFID"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_rfid"
-                        android:tint="@color/primary"
-                        android:contentDescription="RFID" />
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -324,37 +302,34 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="125 KHz / LF"
+                        android:text="125kHz / 13.56MHz"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/cardNFC"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_nfc"
-                        android:tint="@color/primary"
-                        android:contentDescription="NFC" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -364,264 +339,240 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="13.56 MHz / HF"
+                        android:text="Read / Emulate"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Row 2: SUB-GHZ + INFRARED -->
+            <!-- FLIPPER ZERO ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardSubGHz"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_subghz"
-                        android:tint="@color/primary"
-                        android:contentDescription="Sub-GHz" />
+                        app:tint="@color/pink" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="SUB-GHZ"
+                        android:text="Sub-GHz"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="315-915 MHz"
+                        android:text="433 / 868 / 915 MHz"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/cardIR"
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_infrared"
-                        android:tint="@color/primary"
-                        android:contentDescription="Infrared" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="INFRARED"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Rx / Replay"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Row 3: BAD USB + iBUTTON -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                
                 <LinearLayout
                     android:id="@+id/cardBadUSB"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_danger"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_badusb"
-                        android:tint="@color/danger"
-                        android:contentDescription="Bad USB" />
+                        app:tint="@color/danger" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="BAD USB"
-                        android:textColor="@color/danger"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="HID Inject"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/cardIButton"
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_ibutton"
-                        android:tint="@color/primary"
-                        android:contentDescription="iButton" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="iBUTTON"
+                        android:text="Bad USB"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="1-Wire Keys"
+                        android:text="Keystroke Injection"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Row 4: BLUETOOTH + GPIO -->
+            <!-- FLIPPER ZERO ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
-                    android:id="@+id/cardBluetooth"
+                    android:id="@+id/cardIR"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_bluetooth_custom"
-                        android:tint="@color/info"
-                        android:contentDescription="Bluetooth" />
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_ir"
+                        app:tint="@color/orange" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="BLUETOOTH"
+                        android:text="Infrared"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="BLE Scanner"
+                        android:text="TX / RX"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
-                    android:id="@+id/cardGPIO"
+                    android:id="@+id/cardIButton"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_flipper"
+                    android:background="@drawable/bg_hardware_card_flipper"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_ibutton"
+                        app:tint="@color/warning" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="iButton"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1-Wire Keys"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+            </LinearLayout>
+            <!-- FLIPPER ZERO ROW -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+                
+                <LinearLayout
+                    android:id="@+id/cardBluetooth"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_hardware_card_flipper"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_bluetooth_custom"
+                        app:tint="@color/info" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Bluetooth"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BLE Scanner"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:id="@+id/cardGPIO"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_hardware_card_flipper"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_gpio"
-                        android:tint="@color/primary"
-                        android:contentDescription="GPIO" />
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -631,195 +582,152 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="UART Bridge"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- ═══════════════════════════════════════════════════════
-                 SECTION: AWOK MARAUDER
-            ═══════════════════════════════════════════════════════════ -->
-            <LinearLayout
-                android:layout_width="match_parent"
+
+            <!-- SECTION: AWOK / MARAUDER -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="22dp"
+                android:text="AWOK / MARAUDER"
+                android:textColor="@color/danger"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.12"
                 android:layout_marginBottom="8dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/danger"
-                    android:layout_marginEnd="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="AWOK MARAUDER"
-                    android:textColor="@color/danger"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.12" />
-            </LinearLayout>
-
-            <!-- Row: WIFI DEAUTH + MARAUDER -->
+                android:layout_marginTop="4dp" />
+            
+            <!-- AWOK / MARAUDER ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardWifiDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_danger"
+                    android:background="@drawable/bg_hardware_card_awok"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_wifi_deauth"
-                        android:tint="@color/danger"
-                        android:contentDescription="WiFi Deauth" />
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_wifi"
+                        app:tint="@color/danger" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="WIFI DEAUTH"
-                        android:textColor="@color/danger"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="802.11 Attack"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:fontFamily="monospace" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/cardMarauder"
-                    android:layout_width="0dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_awok"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_marauder"
-                        android:tint="@color/warning"
-                        android:contentDescription="Marauder" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="MARAUDER"
+                        android:text="WiFi Deauth"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="ESP32 Suite"
+                        android:text="ESP32 Marauder"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-            </LinearLayout>
-
-            <!-- ═══════════════════════════════════════════════════════
-                 SECTION: RECON & TOOLS
-            ═══════════════════════════════════════════════════════════ -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="22dp"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical">
-
-                <View
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:background="@color/info"
-                    android:layout_marginEnd="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="RECON &amp; TOOLS"
-                    android:textColor="@color/info"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace"
-                    android:letterSpacing="0.12" />
-            </LinearLayout>
-
-            <!-- Row 1: OSINT + GOOGLE DORKS -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                
                 <LinearLayout
-                    android:id="@+id/cardOSINT"
+                    android:id="@+id/cardMarauder"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_awok"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_marauder"
+                        app:tint="@color/danger" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Marauder"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan / Attack"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="9sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!-- SECTION: RECON / TOOLS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RECON / TOOLS"
+                android:textColor="@color/info"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="4dp" />
+            
+            <!-- RECON / TOOLS ROW -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+                
+                <LinearLayout
+                    android:id="@+id/cardOSINT"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/bg_hardware_card_recon"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_osint"
-                        android:tint="@color/info"
-                        android:contentDescription="OSINT" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -829,328 +737,316 @@
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Footprinting"
+                        android:text="Reconnaissance"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/cardDork"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_dork"
-                        android:tint="@color/info"
-                        android:contentDescription="Google Dorks" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="GOOGLE DORKS"
+                        android:text="Google Dork"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Search Ops"
+                        android:text="Search Engine"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Row 2: NETWORK SCAN + EXPLOITS -->
+            <!-- RECON / TOOLS ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardNetScan"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_netscan"
-                        android:tint="@color/info"
-                        android:contentDescription="Network Scanner" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="NETWORK SCAN"
+                        android:text="Network Scan"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="nmap / LAN"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/cardExploit"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_exploit"
-                        android:tint="@color/info"
-                        android:contentDescription="Exploits" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="EXPLOITS"
+                        android:text="Exploits"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="CVE Lookup"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Row 3: PACKET SNIFF + HASH CRACK -->
+            <!-- RECON / TOOLS ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardPacket"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_packet"
-                        android:tint="@color/info"
-                        android:contentDescription="Packet Sniffer" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="PACKET SNIFF"
+                        android:text="Packet Sniff"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="mitmproxy / ss"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/cardHash"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_hash_crack"
-                        android:tint="@color/info"
-                        android:contentDescription="Hash Cracker" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="HASH CRACK"
+                        android:text="Hash Crack"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="MD5/SHA/bcrypt"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Row 4: PHONE SENSORS + SETTINGS -->
+            <!-- RECON / TOOLS ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
-
+                android:layout_marginBottom="8dp">
+                
                 <LinearLayout
                     android:id="@+id/cardPhone"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card_recon"
+                    android:background="@drawable/bg_hardware_card_recon"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_phone_sensors"
-                        android:tint="@color/info"
-                        android:contentDescription="Phone Sensors" />
+                        app:tint="@color/info" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="PHONE SENSORS"
+                        android:text="Phone Sensors"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="WiFi / BLE / NFC"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
-
+                
                 <LinearLayout
                     android:id="@+id/cardSettings"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_module_card"
+                    android:background="@drawable/bg_hardware_card_default"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/ic_settings"
-                        android:tint="@color/text_secondary"
-                        android:contentDescription="Settings" />
+                        app:tint="@color/text_secondary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="SETTINGS"
+                        android:text="Settings"
                         android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.05" />
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
                         android:text="Config"
                         android:textColor="@color/text_secondary"
                         android:textSize="9sp"
-                        android:fontFamily="monospace" />
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- BOTTOM SPACER for nav bar -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- BOTTOM NAV BAR -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom"
+        android:background="@color/surface"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
