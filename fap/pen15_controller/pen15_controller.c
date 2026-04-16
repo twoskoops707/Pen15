@@ -239,67 +239,111 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
-    canvas_set_color(canvas, ColorBlack);
-    canvas_draw_box(canvas, 0, 0, 128, 64);
 
-    // Top bar - purple
-    canvas_set_color(canvas, 0xBD);
-    canvas_draw_box(canvas, 0, 0, 128, 14);
+    /* ── Header bar (inverted) ───────────────────────────────────── */
+    canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 0, 128, 13);
     canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 4, 10, "PEN15");
+    canvas_draw_str(canvas, 3, 10, "PEN15");
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 62, 10, "v3.0");
+    canvas_draw_str(canvas, 44, 10, "v3.0");
 
-    // Spinner
-    const char* sp = (app->spin & 2) ? ((app->spin & 1) ? "\\" : "-") : ((app->spin & 1) ? "/" : "|");
-    canvas_draw_str(canvas, 96, 10, sp);
+    /* Spinner */
+    const char* sp = SPIN_CHARS[app->spin & 3];
+    canvas_draw_str(canvas, 93, 10, sp);
 
-    // Mode badge
-    const char* ml = (app->app_mode == 2) ? "BRIDGE" : (app->app_mode == 1) ? "MENU" : "JSON";
-    Color mc = (app->app_mode == 2) ? 0x50 : (app->app_mode == 1) ? 0xF1 : 0xBD;
-    canvas_set_color(canvas, mc);
-    canvas_draw_box(canvas, 108, 3, 18, 9);
+    /* Mode pill */
+    const char* mode_str = (app->app_mode == ModeBridge) ? "BRIDGE"
+                         : (app->app_mode == ModeMenu)   ? "MENU"
+                                                         : "JSON";
+    canvas_draw_frame(canvas, 102, 2, 24, 9);
+    canvas_draw_str(canvas, 104, 10, mode_str);
+
     canvas_set_color(canvas, ColorBlack);
-    canvas_draw_str(canvas, 110, 10, ml);
 
-    canvas_set_color(canvas, 0x44);
-    canvas_draw_box(canvas, 0, 14, 128, 1);
+    /* ── MENU mode — scrollable list ─────────────────────────────── */
+    if(app->app_mode == ModeMenu) {
+        /* Show 4 visible items; selected item is always visible */
+        uint8_t sel = app->menu_index;
+        uint8_t start = (sel >= 3) ? sel - 2 : 0;
+        if(start + 4 > MENU_COUNT) start = (MENU_COUNT > 4) ? MENU_COUNT - 4 : 0;
 
-    // Status
-    canvas_set_color(canvas, 0xFF);
+        for(uint8_t i = 0; i < 4 && (start + i) < MENU_COUNT; i++) {
+            uint8_t idx = start + i;
+            uint8_t y = 14 + i * 12;
+            bool is_sel = (idx == sel);
+
+            if(is_sel) {
+                canvas_set_color(canvas, ColorBlack);
+                canvas_draw_box(canvas, 0, y, 120, 11);
+                canvas_set_color(canvas, ColorWhite);
+            } else {
+                canvas_set_color(canvas, ColorBlack);
+            }
+            canvas_set_font(canvas, FontSecondary);
+            canvas_draw_str(canvas, 3, y + 8, MENU_TITLES[idx]);
+            canvas_set_color(canvas, ColorBlack);
+        }
+
+        /* Scroll arrows */
+        if(start > 0)
+            canvas_draw_str(canvas, 121, 20, "^");
+        if(start + 4 < MENU_COUNT)
+            canvas_draw_str(canvas, 121, 60, "v");
+
+        /* Bottom nav hint */
+        canvas_set_color(canvas, ColorBlack);
+        canvas_draw_str(canvas, 0, 63, "OK=select BACK=exit");
+        return;
+    }
+
+    /* ── BRIDGE mode — passthrough indicator ─────────────────────── */
+    if(app->app_mode == ModeBridge) {
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 10, 30, "BRIDGE ACTIVE");
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 10, 42, "USB <-> UART");
+        canvas_draw_str(canvas, 10, 52, app->status[0] ? app->status : "connected");
+        canvas_draw_str(canvas, 0, 63, "Hold OK 3s to exit");
+        return;
+    }
+
+    /* ── JSON mode — status + command + progress ─────────────────── */
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2, 24, "STATUS");
-    canvas_set_color(canvas, 0xF8);
-    canvas_draw_str(canvas, 2, 33, app->status[0] ? app->status : "idle");
 
-    // Progress bar
+    /* CMD line */
+    canvas_draw_str(canvas, 2, 22, "CMD:");
+    canvas_draw_str(canvas, 28, 22, app->cmd_disp[0] ? app->cmd_disp : "---");
+
+    /* Status line */
+    canvas_draw_str(canvas, 2, 33, "STS:");
+    canvas_draw_str(canvas, 28, 33, app->status[0] ? app->status : "idle");
+
+    /* Progress bar */
+    canvas_draw_frame(canvas, 2, 36, 124, 5);
     if(app->progress > 0) {
-        uint8_t bw = (app->progress > 100) ? 120 : (uint8_t)((app->progress * 120) / 100);
-        canvas_set_color(canvas, 0x44);
-        canvas_draw_box(canvas, 2, 38, 120, 5);
-        canvas_set_color(canvas, 0x50);
-        canvas_draw_box(canvas, 2, 38, bw, 5);
+        uint8_t bw = (app->progress > 100) ? 122 : (uint8_t)((app->progress * 122) / 100);
+        canvas_draw_box(canvas, 3, 37, bw, 3);
     }
 
-    // RX
-    canvas_set_color(canvas, 0x44);
-    canvas_draw_str(canvas, 62, 50, "RX");
-    canvas_set_color(canvas, 0x8B);
-    canvas_draw_str(canvas, 62, 59, app->rx_disp[0] ? app->rx_disp : "-");
+    /* RX data */
+    canvas_draw_str(canvas, 2, 48, "RX:");
+    canvas_draw_str(canvas, 22, 48, app->rx_disp[0] ? app->rx_disp : "---");
 
-    // Signal bars
-    int8_t r = (int8_t)(app->progress < 100 ? app->progress : 100);
-    if(r < 0) r = 0;
-    for(int i = 0; i < 4; i++) {
-        uint8_t bh = 6 + i * 4;
-        canvas_set_color(canvas, (i < (r / 25)) ? 0x50 : 0x44);
-        canvas_draw_box(canvas, 109 + i*4, 55 - bh, 3, bh);
+    /* Signal bars (progress-driven) */
+    uint8_t bars = (app->progress > 75) ? 4
+                 : (app->progress > 50) ? 3
+                 : (app->progress > 25) ? 2
+                 : (app->progress > 0)  ? 1 : 0;
+    for(uint8_t i = 0; i < 4; i++) {
+        uint8_t bh = (uint8_t)(3 + i * 3);
+        if(i < bars) canvas_draw_box(canvas, 112 + i * 4, 61 - bh, 3, bh);
+        else         canvas_draw_frame(canvas, 112 + i * 4, 61 - bh, 3, bh);
     }
 
-    // Bottom hint
-    canvas_set_color(canvas, 0x62);
-    canvas_draw_str(canvas, 2, 59, "[BACK] exit");
+    /* Bottom hint */
+    canvas_draw_str(canvas, 2, 62, "BACK=menu");
 }
 
 
