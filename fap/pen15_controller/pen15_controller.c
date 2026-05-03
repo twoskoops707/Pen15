@@ -32,6 +32,8 @@
 #define HW_TIMEOUT_MS 30000
 #define TX_MAX_TIMES  512
 #define RX_MAX_TIMES  64
+#define PEN15_FAP_VER "2.1"
+#define PEN15_PROTO_VER 1
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -238,7 +240,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
+    canvas_draw_str(canvas, 2,  10, "PEN15 v2.1");
     canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
     canvas_draw_str(canvas, 74, 10, app->status);
     canvas_set_font(canvas, FontSecondary);
@@ -249,7 +251,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
     canvas_draw_str(canvas, 2,  42, "RX:");
     canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    canvas_draw_str(canvas, 2,  62, app->bridge_mode ? "BRIDGE DTR=exit" : "USB JSON READY");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -566,7 +568,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     if(strcmp(action, "ping") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"unknown\",\"fap\":\"2.1\",\"fap_ver\":\"2.1\",\"protocol\":1,\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status,  "CONN", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
@@ -649,8 +651,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
+            app->app_mode = ModeBridge;
+            app->bridge_mode = true;
+            app->bridge_exit_tick = 0;
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
@@ -690,7 +693,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "get_device_info") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"unknown\",\"fap\":\"2.1\",\"fap_ver\":\"2.1\",\"protocol\":1,\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
@@ -1036,10 +1039,10 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->app_mode == ModeJson) {
+                    handle_json(app, app->json_buf, app->json_len);
+                }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,7 +1057,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
 
@@ -1064,9 +1067,9 @@ int32_t pen15_app(void* p) {
     app->uart_rx_buf = furi_stream_buffer_alloc(UART_RX_BUF, 1);
     app->hw_state    = HwIdle;
 
-    strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
-    strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
-    strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
+    strncpy(app->status,   "READY", sizeof(app->status)   - 1);
+    strncpy(app->cmd_disp, "phone ctrl", sizeof(app->cmd_disp) - 1);
+    strncpy(app->rx_disp,  "usb json",  sizeof(app->rx_disp)  - 1);
 
     app->vp  = view_port_alloc();
     app->gui = furi_record_open(RECORD_GUI);

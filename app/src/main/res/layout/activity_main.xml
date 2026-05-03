@@ -255,6 +255,118 @@
                     app:tint="@color/primary" />
             </LinearLayout>
 
+            <!-- SYSTEM DIAGNOSTICS -->
+            <LinearLayout
+                android:id="@+id/cardDiagnostics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_diagnostics_panel"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SYSTEM READINESS"
+                    android:textColor="@color/success"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.08" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:layout_marginTop="8dp"
+                    android:useDefaultMargins="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FLIPPER USB:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/diagFlipper"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MISSING"
+                        android:textColor="@color/danger"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FAP CONTROL:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/diagFap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WAITING"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AWOK/ESP32:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/diagAwok"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OPTIONAL"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TERMUX:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/diagTermux"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MISSING"
+                        android:textColor="@color/warning"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace" />
+                </GridLayout>
+
+                <TextView
+                    android:id="@+id/diagNextStep"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Tap Flipper/AWOK chips to connect. Use Settings for Termux tools."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:lineSpacingMultiplier="1.2" />
+            </LinearLayout>
+
 
             <!-- SECTION: FLIPPER ZERO -->
             <TextView
