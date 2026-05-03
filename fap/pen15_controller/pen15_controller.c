@@ -85,8 +85,11 @@ typedef struct {
     char   status[DISP_STR_LEN];
     char   cmd_disp[DISP_STR_LEN];
     char   rx_disp[DISP_STR_LEN];
+    char   link_disp[DISP_STR_LEN];
     uint8_t progress;
     uint8_t spin;
+    uint32_t usb_rx_bytes;
+    uint32_t usb_tx_bytes;
 
     PinMode pin_mode[8];
 
@@ -220,6 +223,9 @@ static void usb_send(Pen15App* app, const char* str) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
     furi_mutex_release(app->usb_mtx);
+    app->usb_tx_bytes += len;
+    snprintf(app->link_disp, sizeof(app->link_disp), "TX:%lu RX:%lu",
+        (unsigned long)app->usb_tx_bytes, (unsigned long)app->usb_rx_bytes);
 }
 
 static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
@@ -228,6 +234,17 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)data, len);
     furi_mutex_release(app->usb_mtx);
+    app->usb_tx_bytes += len;
+    snprintf(app->link_disp, sizeof(app->link_disp), "TX:%lu RX:%lu",
+        (unsigned long)app->usb_tx_bytes, (unsigned long)app->usb_rx_bytes);
+}
+
+static void usb_send_status(Pen15App* app, const char* id, const char* status, const char* detail) {
+    static char resp[128];
+    snprintf(resp, sizeof(resp),
+        "{\"status\":\"%s\",\"detail\":\"%s\",\"id\":\"%s\"}\n",
+        status, detail ? detail : "", id ? id : "");
+    usb_send(app, resp);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -249,7 +266,8 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
     canvas_draw_str(canvas, 2,  42, "RX:");
     canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    canvas_draw_str(canvas, 2,  54, app->link_disp);
+    canvas_draw_str(canvas, 78, 62, "[BACK]");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -557,10 +575,14 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     json_str(js, toks, n, "action", action, sizeof(action));
     json_str(js, toks, n, "id",     id,     sizeof(id));
 
-    app->progress = 50;
+    pen15_set_link_disp(app);
+    app->progress = 15;
     app->spin++;
     strncpy(app->cmd_disp, action, sizeof(app->cmd_disp) - 1);
+    strncpy(app->status, "ACK", sizeof(app->status) - 1);
+    strncpy(app->rx_disp, "cmd received", sizeof(app->rx_disp) - 1);
     view_port_update(app->vp);
+    usb_send_status(app, id, "accepted", action);
 
     /* ── ping ──────────────────────────────────────────────────────── */
     if(strcmp(action, "ping") == 0) {
@@ -714,8 +736,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         lfrfid_worker_read_start(app->rfid_worker, LFRFIDWorkerReadTypeAuto, rfid_cb, app);
         app->hw_state = HwRfidRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "reading", "rfid antenna active");
+        app->progress = 25;
         strncpy(app->status, "RFID", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "rfid reading", sizeof(app->rx_disp) - 1);
 
@@ -733,8 +755,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         nfc_scanner_start(app->nfc_scanner, nfc_scanner_cb, app);
         app->hw_state = HwNfcDetect;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "scanning", "nfc field active");
+        app->progress = 25;
         strncpy(app->status, "NFC", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "nfc scanning", sizeof(app->rx_disp) - 1);
 
@@ -753,8 +775,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         infrared_worker_rx_start(app->ir_worker);
         app->hw_state = HwIrRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "reading", "ir receiver active");
+        app->progress = 25;
         strncpy(app->status, "IR", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "ir learning", sizeof(app->rx_disp) - 1);
 
@@ -805,8 +827,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         ibutton_worker_read_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "reading", "ibutton probe active");
+        app->progress = 25;
         strncpy(app->status, "KEY", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "ikey reading", sizeof(app->rx_disp) - 1);
 
@@ -832,8 +854,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "scanning", "subghz receiver active");
+        app->progress = 25;
         strncpy(app->status, "RF RX", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
 
@@ -861,8 +883,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRecord;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
+        usb_send_status(app, id, "recording", "subghz receiver armed");
+        app->progress = 25;
         strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
         strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
 
@@ -895,6 +917,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_start_async_tx(subghz_tx_isr, app);
         app->hw_state = HwSubghzTx;
 
+        usb_send_status(app, id, "transmitting", "subghz radio active");
+        app->progress = 70;
         strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
         strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
 
@@ -1030,16 +1054,20 @@ static void process_usb_rx(Pen15App* app) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     int32_t got = furi_hal_cdc_receive(0, buf, USB_PKT_LEN);
     furi_mutex_release(app->usb_mtx);
+    if(got > 0) {
+        app->usb_rx_bytes += (uint32_t)got;
+        pen15_set_link_disp(app);
+    }
 
     for(int32_t i = 0; i < got; i++) {
         char c = (char)buf[i];
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->app_mode == ModeJson) {
+                    handle_json(app, app->json_buf, app->json_len);
+                    app->json_len = 0;
+                }
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,7 +1082,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
 
@@ -1067,6 +1095,7 @@ int32_t pen15_app(void* p) {
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
+    pen15_set_link_disp(app);
 
     app->vp  = view_port_alloc();
     app->gui = furi_record_open(RECORD_GUI);
@@ -1107,8 +1136,13 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
+                if(got > 0) {
+                    app->usb_rx_bytes += (uint32_t)got;
+                    pen15_set_link_disp(app);
+                }
+                if(got > 0 && app->uart_ready) {
                     furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                }
             } else {
                 process_usb_rx(app);
             }
@@ -1137,7 +1171,9 @@ int32_t pen15_app(void* p) {
             hw_stop_all(app);
             usb_send(app, app->hw_result_json);
             app->progress = 100;
+            strncpy(app->status, "DONE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "hw done", sizeof(app->rx_disp) - 1);
+            view_port_update(app->vp);
         }
 
         if(evts & EvtTxDone) {
@@ -1150,7 +1186,9 @@ int32_t pen15_app(void* p) {
                 "{\"status\":\"ok\",\"id\":\"%s\"}\n", app->hw_id);
             usb_send(app, txresp);
             app->progress = 100;
+            strncpy(app->status, "DONE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "tx done", sizeof(app->rx_disp) - 1);
+            view_port_update(app->vp);
         }
 
         app->spin++;
