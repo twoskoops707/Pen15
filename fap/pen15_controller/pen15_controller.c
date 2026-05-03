@@ -388,12 +388,12 @@ static long long pen15_parse_ll(const char* s) {
 }
 static int json_int(const char* js, jsmntok_t* toks, int n,
                     const char* key, int def) {
-    char tmp[24] = {0};
+    char tmp[32] = {0};
     return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? (int)pen15_parse_ll(tmp) : def;
 }
 static long long json_ll(const char* js, jsmntok_t* toks, int n,
                          const char* key, long long def) {
-    char tmp[24] = {0};
+    char tmp[32] = {0};
     return json_str(js, toks, n, key, tmp, sizeof(tmp)) ? pen15_parse_ll(tmp) : def;
 }
 
