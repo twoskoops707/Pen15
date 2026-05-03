@@ -26,7 +26,7 @@
 #define USB_PKT_LEN   64
 #define UART_RX_BUF   512
 #define JSON_BUF_SZ   2048
-#define DISP_STR_LEN  22
+#define DISP_STR_LEN  32
 #define MAX_TOKENS    64
 #define UART_RX_WAIT  500
 #define HW_TIMEOUT_MS 30000
@@ -58,7 +58,7 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
-typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
+typedef enum { ModeJson, ModeBridge } AppMode;
 
 #define MENU_COUNT 9
 static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
@@ -83,10 +83,16 @@ typedef struct {
     size_t json_len;
 
     char   status[DISP_STR_LEN];
+    char   activity[DISP_STR_LEN];
     char   cmd_disp[DISP_STR_LEN];
+    char   ack_disp[DISP_STR_LEN];
     char   rx_disp[DISP_STR_LEN];
     uint8_t progress;
     uint8_t spin;
+    uint32_t cmd_count;
+    uint32_t ack_count;
+    uint32_t bridge_tx_bytes;
+    uint32_t bridge_rx_bytes;
 
     PinMode pin_mode[8];
 
@@ -216,10 +222,15 @@ static void uart_rx_dma_cb(FuriHalSerialHandle* h, FuriHalSerialRxEvent ev,
 static void usb_send(Pen15App* app, const char* str) {
     uint16_t len = (uint16_t)strlen(str);
     if(len == 0) return;
+    if(str[0] == '{') {
+        app->ack_count++;
+        snprintf(app->ack_disp, sizeof(app->ack_disp), "ACK %lu", (unsigned long)app->ack_count);
+    }
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
     furi_mutex_release(app->usb_mtx);
+    view_port_update(app->vp);
 }
 
 static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
@@ -237,19 +248,26 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
+
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 2,  10, "PEN15 FAP");
+    canvas_draw_str(canvas, 78, 10, SPIN_CHARS[app->spin & 3]);
+    canvas_draw_str(canvas, 92, 10, app->status);
+
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
+    canvas_draw_str(canvas, 2, 21, "USB JSON:");
+    canvas_draw_str(canvas, 58, 21, app->ack_disp);
+    canvas_draw_str(canvas, 2, 31, "WORK:");
+    canvas_draw_str(canvas, 36, 31, app->activity);
+
+    canvas_draw_frame(canvas, 2, 35, 124, 6);
     uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    if(fill > 0) canvas_draw_box(canvas, 2, 35, fill, 6);
+
+    canvas_draw_str(canvas, 2, 50, "CMD:");
+    canvas_draw_str(canvas, 30, 50, app->cmd_disp);
+    canvas_draw_str(canvas, 2, 61, "RX:");
+    canvas_draw_str(canvas, 22, 61, app->rx_disp);
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -537,6 +555,22 @@ static size_t parse_timings(const char* str, int32_t* out, size_t max) {
     return count;
 }
 
+static void note_command(Pen15App* app, const char* action) {
+    app->cmd_count++;
+    app->progress = 50;
+    app->spin++;
+    strncpy(app->cmd_disp, action[0] ? action : "?", sizeof(app->cmd_disp) - 1);
+    snprintf(app->ack_disp, sizeof(app->ack_disp), "CMD %lu", (unsigned long)app->cmd_count);
+    snprintf(app->activity, sizeof(app->activity), "handling %.18s", action[0] ? action : "?");
+    view_port_update(app->vp);
+}
+
+static void note_json_ack(Pen15App* app) {
+    app->ack_count++;
+    snprintf(app->ack_disp, sizeof(app->ack_disp), "ACK %lu/%lu",
+        (unsigned long)app->ack_count, (unsigned long)app->cmd_count);
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    JSON command dispatch
    ═══════════════════════════════════════════════════════════════════ */
@@ -557,10 +591,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     json_str(js, toks, n, "action", action, sizeof(action));
     json_str(js, toks, n, "id",     id,     sizeof(id));
 
-    app->progress = 50;
-    app->spin++;
-    strncpy(app->cmd_disp, action, sizeof(app->cmd_disp) - 1);
-    view_port_update(app->vp);
+    note_command(app, action);
 
     /* ── ping ──────────────────────────────────────────────────────── */
     if(strcmp(action, "ping") == 0) {
@@ -569,6 +600,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status,  "CONN", sizeof(app->status) - 1);
+        strncpy(app->activity, "session verified", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
         app->progress = 100;
 
@@ -591,6 +623,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 "{\"status\":\"ok\",\"pin\":%d,\"mode\":\"%s\",\"id\":\"%s\"}\n", pin, mode, id);
         }
         app->progress = 100; usb_send(app, resp);
+        snprintf(app->activity, sizeof(app->activity), "gpio%d %s", pin, mode);
 
     /* ── gpio_write ────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_write") == 0) {
@@ -609,6 +642,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 pin, value != 0 ? 1 : 0, id);
         }
         app->progress = 100; usb_send(app, resp);
+        snprintf(app->activity, sizeof(app->activity), "gpio%d=%d", pin, value != 0 ? 1 : 0);
 
     /* ── gpio_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_read") == 0) {
@@ -626,6 +660,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 pin, val ? 1 : 0, id);
         }
         app->progress = 100; usb_send(app, resp);
+        snprintf(app->activity, sizeof(app->activity), "gpio%d read", pin);
 
     /* ── uart_init ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_init") == 0) {
@@ -649,10 +684,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
-            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
-            strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
+            strncpy(app->status, "UART", sizeof(app->status) - 1);
+            strncpy(app->activity, "uart ready", sizeof(app->activity) - 1);
+            strncpy(app->rx_disp, "json uart", sizeof(app->rx_disp) - 1);
         }
 
     /* ── uart_send ─────────────────────────────────────────────────── */
@@ -666,6 +700,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             furi_stream_buffer_reset(app->uart_rx_buf);
             furi_hal_serial_tx(app->serial, (uint8_t*)data, strlen(data));
             furi_hal_serial_tx_wait_complete(app->serial);
+            app->bridge_tx_bytes += strlen(data);
             static char awok[200]; memset(awok, 0, sizeof(awok));
             size_t awok_len = 0;
             uint32_t deadline = furi_get_tick() + furi_ms_to_ticks(UART_RX_WAIT);
@@ -682,9 +717,27 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             }
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"ok\",\"uart_rx\":\"%s\",\"id\":\"%s\"}\n", awok, id);
+            app->bridge_rx_bytes += awok_len;
             app->progress = 100; usb_send(app, resp);
+            snprintf(app->activity, sizeof(app->activity), "uart tx %u rx %u",
+                (unsigned)strlen(data), (unsigned)awok_len);
             strncpy(app->rx_disp, awok_len > 0 ? awok : "(no rx)", sizeof(app->rx_disp) - 1);
         }
+
+    /* ── bridge_start ──────────────────────────────────────────────── */
+    } else if(strcmp(action, "bridge_start") == 0) {
+        if(!app->uart_ready) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
+        } else {
+            app->app_mode = ModeBridge;
+            app->bridge_mode = true;
+            app->bridge_exit_tick = 0;
+            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"mode\":\"bridge\",\"id\":\"%s\"}\n", id);
+            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
+            strncpy(app->activity, "raw pass-through", sizeof(app->activity) - 1);
+            strncpy(app->rx_disp, "usb<->uart", sizeof(app->rx_disp) - 1);
+        }
+        app->progress = 100; usb_send(app, resp);
 
     /* ── get_device_info ───────────────────────────────────────────── */
     } else if(strcmp(action, "get_device_info") == 0) {
@@ -692,12 +745,14 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
             "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
+        strncpy(app->activity, "device info", sizeof(app->activity) - 1);
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
     } else if(strcmp(action, "hw_stop") == 0) {
         hw_stop_all(app);
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
+        strncpy(app->activity, "hardware stopped", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "hw stop", sizeof(app->rx_disp) - 1);
 
     /* ── rfid_read ─────────────────────────────────────────────────── */
@@ -717,6 +772,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status, "RFID", sizeof(app->status) - 1);
+        strncpy(app->activity, "rfid field active", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "rfid reading", sizeof(app->rx_disp) - 1);
 
     /* ── nfc_detect ────────────────────────────────────────────────── */
@@ -736,6 +792,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status, "NFC", sizeof(app->status) - 1);
+        strncpy(app->activity, "nfc scanner active", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "nfc scanning", sizeof(app->rx_disp) - 1);
 
     /* ── ir_rx ─────────────────────────────────────────────────────── */
@@ -756,6 +813,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status, "IR", sizeof(app->status) - 1);
+        strncpy(app->activity, "ir receiver active", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "ir learning", sizeof(app->rx_disp) - 1);
 
     /* ── ir_tx ─────────────────────────────────────────────────────── */
@@ -786,6 +844,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
+        strncpy(app->activity, "ir burst sent", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "ir tx ok", sizeof(app->rx_disp) - 1);
 
     /* ── ikey_read ─────────────────────────────────────────────────── */
@@ -808,6 +867,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status, "KEY", sizeof(app->status) - 1);
+        strncpy(app->activity, "ibutton probe active", sizeof(app->activity) - 1);
         strncpy(app->rx_disp, "ikey reading", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_rx ─────────────────────────────────────────────────── */
@@ -835,6 +895,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status, "RF RX", sizeof(app->status) - 1);
+        snprintf(app->activity, sizeof(app->activity), "subghz rx %lu", (unsigned long)freq);
         strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_record ────────────────────────────────────────────── */
@@ -864,6 +925,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
+        snprintf(app->activity, sizeof(app->activity), "record %lu", (unsigned long)freq);
         strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_tx_raw ─────────────────────────────────────────────── */
@@ -896,6 +958,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->hw_state = HwSubghzTx;
 
         strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
+        snprintf(app->activity, sizeof(app->activity), "tx %zu pulses x%d", app->tx_count, repeat);
         strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
 
     /* ── storage_write ─────────────────────────────────────────────── */
@@ -1036,10 +1099,10 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->app_mode == ModeJson) {
+                    handle_json(app, app->json_buf, app->json_len);
+                }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,7 +1117,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
 
@@ -1065,7 +1128,9 @@ int32_t pen15_app(void* p) {
     app->hw_state    = HwIdle;
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
+    strncpy(app->activity, "waiting for USB JSON", sizeof(app->activity) - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
+    strncpy(app->ack_disp, "no commands", sizeof(app->ack_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
 
     app->vp  = view_port_alloc();
@@ -1107,8 +1172,12 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
+                if(got > 0 && app->uart_ready) {
+                    app->bridge_tx_bytes += (uint32_t)got;
+                    snprintf(app->activity, sizeof(app->activity), "usb->uart %luB",
+                        (unsigned long)app->bridge_tx_bytes);
                     furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                }
             } else {
                 process_usb_rx(app);
             }
@@ -1120,13 +1189,19 @@ int32_t pen15_app(void* p) {
                 size_t got;
                 do {
                     got = furi_stream_buffer_receive(app->uart_rx_buf, uart_buf, sizeof(uart_buf), 0);
-                    if(got > 0) usb_send_raw(app, uart_buf, (uint16_t)got);
+                    if(got > 0) {
+                        app->bridge_rx_bytes += (uint32_t)got;
+                        snprintf(app->rx_disp, sizeof(app->rx_disp), "uart->usb %luB",
+                            (unsigned long)app->bridge_rx_bytes);
+                        usb_send_raw(app, uart_buf, (uint16_t)got);
+                    }
                 } while(got > 0);
             }
         }
 
         if(evts & EvtBridgeExit) {
             strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
+            strncpy(app->activity, "json mode",   sizeof(app->activity) - 1);
             strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
             app->progress = 0;
             view_port_update(app->vp);
@@ -1137,6 +1212,7 @@ int32_t pen15_app(void* p) {
             hw_stop_all(app);
             usb_send(app, app->hw_result_json);
             app->progress = 100;
+            strncpy(app->activity, "result sent", sizeof(app->activity) - 1);
             strncpy(app->rx_disp, "hw done", sizeof(app->rx_disp) - 1);
         }
 
@@ -1150,6 +1226,7 @@ int32_t pen15_app(void* p) {
                 "{\"status\":\"ok\",\"id\":\"%s\"}\n", app->hw_id);
             usb_send(app, txresp);
             app->progress = 100;
+            strncpy(app->activity, "rf tx complete", sizeof(app->activity) - 1);
             strncpy(app->rx_disp, "tx done", sizeof(app->rx_disp) - 1);
         }
 
