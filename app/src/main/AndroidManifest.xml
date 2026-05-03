@@ -214,6 +214,10 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".WizardActivity" />
 
+        <service
+            android:name=".TermuxCommandResultService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
