@@ -1,3 +1,9 @@
+/*
+ * pen15_controller.c  — Pen15 FAP v3.0
+ * Complete UI revamp: state-based animated visuals, signal counters,
+ * elapsed-time display, and a result confirmation screen for every op.
+ */
+
 #include <furi.h>
 #include <furi_hal.h>
 #include <furi_hal_usb_cdc.h>
@@ -26,7 +32,7 @@
 #define USB_PKT_LEN   64
 #define UART_RX_BUF   512
 #define JSON_BUF_SZ   2048
-#define DISP_STR_LEN  22
+#define DISP_STR_LEN  32
 #define MAX_TOKENS    64
 #define UART_RX_WAIT  500
 #define HW_TIMEOUT_MS 30000
@@ -58,12 +64,25 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
+/* ── UI screen mode ───────────────────────────────────────────────── */
+typedef enum {
+    UiIdle,        /* waiting for connection */
+    UiConnected,   /* ping received, show ready */
+    UiActive,      /* hw op in progress */
+    UiResult,      /* op finished, showing result for 2s */
+    UiBridge,      /* UART bridge mode */
+} UiMode;
+
 typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
 
 #define MENU_COUNT 9
-static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
-static const char* MENU_HINTS[MENU_COUNT] __attribute__((unused)) = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
-
+static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = {
+    "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read",
+    "SubGHz TX", "UART Bridge", "GPIO Control", "Exit"
+};
+static const char* MENU_HINTS[MENU_COUNT] __attribute__((unused)) = {
+    "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT"
+};
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
@@ -82,11 +101,23 @@ typedef struct {
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
 
+    /* Legacy short display fields (kept for compatibility) */
     char   status[DISP_STR_LEN];
     char   cmd_disp[DISP_STR_LEN];
     char   rx_disp[DISP_STR_LEN];
     uint8_t progress;
     uint8_t spin;
+
+    /* Extended UI state */
+    UiMode   ui_mode;
+    uint32_t op_start_tick;       /* tick when hw op began */
+    uint32_t result_show_tick;    /* tick when result screen appeared */
+    char     op_label[24];        /* e.g. "RFID READ" */
+    char     op_detail[24];       /* e.g. freq, channel info */
+    char     result_line1[22];    /* result line 1 */
+    char     result_line2[22];    /* result line 2 */
+    bool     result_ok;           /* green check vs red X */
+    uint32_t sig_count;           /* live signal count for RF ops */
 
     PinMode pin_mode[8];
 
@@ -231,26 +262,304 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   GUI
+   GUI drawing helpers
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Horizontal dashed separator at y, from x0 to x1 */
+static void draw_hline_dashed(Canvas* c, int x0, int x1, int y) {
+    for(int x = x0; x < x1; x += 3) {
+        canvas_draw_dot(c, x, y);
+        canvas_draw_dot(c, x + 1, y);
+    }
+}
+
+/* Draw centred text on a canvas (128 wide) */
+static void draw_centred(Canvas* c, int y, const char* text) {
+    int w = (int)canvas_string_width(c, text);
+    int x = (128 - w) / 2;
+    if(x < 0) x = 0;
+    canvas_draw_str(c, x, y, text);
+}
+
+/* Draw a concentric ring of radius r centred at (cx,cy).
+   Draws 4 cardinal dots per ring — cheap animation token. */
+static void draw_ring(Canvas* c, int cx, int cy, int r) {
+    if(r < 1) return;
+    canvas_draw_dot(c, cx, cy - r);
+    canvas_draw_dot(c, cx, cy + r);
+    canvas_draw_dot(c, cx - r, cy);
+    canvas_draw_dot(c, cx + r, cy);
+    /* diagonals at 45° */
+    int d = (r * 7) / 10;  /* ≈ r/√2 */
+    if(d > 0) {
+        canvas_draw_dot(c, cx + d, cy - d);
+        canvas_draw_dot(c, cx - d, cy - d);
+        canvas_draw_dot(c, cx + d, cy + d);
+        canvas_draw_dot(c, cx - d, cy + d);
+    }
+}
+
+/* Draw animated scan rings centred at (cx,cy).
+   phase cycles 0..3 and produces expanding ring bursts. */
+static void draw_scan_rings(Canvas* c, int cx, int cy, uint8_t phase) {
+    /* 3 rings, each 6px apart, staggered by phase */
+    for(int i = 0; i < 3; i++) {
+        int base = ((int)phase + i * 4) % 12;  /* 12-step cycle */
+        int r = base + 2;
+        if(r > 14) r = 0;  /* fade out large rings */
+        if(r > 0) draw_ring(c, cx, cy, r);
+    }
+}
+
+/* Draw animated radio waves to the right of (cx,cy).
+   Used for SubGHz RX/TX/Record. */
+static void draw_rf_waves(Canvas* c, int cx, int cy, uint8_t phase) {
+    /* 3 arcs expanding outward */
+    for(int i = 0; i < 3; i++) {
+        int offset = ((int)phase + i * 3) % 9;
+        int r = 5 + offset * 2;
+        if(r > 20) continue;
+        /* Draw quarter-arc (top and bottom dots on right side) */
+        for(int a = -4; a <= 4; a++) {
+            int px = cx + r;
+            int py = cy + a * r / 4;
+            if(py >= 0 && py < 64 && px < 128)
+                canvas_draw_dot(c, px, py);
+        }
+    }
+    /* Same on left for RX indicator */
+    for(int i = 0; i < 2; i++) {
+        int offset = ((int)phase + 1 + i * 4) % 9;
+        int r = 4 + offset * 2;
+        if(r > 18) continue;
+        for(int a = -3; a <= 3; a++) {
+            int px = cx - r;
+            int py = cy + a * r / 4;
+            if(py >= 0 && py < 64 && px >= 0)
+                canvas_draw_dot(c, px, py);
+        }
+    }
+}
+
+/* Progress bar x=2..125 at given y, height 4 */
+static void draw_progress_bar(Canvas* c, int y, uint8_t pct) {
+    canvas_draw_frame(c, 2, y, 124, 4);
+    if(pct > 0) {
+        uint8_t fill = (pct > 100) ? 124 : (uint8_t)((pct * 124u) / 100u);
+        if(fill > 0) canvas_draw_box(c, 2, y, fill, 4);
+    }
+}
+
+/* Format elapsed seconds/ms to buf */
+static void fmt_elapsed(char* buf, size_t sz, uint32_t ms) {
+    if(ms < 1000) snprintf(buf, sz, "%lums", (unsigned long)ms);
+    else          snprintf(buf, sz, "%lu.%lus", (unsigned long)(ms / 1000), (unsigned long)((ms % 1000) / 100));
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Master draw callback
    ═══════════════════════════════════════════════════════════════════ */
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
-    canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
-    canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+
+    uint32_t op_ms  = 0;
+    if(app->op_start_tick > 0) {
+        uint32_t delta = furi_get_tick() - app->op_start_tick;
+        op_ms = (uint32_t)furi_ticks_to_ms(delta);
+    }
+
+    char tmp[32];
+    uint8_t phase = app->spin & 0x0F;  /* 0..15 animation phase */
+
+    /* ── Idle / Waiting for connection ──────────────────────────── */
+    if(app->ui_mode == UiIdle) {
+        canvas_set_font(canvas, FontPrimary);
+        draw_centred(canvas, 12, "PEN15 v3");
+        draw_hline_dashed(canvas, 0, 128, 15);
+
+        canvas_set_font(canvas, FontSecondary);
+        draw_centred(canvas, 28, "Waiting for");
+        draw_centred(canvas, 38, "Android app...");
+
+        /* Pulsing dot animation */
+        int dot_x = 54 + (int)(phase & 0x7) * 2;
+        canvas_draw_box(canvas, dot_x, 47, 4, 4);
+        canvas_draw_box(canvas, dot_x + 8, 47, 4, 4);
+        canvas_draw_box(canvas, dot_x + 16, 47, 4, 4);
+
+        canvas_draw_str(canvas, 30, 62, "[BACK] exit");
+
+    /* ── Connected / Ready ──────────────────────────────────────── */
+    } else if(app->ui_mode == UiConnected) {
+        canvas_set_font(canvas, FontPrimary);
+        draw_centred(canvas, 10, "PEN15 v3");
+        draw_hline_dashed(canvas, 0, 128, 13);
+
+        /* Big "READY" with spinner */
+        canvas_set_font(canvas, FontBigNumbers);
+        canvas_draw_str(canvas, 8, 38, "RDY");
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 84, 38, SPIN_CHARS[phase & 3]);
+
+        canvas_set_font(canvas, FontSecondary);
+        snprintf(tmp, sizeof(tmp), "Cmd: %s", app->cmd_disp);
+        canvas_draw_str(canvas, 2, 52, tmp);
+        canvas_draw_str(canvas, 2, 62, "[BACK] exit");
+
+    /* ── Active — op in progress ─────────────────────────────────── */
+    } else if(app->ui_mode == UiActive) {
+        /* Header bar */
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 2, 10, app->op_label);
+        canvas_draw_str(canvas, 100, 10, SPIN_CHARS[phase & 3]);
+        draw_hline_dashed(canvas, 0, 128, 12);
+
+        canvas_set_font(canvas, FontSecondary);
+
+        /* ── SubGHz RX / Record / TX — show RF waves + signal count ── */
+        if(app->hw_state == HwSubghzRx ||
+           app->hw_state == HwSubghzRecord ||
+           app->hw_state == HwSubghzTx) {
+
+            /* Antenna icon (simple vertical line + horizontal base) */
+            int acx = 22, acy = 36;
+            canvas_draw_line(canvas, acx, acy - 10, acx, acy + 2);
+            canvas_draw_line(canvas, acx - 4, acy + 2, acx + 4, acy + 2);
+
+            draw_rf_waves(canvas, acx, acy - 4, phase);
+
+            /* Signal count */
+            snprintf(tmp, sizeof(tmp), "Sigs: %lu", (unsigned long)app->sig_count);
+            canvas_draw_str(canvas, 55, 28, tmp);
+
+            /* Freq detail */
+            if(app->op_detail[0]) canvas_draw_str(canvas, 55, 38, app->op_detail);
+
+            /* Elapsed */
+            char el[16];
+            fmt_elapsed(el, sizeof(el), op_ms);
+            snprintf(tmp, sizeof(tmp), "Time: %s", el);
+            canvas_draw_str(canvas, 55, 48, tmp);
+
+            /* Progress: timeout-based, 0-95% */
+            uint8_t pct = (uint8_t)((op_ms * 95) / HW_TIMEOUT_MS);
+            if(pct > 95) pct = 95;
+            draw_progress_bar(canvas, 56, pct);
+
+        /* ── RFID / NFC / iKey / IR — scan rings + elapsed ────────── */
+        } else {
+            int cx = 20, cy = 36;
+            draw_scan_rings(canvas, cx, cy, phase);
+
+            /* Inner target circle */
+            canvas_draw_circle(canvas, cx, cy, 3);
+
+            canvas_set_font(canvas, FontSecondary);
+            if(app->op_detail[0]) canvas_draw_str(canvas, 42, 26, app->op_detail);
+
+            canvas_draw_str(canvas, 42, 38, "Scanning...");
+
+            char el[16];
+            fmt_elapsed(el, sizeof(el), op_ms);
+            snprintf(tmp, sizeof(tmp), "Time: %s", el);
+            canvas_draw_str(canvas, 42, 48, tmp);
+
+            /* Timeout progress */
+            uint8_t pct = (uint8_t)((op_ms * 95) / HW_TIMEOUT_MS);
+            if(pct > 95) pct = 95;
+            draw_progress_bar(canvas, 56, pct);
+        }
+
+        /* Remaining time indicator */
+        uint32_t remain_ms = (HW_TIMEOUT_MS > op_ms) ? (HW_TIMEOUT_MS - op_ms) : 0;
+        char rem[16];
+        fmt_elapsed(rem, sizeof(rem), remain_ms);
+        snprintf(tmp, sizeof(tmp), "~%s left", rem);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 2, 62, tmp);
+
+    /* ── Result screen ──────────────────────────────────────────── */
+    } else if(app->ui_mode == UiResult) {
+        canvas_set_font(canvas, FontPrimary);
+
+        if(app->result_ok) {
+            draw_centred(canvas, 10, "[  OK  ]");
+        } else {
+            draw_centred(canvas, 10, "[ FAIL ]");
+        }
+
+        draw_hline_dashed(canvas, 0, 128, 13);
+
+        /* Big checkmark or X */
+        if(app->result_ok) {
+            /* Simple checkmark: / then \ shape */
+            canvas_draw_line(canvas, 4,  36, 10, 44);
+            canvas_draw_line(canvas, 5,  36, 11, 44);
+            canvas_draw_line(canvas, 10, 44, 22, 28);
+            canvas_draw_line(canvas, 11, 44, 23, 28);
+        } else {
+            /* X shape */
+            canvas_draw_line(canvas, 4, 28, 20, 44);
+            canvas_draw_line(canvas, 5, 28, 21, 44);
+            canvas_draw_line(canvas, 20, 28, 4, 44);
+            canvas_draw_line(canvas, 21, 28, 5, 44);
+        }
+
+        canvas_set_font(canvas, FontSecondary);
+        /* Show what was received */
+        if(app->result_line1[0]) canvas_draw_str(canvas, 28, 32, app->result_line1);
+        if(app->result_line2[0]) canvas_draw_str(canvas, 28, 44, app->result_line2);
+
+        /* Auto-return countdown */
+        uint32_t result_age = 0;
+        if(app->result_show_tick > 0) {
+            uint32_t tick_age = furi_get_tick() - app->result_show_tick;
+            result_age = (uint32_t)furi_ticks_to_ms(tick_age);
+        }
+        uint32_t remaining = (2000 > result_age) ? (2000 - result_age) : 0;
+        snprintf(tmp, sizeof(tmp), "Back in %lu.%lus", (unsigned long)(remaining / 1000), (unsigned long)((remaining % 1000) / 100));
+        canvas_draw_str(canvas, 2, 62, tmp);
+
+        /* Result bar: fills over 2s */
+        uint8_t rpct = (uint8_t)((result_age > 2000 ? 2000 : result_age) * 100 / 2000);
+        draw_progress_bar(canvas, 56, rpct);
+
+    /* ── Bridge mode ────────────────────────────────────────────── */
+    } else if(app->ui_mode == UiBridge) {
+        canvas_set_font(canvas, FontPrimary);
+        draw_centred(canvas, 10, "BRIDGE MODE");
+        draw_hline_dashed(canvas, 0, 128, 13);
+
+        canvas_set_font(canvas, FontSecondary);
+        draw_centred(canvas, 26, "USB<->UART Active");
+        draw_centred(canvas, 36, "AWOK connected");
+
+        /* TX/RX bytes would be nice — use spin as activity indicator */
+        snprintf(tmp, sizeof(tmp), "Activity: %s", SPIN_CHARS[phase & 3]);
+        draw_centred(canvas, 48, tmp);
+
+        canvas_draw_str(canvas, 2, 62, "[disconnect] exit");
+
+    /* ── Fallback / legacy JSON mode display ─────────────────────── */
+    } else {
+        canvas_set_font(canvas, FontPrimary);
+        canvas_draw_str(canvas, 2,  10, "PEN15 v3");
+        canvas_draw_str(canvas, 80, 10, SPIN_CHARS[phase & 3]);
+        canvas_draw_str(canvas, 96, 10, app->status);
+        draw_hline_dashed(canvas, 0, 128, 13);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 2,  24, "CMD:");
+        canvas_draw_str(canvas, 32, 24, app->cmd_disp);
+        draw_progress_bar(canvas, 28, app->progress);
+        canvas_draw_str(canvas, 2,  42, "RX:");
+        canvas_draw_str(canvas, 24, 42, app->rx_disp);
+        canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    }
+
 }
+
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
     if(ev->type == InputTypeShort && ev->key == InputKeyBack)
@@ -259,7 +568,6 @@ static void input_cb(InputEvent* ev, void* ctx) {
 
 /* ═══════════════════════════════════════════════════════════════════
    JSON string unescape (in-place: \\n→\n, \\r→\r, \\t→\t, etc.)
-   Required because jsmn returns raw JSON token bytes without unescaping.
    ═══════════════════════════════════════════════════════════════════ */
 static void json_unescape(char* s) {
     char* r = s;
@@ -324,6 +632,34 @@ static long long json_ll(const char* js, jsmntok_t* toks, int n,
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   UI helpers
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Begin an active hardware operation */
+static void ui_start_op(Pen15App* app, const char* label, const char* detail) {
+    app->ui_mode       = UiActive;
+    app->op_start_tick = furi_get_tick();
+    app->sig_count     = 0;
+    strncpy(app->op_label,  label,  sizeof(app->op_label)  - 1);
+    strncpy(app->op_detail, detail, sizeof(app->op_detail) - 1);
+    app->op_label[sizeof(app->op_label)   - 1] = '\0';
+    app->op_detail[sizeof(app->op_detail) - 1] = '\0';
+    app->result_line1[0] = '\0';
+    app->result_line2[0] = '\0';
+}
+
+/* Show result screen with two summary lines */
+static void ui_show_result(Pen15App* app, bool ok, const char* line1, const char* line2) {
+    app->ui_mode          = UiResult;
+    app->result_ok        = ok;
+    app->result_show_tick = furi_get_tick();
+    strncpy(app->result_line1, line1 ? line1 : "", sizeof(app->result_line1) - 1);
+    strncpy(app->result_line2, line2 ? line2 : "", sizeof(app->result_line2) - 1);
+    app->result_line1[sizeof(app->result_line1) - 1] = '\0';
+    app->result_line2[sizeof(app->result_line2) - 1] = '\0';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    Hardware stop-all
    ═══════════════════════════════════════════════════════════════════ */
 static void hw_stop_all(Pen15App* app) {
@@ -343,7 +679,7 @@ static void hw_stop_all(Pen15App* app) {
         ibutton_worker_free(app->ibutton_worker);
         app->ibutton_worker = NULL;
         if(app->ibutton_protocols) { ibutton_protocols_free(app->ibutton_protocols); app->ibutton_protocols = NULL; }
-        /* ibutton_key is kept alive after read so ikey_emulate can reuse it */
+        /* ibutton_key kept alive so ikey_emulate can reuse it */
     }
     if(app->hw_state == HwNfcDetect && app->nfc_scanner) {
         nfc_scanner_stop(app->nfc_scanner);
@@ -473,6 +809,7 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
 static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     Pen15App* app = ctx;
     app->subghz_rx_count++;
+    app->sig_count = app->subghz_rx_count;  /* live update for UI */
 
     if(app->hw_state == HwSubghzRecord) {
         if(app->rx_timings_count < RX_MAX_TIMES) {
@@ -480,7 +817,6 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
         }
         if(app->rx_timings_count >= RX_MAX_TIMES) {
             app->hw_state = HwIdle;
-            /* Format timings as comma-separated signed ints */
             char* p = app->hw_result_json;
             int remaining = (int)sizeof(app->hw_result_json);
             int written = snprintf(p, (size_t)remaining,
@@ -492,6 +828,7 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
                 p += written; remaining -= written;
             }
             written = snprintf(p, (size_t)remaining, "\",\"id\":\"%s\"}\n", app->hw_id);
+            UNUSED(written);
             furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
         }
         return;
@@ -523,7 +860,6 @@ static LevelDuration subghz_tx_isr(void* ctx) {
 
 /* ═══════════════════════════════════════════════════════════════════
    Parse comma-separated timing string into int32 array.
-   "+350,-10850,350,-1050,..." → {350,-10850,350,-1050,...}
    ═══════════════════════════════════════════════════════════════════ */
 static size_t parse_timings(const char* str, int32_t* out, size_t max) {
     size_t count = 0;
@@ -566,11 +902,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     if(strcmp(action, "ping") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap\":\"3.0\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status,  "CONN", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
         app->progress = 100;
+        app->ui_mode  = UiConnected;
 
     /* ── gpio_mode ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_mode") == 0) {
@@ -649,8 +986,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
+            app->app_mode = ModeBridge;
+            app->bridge_exit_tick = 0;
+            app->ui_mode  = UiBridge;
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
@@ -690,7 +1028,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "get_device_info") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap_ver\":\"3.0\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
@@ -698,6 +1036,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         hw_stop_all(app);
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
+        app->ui_mode = UiConnected;
         strncpy(app->rx_disp, "hw stop", sizeof(app->rx_disp) - 1);
 
     /* ── rfid_read ─────────────────────────────────────────────────── */
@@ -716,8 +1055,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "RFID", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "rfid reading", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "RFID READ", "125kHz LF");
 
     /* ── nfc_detect ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_detect") == 0) {
@@ -735,8 +1073,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "NFC", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "nfc scanning", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "NFC DETECT", "13.56MHz");
 
     /* ── ir_rx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_rx") == 0) {
@@ -755,8 +1092,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "IR", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ir learning", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "IR LEARN", "38kHz carrier");
 
     /* ── ir_tx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_tx") == 0) {
@@ -786,7 +1122,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, "ir tx ok", sizeof(app->rx_disp) - 1);
+
+        char line2[22];
+        snprintf(line2, sizeof(line2), "%s cmd=%lld", proto_name, command);
+        ui_show_result(app, true, "IR TX Sent", line2);
 
     /* ── ikey_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_read") == 0) {
@@ -807,8 +1146,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "KEY", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ikey reading", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "iBUTTON READ", "1-Wire DS1990");
 
     /* ── subghz_rx ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_rx") == 0) {
@@ -834,8 +1172,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "RF RX", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
+
+        char detail[24];
+        snprintf(detail, sizeof(detail), "%lluMHz", freq / 1000000LL);
+        ui_start_op(app, "RF RX", detail);
 
     /* ── subghz_record ────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_record") == 0) {
@@ -863,8 +1203,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
+
+        char detail[24];
+        snprintf(detail, sizeof(detail), "%lluMHz REC", freq / 1000000LL);
+        ui_start_op(app, "RF RECORD", detail);
 
     /* ── subghz_tx_raw ─────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_tx_raw") == 0) {
@@ -895,8 +1237,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_start_async_tx(subghz_tx_isr, app);
         app->hw_state = HwSubghzTx;
 
-        strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
+        char detail[24];
+        snprintf(detail, sizeof(detail), "%lluMHz x%d", freq / 1000000LL, repeat);
+        ui_start_op(app, "RF TX RAW", detail);
 
     /* ── storage_write ─────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_write") == 0) {
@@ -910,7 +1253,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         snprintf(resp, sizeof(resp), "{\"status\":\"%s\",\"id\":\"%s\"}\n",
             ok ? "ok" : "error", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, ok ? "write ok" : "write err", sizeof(app->rx_disp) - 1);
+        ui_show_result(app, ok, ok ? "File Written" : "Write FAILED", path);
 
     /* ── storage_read ──────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_read") == 0) {
@@ -920,7 +1263,6 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         static char content[512]; memset(content, 0, sizeof(content));
         size_t got = storage_read_file(path, content, sizeof(content));
 
-        /* Escape double quotes for JSON */
         static char escaped[512]; size_t elen = 0;
         for(size_t i = 0; i < got && elen < sizeof(escaped) - 2; i++) {
             if(content[i] == '"') { escaped[elen++] = '\\'; }
@@ -970,8 +1312,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "RFID EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "rfid emulate", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "RFID EMULATE", type_str);
 
     /* ── ikey_emulate ─────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_emulate") == 0) {
@@ -991,8 +1332,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "KEY EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "ikey emulate", sizeof(app->rx_disp) - 1);
+        ui_start_op(app, "iKEY EMULATE", "1-Wire DS1990");
 
     /* ── nfc_emulate ──────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_emulate") == 0) {
@@ -1036,10 +1376,10 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->app_mode == ModeJson) {
+                    handle_json(app, app->json_buf, app->json_len);
+                    app->json_len = 0;
+                }
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1057,6 +1397,7 @@ int32_t pen15_app(void* p) {
     app->app_mode = ModeMenu;
     app->menu_index = 0;
     app->init_done = true;
+    app->ui_mode   = UiIdle;
 
     app->thread      = furi_thread_get_current();
     app->usb_mtx     = furi_mutex_alloc(FuriMutexTypeNormal);
@@ -1083,7 +1424,7 @@ int32_t pen15_app(void* p) {
         uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 250);
 
         if(evts & FuriFlagError) {
-            /* Timeout tick — check hw deadline */
+            /* Timeout tick: check hw deadline + result-screen auto-dismiss */
             if(app->hw_state != HwIdle &&
                furi_get_tick() > app->hw_deadline_tick) {
                 static char tout[64];
@@ -1092,8 +1433,19 @@ int32_t pen15_app(void* p) {
                     app->hw_id);
                 hw_stop_all(app);
                 usb_send(app, tout);
-                strncpy(app->rx_disp, "hw timeout", sizeof(app->rx_disp) - 1);
+                ui_show_result(app, false, "TIMEOUT", app->op_label);
             }
+
+            /* Auto-dismiss result screen after 2s */
+            if(app->ui_mode == UiResult && app->result_show_tick > 0) {
+                uint32_t age_ticks = furi_get_tick() - app->result_show_tick;
+                uint32_t age_ms = (uint32_t)furi_ticks_to_ms(age_ticks);
+                if(age_ms >= 2000) {
+                    app->ui_mode          = UiConnected;
+                    app->result_show_tick = 0;
+                }
+            }
+
             app->spin++;
             view_port_update(app->vp);
             continue;
@@ -1126,6 +1478,7 @@ int32_t pen15_app(void* p) {
         }
 
         if(evts & EvtBridgeExit) {
+            app->ui_mode = UiConnected;
             strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
             strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
             app->progress = 0;
@@ -1133,15 +1486,66 @@ int32_t pen15_app(void* p) {
         }
 
         if(evts & EvtHwDone) {
-            /* Hardware read completed — result already in hw_result_json */
+            /* Hardware read completed — extract result for display */
+            HwState completed_state = app->hw_state;
             hw_stop_all(app);
             usb_send(app, app->hw_result_json);
             app->progress = 100;
-            strncpy(app->rx_disp, "hw done", sizeof(app->rx_disp) - 1);
+
+            /* Parse result JSON for the result screen */
+            char r1[22] = {0}, r2[22] = {0};
+            if(completed_state == HwRfidRead) {
+                /* Extract type and first 8 chars of data */
+                char type_val[32] = {0}, data_val[32] = {0};
+                jsmn_parser p2; jsmntok_t t2[32];
+                jsmn_init(&p2);
+                int nn = jsmn_parse(&p2, app->hw_result_json,
+                                    strlen(app->hw_result_json), t2, 32);
+                json_str(app->hw_result_json, t2, nn, "type", type_val, sizeof(type_val));
+                json_str(app->hw_result_json, t2, nn, "data", data_val, sizeof(data_val));
+                snprintf(r1, sizeof(r1), "RFID: %s", type_val);
+                snprintf(r2, sizeof(r2), "%.16s", data_val);
+                ui_show_result(app, true, r1, r2);
+            } else if(completed_state == HwNfcDetect) {
+                char type_val[32] = {0};
+                jsmn_parser p2; jsmntok_t t2[32];
+                jsmn_init(&p2);
+                int nn = jsmn_parse(&p2, app->hw_result_json,
+                                    strlen(app->hw_result_json), t2, 32);
+                json_str(app->hw_result_json, t2, nn, "type", type_val, sizeof(type_val));
+                snprintf(r1, sizeof(r1), "NFC: %s", type_val);
+                strcpy(r2, "Detected!");
+                ui_show_result(app, true, r1, r2);
+            } else if(completed_state == HwIrRx) {
+                char proto_val[24] = {0};
+                jsmn_parser p2; jsmntok_t t2[32];
+                jsmn_init(&p2);
+                int nn = jsmn_parse(&p2, app->hw_result_json,
+                                    strlen(app->hw_result_json), t2, 32);
+                json_str(app->hw_result_json, t2, nn, "protocol", proto_val, sizeof(proto_val));
+                snprintf(r1, sizeof(r1), "IR: %s", proto_val);
+                strcpy(r2, "Signal decoded!");
+                ui_show_result(app, true, r1, r2);
+            } else if(completed_state == HwIkeyRead) {
+                char type_val[32] = {0};
+                jsmn_parser p2; jsmntok_t t2[32];
+                jsmn_init(&p2);
+                int nn = jsmn_parse(&p2, app->hw_result_json,
+                                    strlen(app->hw_result_json), t2, 32);
+                json_str(app->hw_result_json, t2, nn, "type", type_val, sizeof(type_val));
+                snprintf(r1, sizeof(r1), "KEY: %s", type_val);
+                strcpy(r2, "Key read OK");
+                ui_show_result(app, true, r1, r2);
+            } else if(completed_state == HwSubghzRx || completed_state == HwSubghzRecord) {
+                snprintf(r1, sizeof(r1), "RF: %lu sigs", (unsigned long)app->sig_count);
+                strcpy(r2, completed_state == HwSubghzRecord ? "Record done" : "RX done");
+                ui_show_result(app, true, r1, r2);
+            } else {
+                ui_show_result(app, true, "Done", app->op_label);
+            }
         }
 
         if(evts & EvtTxDone) {
-            /* Async TX finished */
             furi_hal_subghz_stop_async_tx();
             furi_hal_subghz_sleep();
             app->hw_state = HwIdle;
@@ -1150,7 +1554,9 @@ int32_t pen15_app(void* p) {
                 "{\"status\":\"ok\",\"id\":\"%s\"}\n", app->hw_id);
             usb_send(app, txresp);
             app->progress = 100;
-            strncpy(app->rx_disp, "tx done", sizeof(app->rx_disp) - 1);
+            char line1[22];
+            snprintf(line1, sizeof(line1), "TX %s", app->op_detail);
+            ui_show_result(app, true, line1, "Transmit done!");
         }
 
         app->spin++;
