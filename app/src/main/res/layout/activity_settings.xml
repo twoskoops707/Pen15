@@ -220,7 +220,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="1. Install Termux from F-Droid (NOT Play Store)\n2. Open Termux and run:\n   mkdir -p ~/.termux ~/.pen15\n   echo 'allow-external-apps=true' >> ~/.termux/termux.properties\n   termux-reload-settings\n3. Come back and tap CHECK STATUS\n4. Optional HIBP key:\n   echo YOUR_KEY &gt; ~/.pen15/hibp_key.txt"
+                                android:text="Do this one time:\n1. Tap GET TERMUX and install it from F-Droid.\n2. Open Termux.\n3. Copy/paste this whole block:\n   mkdir -p ~/.termux ~/.pen15\n   echo 'allow-external-apps=true' &gt;&gt; ~/.termux/termux.properties\n   termux-reload-settings\n4. Close Termux fully, then open it again.\n5. Come back here and tap CHECK STATUS.\nOptional HIBP key:\n   echo YOUR_KEY &gt; ~/.pen15/hibp_key.txt"
                                 android:textColor="@color/success"
                                 android:textSize="12sp"
                                 android:fontFamily="monospace"

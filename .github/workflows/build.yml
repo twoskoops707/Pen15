@@ -68,17 +68,21 @@ jobs:
             - **pen15-v3.0.${{ github.run_number }}-*.apk** — Install on phone
             - **pen15_controller.fap** — Install on Flipper SD card
 
-            ### Installation
-            **Phone (APK):**
-            1. Download the .apk to phone
-            2. Enable "Install Unknown Apps" for your browser/file manager
-            3. Tap APK to install
+            ### Super Simple Setup
+            1. Put the APK on the Android phone and tap it.
+            2. If Android asks, tap **Allow / Install anyway**.
+            3. Put `pen15_controller.fap` on the Flipper SD card at:
+               `/apps/Tools/pen15_controller.fap`
+            4. On the Flipper, open:
+               **Apps → Tools → Pen15 Controller**
+            5. Plug the Flipper into the phone with USB-C / OTG.
+            6. Open PEN15 on the phone.
+            7. Tap the **FLIPPER** box.
+            8. Wait until the phone says **FAP OK**.
+            9. For AWOK Mini 3 / Marauder: wire AWOK to the Flipper GPIO UART pins, then use the AWOK / Marauder cards.
+            10. For recon tools: install Termux from F-Droid, then open PEN15 Settings and tap **CHECK STATUS**.
 
-            **Flipper Zero (FAP):**
-            1. Download pen15_controller.fap
-            2. Copy to Flipper SD card: `/apps/Tools/pen15_controller.fap`
-            3. On Flipper: Apps → Tools → Pen15 Controller
-            4. Then connect USB OTG and tap Connect in the phone app
+            If a box says **MISSING**, fix that box first. The app tells you the next step.
 
             🤖 Auto-built by GitHub Actions
           files: |
