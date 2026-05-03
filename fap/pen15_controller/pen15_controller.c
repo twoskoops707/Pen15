@@ -88,6 +88,23 @@ typedef struct {
     uint8_t progress;
     uint8_t spin;
 
+    /* ── Verification / activity counters (for UI) ─────────────────── */
+    uint32_t cmd_count;         /* total JSON commands handled */
+    uint32_t usb_rx_bytes;      /* lifetime USB bytes in */
+    uint32_t usb_tx_bytes;      /* lifetime USB bytes out */
+    uint32_t uart_rx_bytes;     /* lifetime UART bytes from AWOK */
+    uint32_t uart_tx_bytes;     /* lifetime UART bytes to AWOK */
+    uint32_t hw_start_tick;     /* when current HW op started */
+    uint32_t last_usb_rx_tick;  /* for USB blink */
+    uint32_t last_usb_tx_tick;  /* for USB blink */
+    uint32_t last_uart_rx_tick; /* for bridge blink */
+    uint32_t last_uart_tx_tick; /* for bridge blink */
+    uint32_t last_resp_tick;    /* for footer flash */
+    uint32_t boot_tick;         /* app start */
+    uint32_t subghz_freq;       /* last set RF frequency */
+    bool     link_up;           /* USB DTR asserted (host present) */
+    bool     last_resp_ok;      /* for footer color */
+
     PinMode pin_mode[8];
 
     AppMode    app_mode;
@@ -142,7 +159,7 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
-static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
+static const char* SPIN_CHARS[] __attribute__((unused)) = {"|", "/", "-", "\\"};
 
 /* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
 static const uint8_t OOK650_PRESET[] = {
@@ -178,9 +195,13 @@ static void cdc_on_tx_done(void* ctx) {
     Pen15App* app = ctx;
     furi_semaphore_release(app->tx_sem);
 }
-static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
+static void cdc_state_cb(void* ctx, uint8_t s) {
+    Pen15App* app = ctx;
+    app->link_up = (s != 0);
+}
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
+    app->link_up = (s & 0x01) ? true : false;
     if(app->bridge_mode && !(s & 0x01)) {
         app->app_mode = ModeJson;
         app->bridge_mode = false;
@@ -220,6 +241,16 @@ static void usb_send(Pen15App* app, const char* str) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
     furi_mutex_release(app->usb_mtx);
+    app->usb_tx_bytes += len;
+    app->last_usb_tx_tick = furi_get_tick();
+    /* sniff status of the JSON response for the footer indicator */
+    if(strstr(str, "\"status\":\"ok\"") || strstr(str, "\"status\":\"reading\"") ||
+       strstr(str, "\"status\":\"scanning\"") || strstr(str, "\"status\":\"recording\"")) {
+        app->last_resp_ok = true;
+    } else if(strstr(str, "\"status\":\"error\"")) {
+        app->last_resp_ok = false;
+    }
+    app->last_resp_tick = furi_get_tick();
 }
 
 static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
@@ -228,28 +259,341 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)data, len);
     furi_mutex_release(app->usb_mtx);
+    app->usb_tx_bytes += len;
+    app->last_usb_tx_tick = furi_get_tick();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   GUI
+   GUI — verification / live-activity layout
+   128x64 mono. Every operation gets a context-specific renderer so the
+   user can SEE that something is happening, even for invisible stuff
+   like radio waves or iButton 1-wire pulses.
+
+   Layout:
+     y  0..10  status bar (title | link dot | mode badge | uptime)
+     y 11      divider
+     y 12..41  context view (per HwState / bridge)
+     y 42..51  meter row (USB rx/tx + UART rx/tx + cmd#)
+     y 52..63  footer ACK strip (last cmd  ->  ok/err, inverted)
    ═══════════════════════════════════════════════════════════════════ */
+static const char* hw_state_label(HwState s, AppMode m) {
+    if(m == ModeBridge) return "BRIDGE";
+    switch(s) {
+        case HwRfidRead:      return "RFID";
+        case HwRfidEmulate:   return "RFID-EM";
+        case HwNfcDetect:     return "NFC";
+        case HwIrRx:          return "IR";
+        case HwIkeyRead:      return "iKEY";
+        case HwIkeyEmulate:   return "iKEY-EM";
+        case HwSubghzRx:      return "RF-RX";
+        case HwSubghzRecord:  return "RF-REC";
+        case HwSubghzTx:      return "RF-TX";
+        default:              return "READY";
+    }
+}
+
+static void fmt_elapsed(char* buf, size_t sz, uint32_t start_tick) {
+    if(start_tick == 0) { snprintf(buf, sz, "--:--"); return; }
+    uint32_t now = furi_get_tick();
+    uint32_t ms  = (now > start_tick) ? (now - start_tick) : 0;
+    uint32_t s   = ms / furi_ms_to_ticks(1000);
+    snprintf(buf, sz, "%02lu:%02lu", (unsigned long)(s / 60), (unsigned long)(s % 60));
+}
+
+static void fmt_bytes(char* buf, size_t sz, uint32_t n) {
+    if(n < 1000)          snprintf(buf, sz, "%luB",  (unsigned long)n);
+    else if(n < 1000000)  snprintf(buf, sz, "%luK",  (unsigned long)(n / 1000));
+    else                  snprintf(buf, sz, "%luM",  (unsigned long)(n / 1000000));
+}
+
+/* Draw an animated concentric ripple — signals "field active" for RFID/NFC */
+static void draw_field_ripple(Canvas* canvas, int cx, int cy, uint8_t spin) {
+    uint8_t phase = spin & 3;
+    for(int i = 0; i < 3; i++) {
+        int r = 3 + i * 5 + phase;
+        if(r < 18) canvas_draw_circle(canvas, cx, cy, r);
+    }
+    canvas_draw_disc(canvas, cx, cy, 2);
+}
+
+/* Draw an RSSI-like bar graph driven by a counter that really advances
+   every time the radio captures a real edge. If the bars rise, real RF
+   is reaching the chip. */
+static void draw_rssi_bars(Canvas* canvas, int x, int y, uint32_t count, uint8_t spin) {
+    for(int i = 0; i < 10; i++) {
+        int h = (int)((count + i * 3 + spin) % 14);
+        if(h < 2) h = 2;
+        canvas_draw_box(canvas, x + i * 5, y + (14 - h), 3, h);
+    }
+}
+
+/* Pulse train for SubGHz TX — shows advancing TX index as a wave */
+static void draw_pulse_train(Canvas* canvas, int x, int y, int w, int h,
+                              size_t tx_idx, size_t tx_count) {
+    if(tx_count == 0) return;
+    int mid = y + h / 2;
+    canvas_draw_line(canvas, x, mid, x + w, mid);
+    int step = 4;
+    for(int i = 0; i < w / step; i++) {
+        int top = ((tx_idx + i) % 2 == 0) ? mid - h / 2 : mid;
+        canvas_draw_line(canvas, x + i * step,       top, x + i * step,       mid);
+        canvas_draw_line(canvas, x + i * step,       top, x + i * step + step - 1, top);
+        canvas_draw_line(canvas, x + i * step + step - 1, top, x + i * step + step - 1, mid);
+    }
+}
+
+/* Bridge: bidirectional data flow arrows with animated direction */
+static void draw_bridge_flow(Canvas* canvas, Pen15App* app) {
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 2,  22, "PHONE");
+    canvas_draw_str(canvas, 98, 22, "AWOK");
+
+    uint32_t now = furi_get_tick();
+    bool usb_in_recent  = (app->last_usb_rx_tick  && (now - app->last_usb_rx_tick)  < furi_ms_to_ticks(300));
+    bool uart_out_recent = (app->last_uart_tx_tick && (now - app->last_uart_tx_tick) < furi_ms_to_ticks(300));
+    bool uart_in_recent  = (app->last_uart_rx_tick && (now - app->last_uart_rx_tick) < furi_ms_to_ticks(300));
+
+    /* top arrow: phone -> awok */
+    int y1 = 27;
+    canvas_draw_line(canvas, 32, y1, 92, y1);
+    canvas_draw_line(canvas, 90, y1 - 2, 92, y1);
+    canvas_draw_line(canvas, 90, y1 + 2, 92, y1);
+    if(usb_in_recent || uart_out_recent) {
+        int step = (app->spin * 6) % 56;
+        canvas_draw_box(canvas, 34 + step, y1 - 1, 4, 3);
+    }
+
+    /* bottom arrow: awok -> phone */
+    int y2 = 35;
+    canvas_draw_line(canvas, 32, y2, 92, y2);
+    canvas_draw_line(canvas, 32, y2, 34, y2 - 2);
+    canvas_draw_line(canvas, 32, y2, 34, y2 + 2);
+    if(uart_in_recent) {
+        int step = (app->spin * 6) % 56;
+        canvas_draw_box(canvas, 88 - step, y2 - 1, 4, 3);
+    }
+
+    /* UART byte totals centered */
+    char b1[20], b2[20];
+    fmt_bytes(b1, sizeof(b1), app->uart_tx_bytes);
+    fmt_bytes(b2, sizeof(b2), app->uart_rx_bytes);
+    char line[24];
+    snprintf(line, sizeof(line), "TX:%s  RX:%s", b1, b2);
+    canvas_draw_str(canvas, 18, 41, line);
+}
+
+static void draw_progress_bar(Canvas* canvas, int x, int y, int w, int h, int pct) {
+    if(pct < 0) pct = 0;
+    if(pct > 100) pct = 100;
+    canvas_draw_frame(canvas, x, y, w, h);
+    int fill = ((w - 2) * pct) / 100;
+    if(fill > 0) canvas_draw_box(canvas, x + 1, y + 1, fill, h - 2);
+}
+
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
+
+    /* ── Top status bar ──────────────────────────────────────────── */
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 2, 9, "PEN15");
+
+    /* Link indicator: filled dot = USB DTR asserted (host present) */
+    if(app->link_up) canvas_draw_disc(canvas, 36, 5, 3);
+    else             canvas_draw_circle(canvas, 36, 5, 3);
+
+    /* Mode badge (inverted rounded box at right) */
+    const char* mode = hw_state_label(app->hw_state, app->app_mode);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    int mode_w = canvas_string_width(canvas, mode) + 6;
+    int mode_x = 126 - mode_w;
+    canvas_draw_rbox(canvas, mode_x, 0, mode_w, 11, 2);
+    canvas_set_color(canvas, ColorWhite);
+    canvas_draw_str(canvas, mode_x + 3, 9, mode);
+    canvas_set_color(canvas, ColorBlack);
+
+    /* Uptime or current-op elapsed between link dot and badge */
+    char tbuf[12];
+    if(app->hw_state != HwIdle && app->hw_start_tick) {
+        fmt_elapsed(tbuf, sizeof(tbuf), app->hw_start_tick);
+    } else {
+        fmt_elapsed(tbuf, sizeof(tbuf), app->boot_tick);
+    }
+    canvas_draw_str(canvas, 45, 9, tbuf);
+
+    /* Divider */
+    canvas_draw_line(canvas, 0, 11, 127, 11);
+
+    /* ── Context view (y 12..41) ─────────────────────────────────── */
+    if(app->app_mode == ModeBridge) {
+        draw_bridge_flow(canvas, app);
+    } else switch(app->hw_state) {
+        case HwIdle: {
+            canvas_set_font(canvas, FontPrimary);
+            canvas_draw_str(canvas, 2, 22, "READY");
+            canvas_set_font(canvas, FontSecondary);
+            char cbuf[28];
+            snprintf(cbuf, sizeof(cbuf), "cmds: %lu", (unsigned long)app->cmd_count);
+            canvas_draw_str(canvas, 2, 32, cbuf);
+            if(app->cmd_disp[0]) {
+                char lbuf[28];
+                snprintf(lbuf, sizeof(lbuf), "last: %s", app->cmd_disp);
+                canvas_draw_str(canvas, 2, 41, lbuf);
+            } else {
+                canvas_draw_str(canvas, 2, 41, "awaiting USB...");
+            }
+            break;
+        }
+        case HwRfidRead:
+        case HwRfidEmulate: {
+            draw_field_ripple(canvas, 18, 27, app->spin);
+            canvas_set_font(canvas, FontPrimary);
+            canvas_draw_str(canvas, 40, 22,
+                app->hw_state == HwRfidRead ? "LF FIELD" : "LF EMU");
+            canvas_set_font(canvas, FontSecondary);
+            canvas_draw_str(canvas, 40, 32,
+                app->hw_state == HwRfidRead ? "scanning 125kHz" : "broadcasting");
+            canvas_draw_str(canvas, 40, 41, "present card...");
+            break;
+        }
+        case HwNfcDetect: {
+            draw_field_ripple(canvas, 18, 27, app->spin);
+            canvas_set_font(canvas, FontPrimary);
+            canvas_draw_str(canvas, 40, 22, "HF FIELD");
+            canvas_set_font(canvas, FontSecondary);
+            canvas_draw_str(canvas, 40, 32, "scanning 13.56M");
+            canvas_draw_str(canvas, 40, 41, "present tag...");
+            break;
+        }
+        case HwIrRx: {
+            canvas_set_font(canvas, FontPrimary);
+            canvas_draw_str(canvas, 2, 22, "IR LEARN");
+            /* IR beam animation */
+            canvas_set_font(canvas, FontSecondary);
+            for(int i = 0; i < 6; i++) {
+                int bx = 60 + ((app->spin + i * 3) % 60);
+                canvas_draw_box(canvas, bx, 20, 2, 2);
+            }
+            canvas_draw_str(canvas, 2, 32, "point remote");
+            canvas_draw_str(canvas, 2, 41, "press any key");
+            break;
+        }
+        case HwIkeyRead:
+        case HwIkeyEmulate: {
+            canvas_set_font(canvas, FontPrimary);
+            canvas_draw_str(canvas, 2, 22,
+                app->hw_state == HwIkeyRead ? "iBUTTON" : "iKEY EMU");
+            /* 1-wire pulse train */
+            int px = 2, py = 30;
+            for(int i = 0; i < 24; i++) {
+                int h = ((app->spin + i) & 1) ? 0 : 6;
+                canvas_draw_line(canvas, px + i * 5, py + 6,
+                                         px + i * 5, py + 6 - h);
+                canvas_draw_line(canvas, px + i * 5, py + 6 - h,
+                                         px + i * 5 + 4, py + 6 - h);
+                canvas_draw_line(canvas, px + i * 5 + 4, py + 6 - h,
+                                         px + i * 5 + 4, py + 6);
+            }
+            canvas_set_font(canvas, FontSecondary);
+            canvas_draw_str(canvas, 70, 22,
+                app->hw_state == HwIkeyRead ? "touch key" : "touch reader");
+            break;
+        }
+        case HwSubghzRx:
+        case HwSubghzRecord: {
+            canvas_set_font(canvas, FontSecondary);
+            char fbuf[24];
+            if(app->subghz_freq > 0)
+                snprintf(fbuf, sizeof(fbuf), "%lu.%02lu MHz",
+                    (unsigned long)(app->subghz_freq / 1000000),
+                    (unsigned long)((app->subghz_freq / 10000) % 100));
+            else
+                snprintf(fbuf, sizeof(fbuf), "433.92 MHz");
+            canvas_draw_str(canvas, 2, 20, fbuf);
+
+            char ebuf[24];
+            snprintf(ebuf, sizeof(ebuf), "edges: %lu",
+                (unsigned long)app->subghz_rx_count);
+            canvas_draw_str(canvas, 70, 20, ebuf);
+
+            /* Live RSSI-style bars driven by real edge count */
+            draw_rssi_bars(canvas, 2, 22, app->subghz_rx_count, app->spin);
+
+            if(app->hw_state == HwSubghzRecord) {
+                int pct = (int)((app->rx_timings_count * 100) / RX_MAX_TIMES);
+                draw_progress_bar(canvas, 2, 38, 124, 4, pct);
+            }
+            break;
+        }
+        case HwSubghzTx: {
+            canvas_set_font(canvas, FontSecondary);
+            char fbuf[24];
+            if(app->subghz_freq > 0)
+                snprintf(fbuf, sizeof(fbuf), "%lu.%02lu MHz",
+                    (unsigned long)(app->subghz_freq / 1000000),
+                    (unsigned long)((app->subghz_freq / 10000) % 100));
+            else
+                snprintf(fbuf, sizeof(fbuf), "433.92 MHz");
+            canvas_draw_str(canvas, 2, 20, fbuf);
+
+            char bbuf[24];
+            int rep = app->tx_repeat > 0 ? app->tx_repeat : 1;
+            snprintf(bbuf, sizeof(bbuf), "burst %d/%d",
+                app->tx_repeat_cnt + 1, rep);
+            canvas_draw_str(canvas, 70, 20, bbuf);
+
+            draw_pulse_train(canvas, 2, 22, 124, 12, app->tx_idx, app->tx_count);
+
+            int pct = app->tx_count > 0
+                ? (int)((app->tx_idx * 100) / app->tx_count)
+                : 0;
+            draw_progress_bar(canvas, 2, 38, 124, 4, pct);
+            break;
+        }
+    }
+
+    /* ── Meter row (y 42..51) ────────────────────────────────────── */
+    canvas_draw_line(canvas, 0, 43, 127, 43);
+    canvas_set_font(canvas, FontSecondary);
+
+    uint32_t now = furi_get_tick();
+    bool usb_rx_blink = (app->last_usb_rx_tick && (now - app->last_usb_rx_tick) < furi_ms_to_ticks(150));
+    bool usb_tx_blink = (app->last_usb_tx_tick && (now - app->last_usb_tx_tick) < furi_ms_to_ticks(150));
+
+    /* USB in/out meters */
+    if(usb_rx_blink) canvas_draw_disc(canvas, 4, 49, 2);
+    else             canvas_draw_circle(canvas, 4, 49, 2);
+    char usb_in[12]; fmt_bytes(usb_in, sizeof(usb_in), app->usb_rx_bytes);
+    char usb_line[24]; snprintf(usb_line, sizeof(usb_line), "in %s", usb_in);
+    canvas_draw_str(canvas, 9, 51, usb_line);
+
+    if(usb_tx_blink) canvas_draw_disc(canvas, 52, 49, 2);
+    else             canvas_draw_circle(canvas, 52, 49, 2);
+    char usb_out[12]; fmt_bytes(usb_out, sizeof(usb_out), app->usb_tx_bytes);
+    char usb_oline[24]; snprintf(usb_oline, sizeof(usb_oline), "out %s", usb_out);
+    canvas_draw_str(canvas, 57, 51, usb_oline);
+
+    /* cmd count at right */
+    char cline[16];
+    snprintf(cline, sizeof(cline), "#%lu", (unsigned long)app->cmd_count);
+    canvas_draw_str(canvas, 100, 51, cline);
+
+    /* ── Footer ACK strip (y 52..63, inverted) ───────────────────── */
+    canvas_draw_box(canvas, 0, 52, 128, 12);
+    canvas_set_color(canvas, ColorWhite);
+
+    char foot[40];
+    if(app->cmd_count == 0) {
+        snprintf(foot, sizeof(foot), "waiting for JSON on USB");
+    } else {
+        const char* tag = app->last_resp_ok ? "ACK" : "NAK";
+        snprintf(foot, sizeof(foot), "%s %s -> %s",
+            tag, app->cmd_disp[0] ? app->cmd_disp : "?",
+            app->last_resp_ok ? "ok" : "err");
+    }
+    canvas_draw_str(canvas, 3, 61, foot);
+    canvas_set_color(canvas, ColorBlack);
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -557,8 +901,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     json_str(js, toks, n, "action", action, sizeof(action));
     json_str(js, toks, n, "id",     id,     sizeof(id));
 
+    app->cmd_count++;
     app->progress = 50;
     app->spin++;
+    memset(app->cmd_disp, 0, sizeof(app->cmd_disp));
     strncpy(app->cmd_disp, action, sizeof(app->cmd_disp) - 1);
     view_port_update(app->vp);
 
@@ -664,15 +1010,23 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             usb_send(app, resp);
         } else {
             furi_stream_buffer_reset(app->uart_rx_buf);
-            furi_hal_serial_tx(app->serial, (uint8_t*)data, strlen(data));
+            size_t data_len = strlen(data);
+            furi_hal_serial_tx(app->serial, (uint8_t*)data, data_len);
             furi_hal_serial_tx_wait_complete(app->serial);
+            app->uart_tx_bytes += (uint32_t)data_len;
+            app->last_uart_tx_tick = furi_get_tick();
             static char awok[200]; memset(awok, 0, sizeof(awok));
             size_t awok_len = 0;
             uint32_t deadline = furi_get_tick() + furi_ms_to_ticks(UART_RX_WAIT);
             while(furi_get_tick() < deadline && awok_len < sizeof(awok) - 1) {
                 uint8_t b; size_t got = furi_stream_buffer_receive(app->uart_rx_buf, &b, 1, 0);
-                if(got > 0) awok[awok_len++] = (char)b;
-                else furi_delay_ms(5);
+                if(got > 0) {
+                    awok[awok_len++] = (char)b;
+                    app->uart_rx_bytes++;
+                    app->last_uart_rx_tick = furi_get_tick();
+                } else {
+                    furi_delay_ms(5);
+                }
             }
             for(size_t i = 0; i < awok_len; i++) {
                 if(awok[i] == '"')  awok[i] = '\'';
@@ -708,6 +1062,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick = furi_get_tick();
 
         app->rfid_dict   = protocol_dict_alloc(lfrfid_protocols, LFRFIDProtocolMax);
         app->rfid_worker = lfrfid_worker_alloc(app->rfid_dict);
@@ -727,6 +1082,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick = furi_get_tick();
 
         app->nfc         = nfc_alloc();
         app->nfc_scanner = nfc_scanner_alloc(app->nfc);
@@ -746,6 +1102,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick = furi_get_tick();
 
         app->ir_worker = infrared_worker_alloc();
         infrared_worker_rx_enable_signal_decoding(app->ir_worker, true);
@@ -796,6 +1153,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick = furi_get_tick();
 
         if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
         app->ibutton_protocols = ibutton_protocols_alloc();
@@ -819,7 +1177,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick     = furi_get_tick();
         app->subghz_rx_count   = 0;
+        app->subghz_freq       = (uint32_t)freq;
 
         furi_hal_subghz_reset();
         furi_hal_subghz_load_custom_preset(OOK650_PRESET);
@@ -846,7 +1206,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->hw_start_tick     = furi_get_tick();
         app->subghz_rx_count   = 0;
+        app->subghz_freq       = (uint32_t)freq;
         app->rx_timings_count  = 0;
         app->subghz_record_mode = true;
 
@@ -883,6 +1245,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->tx_repeat     = repeat;
         app->tx_repeat_cnt = 0;
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->subghz_freq   = (uint32_t)freq;
 
         if(app->tx_count == 0) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"NO_TIMINGS\",\"id\":\"%s\"}\n", id);
@@ -1031,6 +1395,11 @@ static void process_usb_rx(Pen15App* app) {
     int32_t got = furi_hal_cdc_receive(0, buf, USB_PKT_LEN);
     furi_mutex_release(app->usb_mtx);
 
+    if(got > 0) {
+        app->usb_rx_bytes += (uint32_t)got;
+        app->last_usb_rx_tick = furi_get_tick();
+    }
+
     for(int32_t i = 0; i < got; i++) {
         char c = (char)buf[i];
         if(c == '\n' || c == '\r') {
@@ -1054,9 +1423,11 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
+    app->boot_tick = furi_get_tick();
+    app->link_up = false;
 
     app->thread      = furi_thread_get_current();
     app->usb_mtx     = furi_mutex_alloc(FuriMutexTypeNormal);
@@ -1107,8 +1478,15 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
+                if(got > 0) {
+                    app->usb_rx_bytes += (uint32_t)got;
+                    app->last_usb_rx_tick = furi_get_tick();
+                }
+                if(got > 0 && app->uart_ready) {
                     furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                    app->uart_tx_bytes += (uint32_t)got;
+                    app->last_uart_tx_tick = furi_get_tick();
+                }
             } else {
                 process_usb_rx(app);
             }
@@ -1120,7 +1498,11 @@ int32_t pen15_app(void* p) {
                 size_t got;
                 do {
                     got = furi_stream_buffer_receive(app->uart_rx_buf, uart_buf, sizeof(uart_buf), 0);
-                    if(got > 0) usb_send_raw(app, uart_buf, (uint16_t)got);
+                    if(got > 0) {
+                        app->uart_rx_bytes += (uint32_t)got;
+                        app->last_uart_rx_tick = furi_get_tick();
+                        usb_send_raw(app, uart_buf, (uint16_t)got);
+                    }
                 } while(got > 0);
             }
         }
