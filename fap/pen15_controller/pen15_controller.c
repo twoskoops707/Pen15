@@ -26,12 +26,14 @@
 #define USB_PKT_LEN   64
 #define UART_RX_BUF   512
 #define JSON_BUF_SZ   2048
-#define DISP_STR_LEN  22
 #define MAX_TOKENS    64
 #define UART_RX_WAIT  500
 #define HW_TIMEOUT_MS 30000
 #define TX_MAX_TIMES  512
 #define RX_MAX_TIMES  64
+#define PROGRESS_INTERVAL_MS 1000
+#define USB_ALIVE_TIMEOUT_MS 5000
+#define DETAIL_LEN    32
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -41,8 +43,9 @@ typedef enum {
     EvtHwDone     = (1 << 3),
     EvtTxDone     = (1 << 4),
     EvtBridgeExit = (1 << 5),
+    EvtHwStop     = (1 << 6),
 } Pen15Evt;
-#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit)
+#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit | EvtHwStop)
 
 /* ── Hardware state ───────────────────────────────────────────────── */
 typedef enum {
@@ -58,13 +61,17 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
-typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
+/* ── Operation phase (verification state machine) ─────────────────── */
+typedef enum {
+    PhaseIdle,
+    PhaseAck,
+    PhaseInit,
+    PhaseActive,
+    PhaseDone,
+    PhaseError,
+} OpPhase;
 
-#define MENU_COUNT 9
-static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
-static const char* MENU_HINTS[MENU_COUNT] __attribute__((unused)) = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
-
-
+typedef enum { ModeJson, ModeBridge } AppMode;
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
 /* ── App context ──────────────────────────────────────────────────── */
@@ -82,21 +89,31 @@ typedef struct {
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
 
-    char   status[DISP_STR_LEN];
-    char   cmd_disp[DISP_STR_LEN];
-    char   rx_disp[DISP_STR_LEN];
-    uint8_t progress;
-    uint8_t spin;
-
     PinMode pin_mode[8];
 
     AppMode    app_mode;
-    uint8_t    menu_index;
-    uint32_t   bridge_exit_tick;
     bool       init_done;
 
     Gui*      gui;
     ViewPort* vp;
+
+    /* ── Operation tracking (verification) ─── */
+    OpPhase  op_phase;
+    uint32_t op_start_tick;
+    char     op_name[DETAIL_LEN];
+    char     detail1[DETAIL_LEN];
+    char     detail2[DETAIL_LEN];
+    char     last_result[DETAIL_LEN];
+    uint8_t  progress;
+    uint32_t cmd_count;
+    uint32_t total_tx;
+    uint32_t total_rx;
+    bool     blink;
+    uint32_t last_progress_tick;
+
+    /* ── USB connection tracking ─── */
+    bool     usb_active;
+    uint32_t usb_last_rx_tick;
 
     /* ── Hardware state ─── */
     HwState  hw_state;
@@ -126,6 +143,7 @@ typedef struct {
     bool          subghz_record_mode;
     int32_t       rx_timings[RX_MAX_TIMES];
     size_t        rx_timings_count;
+    uint32_t      subghz_freq;
 
     /* SubGHz TX */
     int32_t  tx_timings[TX_MAX_TIMES];
@@ -142,28 +160,13 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
-static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
-
 /* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
 static const uint8_t OOK650_PRESET[] = {
-    0x02, 0x0D,
-    0x03, 0x07,
-    0x08, 0x32,
-    0x0B, 0x06,
-    0x10, 0x17,
-    0x11, 0x32,
-    0x12, 0x30,
-    0x13, 0x00,
-    0x14, 0x00,
-    0x18, 0x18,
-    0x19, 0x18,
-    0x1B, 0x07,
-    0x1C, 0x00,
-    0x1D, 0x91,
-    0x20, 0xFB,
-    0x21, 0xB6,
-    0x22, 0x11,
-    0x00, 0x00,
+    0x02, 0x0D, 0x03, 0x07, 0x08, 0x32, 0x0B, 0x06,
+    0x10, 0x17, 0x11, 0x32, 0x12, 0x30, 0x13, 0x00,
+    0x14, 0x00, 0x18, 0x18, 0x19, 0x18, 0x1B, 0x07,
+    0x1C, 0x00, 0x1D, 0x91, 0x20, 0xFB, 0x21, 0xB6,
+    0x22, 0x11, 0x00, 0x00,
     0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
@@ -178,7 +181,7 @@ static void cdc_on_tx_done(void* ctx) {
     Pen15App* app = ctx;
     furi_semaphore_release(app->tx_sem);
 }
-static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
+static void cdc_state_cb(void* ctx, uint8_t s) { UNUSED(ctx); UNUSED(s); }
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
     if(app->bridge_mode && !(s & 0x01)) {
@@ -211,11 +214,12 @@ static void uart_rx_dma_cb(FuriHalSerialHandle* h, FuriHalSerialRxEvent ev,
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   USB send
+   USB send (with byte counting for verification display)
    ═══════════════════════════════════════════════════════════════════ */
 static void usb_send(Pen15App* app, const char* str) {
     uint16_t len = (uint16_t)strlen(str);
     if(len == 0) return;
+    app->total_tx += len;
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
@@ -224,6 +228,7 @@ static void usb_send(Pen15App* app, const char* str) {
 
 static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     if(len == 0) return;
+    app->total_tx += len;
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)data, len);
@@ -231,35 +236,251 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   GUI
+   Display helpers
+   ═══════════════════════════════════════════════════════════════════ */
+static void format_elapsed(uint32_t start_tick, char* buf, size_t sz) {
+    uint32_t ms = furi_get_tick() - start_tick;
+    if(ms < 10000) {
+        snprintf(buf, sz, "%lu.%lus", (unsigned long)(ms / 1000),
+            (unsigned long)((ms % 1000) / 100));
+    } else if(ms < 60000) {
+        snprintf(buf, sz, "%lus", (unsigned long)(ms / 1000));
+    } else {
+        snprintf(buf, sz, "%lum%02lu", (unsigned long)(ms / 60000),
+            (unsigned long)((ms % 60000) / 1000));
+    }
+}
+
+static void format_bytes(uint32_t n, char* buf, size_t sz) {
+    if(n < 1024)
+        snprintf(buf, sz, "%luB", (unsigned long)n);
+    else if(n < 1048576)
+        snprintf(buf, sz, "%lu.%luK", (unsigned long)(n / 1024),
+            (unsigned long)((n % 1024) * 10 / 1024));
+    else
+        snprintf(buf, sz, "%lu.%luM", (unsigned long)(n / 1048576),
+            (unsigned long)((n % 1048576) * 10 / 1048576));
+}
+
+static const char* phase_icon(OpPhase phase) {
+    switch(phase) {
+    case PhaseIdle:   return "-";
+    case PhaseAck:    return "?";
+    case PhaseInit:   return ">";
+    case PhaseActive: return ">>";
+    case PhaseDone:   return "OK";
+    case PhaseError:  return "!!";
+    default:          return "?";
+    }
+}
+
+static char hw_module_char(HwState st) {
+    switch(st) {
+    case HwRfidRead: case HwRfidEmulate: return 'R';
+    case HwNfcDetect:   return 'N';
+    case HwSubghzRx: case HwSubghzRecord: case HwSubghzTx: return 'S';
+    case HwIrRx:        return 'I';
+    case HwIkeyRead: case HwIkeyEmulate: return 'K';
+    default:            return ' ';
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GUI — Comprehensive verification display
+   ═══════════════════════════════════════════════════════════════════
+
+   128x64 monochrome layout:
+   ┌──────────────────────────────────────┐
+   │ PEN15 v3  [USB]  [module]   #cmds   │ y=0-11  inverted header
+   │──────────────────────────────────────│
+   │ >> rfid_read              3.2s       │ y=20    operation + timer
+   │ [████████████░░░░░░░] 55%            │ y=22-26 progress bar
+   │ Antenna: ACTIVE                      │ y=35    detail line 1
+   │ Scanning for tags...                 │ y=44    detail line 2
+   │ TX:1.2K  RX:340B   23 signals       │ y=53    byte counters
+   │ [<]Quit [O]Stop             ACTIVE   │ y=63    controls + state
+   └──────────────────────────────────────┘
    ═══════════════════════════════════════════════════════════════════ */
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
+
+    /* ── HEADER BAR (inverted: black bg, white text) ───────────── */
     canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 0, 128, 12);
+    canvas_set_color(canvas, ColorWhite);
+
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 2, 10, "PEN15 v3");
+
+    canvas_set_font(canvas, FontKeyboard);
+
+    if(app->usb_active) {
+        canvas_draw_frame(canvas, 60, 2, 18, 8);
+        canvas_draw_str(canvas, 62, 9, "USB");
+    } else {
+        canvas_draw_str(canvas, 62, 9, "---");
+    }
+
+    if(app->hw_state != HwIdle) {
+        char mod = hw_module_char(app->hw_state);
+        if(mod != ' ') {
+            if(app->blink) {
+                canvas_draw_box(canvas, 82, 2, 8, 8);
+                canvas_set_color(canvas, ColorBlack);
+                char ms[2] = {mod, '\0'};
+                canvas_draw_str(canvas, 84, 9, ms);
+                canvas_set_color(canvas, ColorWhite);
+            } else {
+                canvas_draw_frame(canvas, 82, 2, 8, 8);
+                char ms[2] = {mod, '\0'};
+                canvas_draw_str(canvas, 84, 9, ms);
+            }
+        }
+    }
+
+    if(app->bridge_mode) {
+        canvas_draw_frame(canvas, 82, 2, 14, 8);
+        canvas_draw_str(canvas, 84, 9, "BR");
+    }
+
+    {
+        char cnt[10];
+        snprintf(cnt, sizeof(cnt), "#%lu", (unsigned long)app->cmd_count);
+        canvas_draw_str(canvas, 108, 9, cnt);
+    }
+
+    canvas_set_color(canvas, ColorBlack);
+
+    /* ── OPERATION LINE ──────────────────────────────────────────── */
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+
+    if(app->op_phase == PhaseIdle && !app->bridge_mode) {
+        canvas_draw_str(canvas, 2, 21, "Awaiting command...");
+    } else if(app->bridge_mode) {
+        canvas_draw_str(canvas, 2, 21, ">> UART BRIDGE ACTIVE");
+        char time_str[12];
+        format_elapsed(app->op_start_tick, time_str, sizeof(time_str));
+        canvas_draw_str(canvas, 100, 21, time_str);
+    } else {
+        const char* icon = phase_icon(app->op_phase);
+        char op_line[48];
+        snprintf(op_line, sizeof(op_line), "%s %s", icon, app->op_name);
+        canvas_draw_str(canvas, 2, 21, op_line);
+
+        char time_str[12];
+        format_elapsed(app->op_start_tick, time_str, sizeof(time_str));
+        canvas_draw_str(canvas, 100, 21, time_str);
+    }
+
+    /* ── PROGRESS BAR ────────────────────────────────────────────── */
+    canvas_draw_frame(canvas, 2, 23, 108, 5);
+    uint8_t fill = (app->progress > 100) ? 106 : (uint8_t)((app->progress * 106) / 100);
+    if(fill > 0) canvas_draw_box(canvas, 3, 24, fill, 3);
+
+    if(app->progress > 0) {
+        char pct[6];
+        snprintf(pct, sizeof(pct), "%u%%", app->progress);
+        canvas_draw_str(canvas, 113, 27, pct);
+    }
+
+    /* Blinking activity dot for active operations */
+    if(app->op_phase == PhaseActive && app->blink) {
+        canvas_draw_disc(canvas, 123, 25, 2);
+    }
+
+    /* ── DETAIL LINES ────────────────────────────────────────────── */
+    canvas_draw_str(canvas, 2, 37, app->detail1);
+    canvas_draw_str(canvas, 2, 46, app->detail2);
+
+    /* SubGHz signal visualization: draw small bars when receiving */
+    if((app->hw_state == HwSubghzRx || app->hw_state == HwSubghzRecord) &&
+       app->op_phase == PhaseActive) {
+        int bars = (int)(app->subghz_rx_count % 6);
+        for(int i = 0; i < 5; i++) {
+            int h = (i + 1) * 2;
+            int x = 104 + i * 5;
+            int y = 46 - h;
+            if(i <= bars)
+                canvas_draw_box(canvas, x, y, 3, h);
+            else
+                canvas_draw_frame(canvas, x, y, 3, h);
+        }
+    }
+
+    /* ── BYTE COUNTERS ───────────────────────────────────────────── */
+    {
+        char tx_str[12], rx_str[12];
+        format_bytes(app->total_tx, tx_str, sizeof(tx_str));
+        format_bytes(app->total_rx, rx_str, sizeof(rx_str));
+        char counters[48];
+        snprintf(counters, sizeof(counters), "TX:%s  RX:%s", tx_str, rx_str);
+        canvas_draw_str(canvas, 2, 55, counters);
+    }
+
+    if(app->hw_state == HwSubghzRx || app->hw_state == HwSubghzRecord) {
+        char sig[12];
+        snprintf(sig, sizeof(sig), "%lu sig", (unsigned long)app->subghz_rx_count);
+        canvas_draw_str(canvas, 90, 55, sig);
+    }
+
+    /* ── BOTTOM CONTROLS BAR ─────────────────────────────────────── */
+    canvas_draw_line(canvas, 0, 57, 128, 57);
+    canvas_set_font(canvas, FontKeyboard);
+    canvas_draw_str(canvas, 2, 64, "[<]Quit");
+
+    if(app->hw_state != HwIdle) {
+        canvas_draw_str(canvas, 38, 64, "[O]Stop");
+    }
+
+    switch(app->op_phase) {
+    case PhaseIdle:
+        canvas_draw_str(canvas, 95, 64, "IDLE");
+        break;
+    case PhaseAck:
+        canvas_draw_str(canvas, 95, 64, "RECV");
+        break;
+    case PhaseInit:
+        canvas_draw_str(canvas, 95, 64, "INIT");
+        break;
+    case PhaseActive:
+        canvas_draw_str(canvas, 88, 64, "ACTIVE");
+        break;
+    case PhaseDone:
+        canvas_draw_str(canvas, 95, 64, "DONE");
+        break;
+    case PhaseError:
+        canvas_draw_str(canvas, 93, 64, "ERROR");
+        break;
+    }
+
+    /* Last result line (shown when idle as a verification of last op) */
+    if(app->op_phase == PhaseIdle && app->last_result[0] != '\0') {
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 2, 37, "Last:");
+        canvas_draw_str(canvas, 30, 37, app->last_result);
+    }
 }
+
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
-    if(ev->type == InputTypeShort && ev->key == InputKeyBack)
-        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+    if(ev->type == InputTypeShort) {
+        switch(ev->key) {
+        case InputKeyBack:
+            furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+            break;
+        case InputKeyOk:
+            if(app->hw_state != HwIdle)
+                furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwStop);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   JSON string unescape (in-place: \\n→\n, \\r→\r, \\t→\t, etc.)
-   Required because jsmn returns raw JSON token bytes without unescaping.
+   JSON string unescape (in-place)
    ═══════════════════════════════════════════════════════════════════ */
 static void json_unescape(char* s) {
     char* r = s;
@@ -343,7 +564,6 @@ static void hw_stop_all(Pen15App* app) {
         ibutton_worker_free(app->ibutton_worker);
         app->ibutton_worker = NULL;
         if(app->ibutton_protocols) { ibutton_protocols_free(app->ibutton_protocols); app->ibutton_protocols = NULL; }
-        /* ibutton_key is kept alive after read so ikey_emulate can reuse it */
     }
     if(app->hw_state == HwNfcDetect && app->nfc_scanner) {
         nfc_scanner_stop(app->nfc_scanner);
@@ -395,7 +615,7 @@ static size_t storage_read_file(const char* path, char* buf, size_t buf_sz) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Hardware callbacks (called from worker threads / ISR)
+   Hardware callbacks — update detail strings for verification
    ═══════════════════════════════════════════════════════════════════ */
 
 /* RFID */
@@ -417,6 +637,12 @@ static void rfid_cb(LFRFIDWorkerReadResult result, ProtocolId proto, void* ctx) 
             "{\"status\":\"ok\",\"type\":\"%s\",\"data\":\"%s\",\"id\":\"%s\"}\n",
             name ? name : "RFID", hex, app->hw_id);
 
+        snprintf(app->detail1, DETAIL_LEN, "Tag: %s", name ? name : "RFID");
+        snprintf(app->detail2, DETAIL_LEN, "Data: %.16s", hex);
+        snprintf(app->last_result, DETAIL_LEN, "RFID:%s", name ? name : "?");
+        app->op_phase = PhaseDone;
+        app->progress = 100;
+
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
 }
@@ -432,6 +658,16 @@ static void ir_rx_cb(void* ctx, InfraredWorkerSignal* signal) {
             (unsigned long)msg->address,
             (unsigned long)msg->command,
             app->hw_id);
+
+        snprintf(app->detail1, DETAIL_LEN, "IR: %s decoded",
+            infrared_get_protocol_name(msg->protocol));
+        snprintf(app->detail2, DETAIL_LEN, "Addr:0x%lX Cmd:0x%lX",
+            (unsigned long)msg->address, (unsigned long)msg->command);
+        snprintf(app->last_result, DETAIL_LEN, "IR:%s",
+            infrared_get_protocol_name(msg->protocol));
+        app->op_phase = PhaseDone;
+        app->progress = 100;
+
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
 }
@@ -449,6 +685,12 @@ static void ibutton_cb(void* ctx) {
         "{\"status\":\"ok\",\"type\":\"%s\",\"data\":\"%s\",\"id\":\"%s\"}\n",
         name ? name : "iButton", furi_string_get_cstr(data_str), app->hw_id);
 
+    snprintf(app->detail1, DETAIL_LEN, "Key: %s found", name ? name : "iButton");
+    snprintf(app->detail2, DETAIL_LEN, "%.20s", furi_string_get_cstr(data_str));
+    snprintf(app->last_result, DETAIL_LEN, "iKey:%s", name ? name : "?");
+    app->op_phase = PhaseDone;
+    app->progress = 100;
+
     furi_string_free(data_str);
     furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
 }
@@ -465,6 +707,12 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
             "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"\",\"id\":\"%s\"}\n",
             proto_name, app->hw_id);
 
+        snprintf(app->detail1, DETAIL_LEN, "Card: %s detected", proto_name);
+        snprintf(app->detail2, DETAIL_LEN, "NFC read complete");
+        snprintf(app->last_result, DETAIL_LEN, "NFC:%s", proto_name);
+        app->op_phase = PhaseDone;
+        app->progress = 100;
+
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
 }
@@ -480,7 +728,6 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
         }
         if(app->rx_timings_count >= RX_MAX_TIMES) {
             app->hw_state = HwIdle;
-            /* Format timings as comma-separated signed ints */
             char* p = app->hw_result_json;
             int remaining = (int)sizeof(app->hw_result_json);
             int written = snprintf(p, (size_t)remaining,
@@ -491,7 +738,14 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
                     (long)app->rx_timings[i]);
                 p += written; remaining -= written;
             }
-            written = snprintf(p, (size_t)remaining, "\",\"id\":\"%s\"}\n", app->hw_id);
+            snprintf(p, (size_t)remaining, "\",\"id\":\"%s\"}\n", app->hw_id);
+
+            snprintf(app->detail1, DETAIL_LEN, "Recorded %zu timings", app->rx_timings_count);
+            snprintf(app->detail2, DETAIL_LEN, "Signal capture complete");
+            snprintf(app->last_result, DETAIL_LEN, "REC:%zu", app->rx_timings_count);
+            app->op_phase = PhaseDone;
+            app->progress = 100;
+
             furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
         }
         return;
@@ -502,11 +756,19 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
             "{\"status\":\"ok\",\"count\":%u,\"timings\":\"\",\"id\":\"%s\"}\n",
             (unsigned)app->subghz_rx_count, app->hw_id);
+
+        snprintf(app->detail1, DETAIL_LEN, "RX: %u signals captured",
+            (unsigned)app->subghz_rx_count);
+        snprintf(app->detail2, DETAIL_LEN, "SubGHz scan complete");
+        snprintf(app->last_result, DETAIL_LEN, "RX:%u", (unsigned)app->subghz_rx_count);
+        app->op_phase = PhaseDone;
+        app->progress = 100;
+
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
 }
 
-/* SubGHz TX ISR callback — ISR context, must be fast */
+/* SubGHz TX ISR callback */
 static LevelDuration subghz_tx_isr(void* ctx) {
     Pen15App* app = ctx;
     if(app->tx_idx >= app->tx_count) {
@@ -522,8 +784,7 @@ static LevelDuration subghz_tx_isr(void* ctx) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Parse comma-separated timing string into int32 array.
-   "+350,-10850,350,-1050,..." → {350,-10850,350,-1050,...}
+   Parse comma-separated timing string
    ═══════════════════════════════════════════════════════════════════ */
 static size_t parse_timings(const char* str, int32_t* out, size_t max) {
     size_t count = 0;
@@ -538,7 +799,56 @@ static size_t parse_timings(const char* str, int32_t* out, size_t max) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   JSON command dispatch
+   Progress reporting — sends periodic updates to phone
+   ═══════════════════════════════════════════════════════════════════ */
+static void send_progress(Pen15App* app) {
+    static char prog[192];
+    uint32_t elapsed = furi_get_tick() - app->op_start_tick;
+
+    switch(app->hw_state) {
+    case HwSubghzRx:
+        snprintf(prog, sizeof(prog),
+            "{\"status\":\"progress\",\"pulses\":%u,\"elapsed_ms\":%lu,\"id\":\"%s\"}\n",
+            (unsigned)app->subghz_rx_count, (unsigned long)elapsed, app->hw_id);
+        usb_send(app, prog);
+        snprintf(app->detail2, DETAIL_LEN, "%u signals | %lu.%lus",
+            (unsigned)app->subghz_rx_count,
+            (unsigned long)(elapsed / 1000), (unsigned long)((elapsed % 1000) / 100));
+        break;
+    case HwSubghzRecord:
+        snprintf(prog, sizeof(prog),
+            "{\"status\":\"progress\",\"timings\":%zu,\"max\":%d,\"elapsed_ms\":%lu,\"id\":\"%s\"}\n",
+            app->rx_timings_count, RX_MAX_TIMES, (unsigned long)elapsed, app->hw_id);
+        usb_send(app, prog);
+        app->progress = (uint8_t)((app->rx_timings_count * 100) / RX_MAX_TIMES);
+        snprintf(app->detail2, DETAIL_LEN, "Captured %zu/%d timings",
+            app->rx_timings_count, RX_MAX_TIMES);
+        break;
+    case HwSubghzTx:
+        snprintf(prog, sizeof(prog),
+            "{\"status\":\"progress\",\"repeat\":%d,\"of\":%d,\"elapsed_ms\":%lu,\"id\":\"%s\"}\n",
+            app->tx_repeat_cnt + 1, app->tx_repeat, (unsigned long)elapsed, app->hw_id);
+        usb_send(app, prog);
+        app->progress = (uint8_t)(((app->tx_repeat_cnt + 1) * 100) / app->tx_repeat);
+        snprintf(app->detail2, DETAIL_LEN, "TX repeat %d/%d",
+            app->tx_repeat_cnt + 1, app->tx_repeat);
+        break;
+    case HwRfidRead:
+    case HwNfcDetect:
+    case HwIrRx:
+    case HwIkeyRead:
+        snprintf(prog, sizeof(prog),
+            "{\"status\":\"progress\",\"phase\":\"waiting\",\"elapsed_ms\":%lu,\"id\":\"%s\"}\n",
+            (unsigned long)elapsed, app->hw_id);
+        usb_send(app, prog);
+        break;
+    default:
+        break;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   JSON command dispatch — with ACK verification
    ═══════════════════════════════════════════════════════════════════ */
 static void handle_json(Pen15App* app, const char* js, size_t len) {
     jsmn_parser parser;
@@ -557,19 +867,30 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     json_str(js, toks, n, "action", action, sizeof(action));
     json_str(js, toks, n, "id",     id,     sizeof(id));
 
-    app->progress = 50;
-    app->spin++;
-    strncpy(app->cmd_disp, action, sizeof(app->cmd_disp) - 1);
+    /* ── ACK: immediately confirm command receipt ─────────────────── */
+    app->cmd_count++;
+    app->op_phase = PhaseAck;
+    app->op_start_tick = furi_get_tick();
+    app->progress = 10;
+    strncpy(app->op_name, action, sizeof(app->op_name) - 1);
+    strncpy(app->detail1, "Command received", DETAIL_LEN - 1);
+    strncpy(app->detail2, "Processing...", DETAIL_LEN - 1);
     view_port_update(app->vp);
+
+    snprintf(resp, sizeof(resp),
+        "{\"status\":\"ack\",\"action\":\"%s\",\"id\":\"%s\"}\n", action, id);
+    usb_send(app, resp);
 
     /* ── ping ──────────────────────────────────────────────────────── */
     if(strcmp(action, "ping") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap\":\"3.0\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status,  "CONN", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
+        strncpy(app->detail1, "Ping: connected", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Flipper Zero OK", DETAIL_LEN - 1);
+        strncpy(app->last_result, "Ping OK", DETAIL_LEN - 1);
+        app->op_phase = PhaseDone;
         app->progress = 100;
 
     /* ── gpio_mode ─────────────────────────────────────────────────── */
@@ -577,8 +898,15 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         int  pin  = json_int(js, toks, n, "pin", -1);
         char mode[16] = {0};
         json_str(js, toks, n, "mode", mode, sizeof(mode));
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "GPIO pin %d -> %s", pin, mode);
+        view_port_update(app->vp);
+
         if(pin < 0 || pin > 7) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: invalid pin", DETAIL_LEN - 1);
         } else {
             if(strcmp(mode, "output") == 0) {
                 furi_hal_gpio_init(EXT_PINS[pin], GpioModeOutputPushPull, GpioPullNo, GpioSpeedMedium);
@@ -589,6 +917,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             }
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"ok\",\"pin\":%d,\"mode\":\"%s\",\"id\":\"%s\"}\n", pin, mode, id);
+            snprintf(app->detail2, DETAIL_LEN, "Pin %d configured OK", pin);
+            snprintf(app->last_result, DETAIL_LEN, "GPIO%d:%s", pin, mode);
+            app->op_phase = PhaseDone;
         }
         app->progress = 100; usb_send(app, resp);
 
@@ -596,25 +927,42 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "gpio_write") == 0) {
         int pin   = json_int(js, toks, n, "pin",   -1);
         int value = json_int(js, toks, n, "value", -1);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "GPIO%d write %d", pin, value);
+
         if(pin < 0 || pin > 7) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: invalid pin", DETAIL_LEN - 1);
         } else if(app->pin_mode[pin] != PinOutput) {
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"error\",\"code\":\"NOT_OUTPUT\","
                 "\"message\":\"Call gpio_mode output first\",\"id\":\"%s\"}\n", id);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: not output mode", DETAIL_LEN - 1);
         } else {
             furi_hal_gpio_write(EXT_PINS[pin], value != 0);
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"ok\",\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
                 pin, value != 0 ? 1 : 0, id);
+            snprintf(app->detail2, DETAIL_LEN, "Pin %d = %d OK", pin, value != 0 ? 1 : 0);
+            snprintf(app->last_result, DETAIL_LEN, "GPIO%d=%d", pin, value != 0 ? 1 : 0);
+            app->op_phase = PhaseDone;
         }
         app->progress = 100; usb_send(app, resp);
 
     /* ── gpio_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_read") == 0) {
         int pin = json_int(js, toks, n, "pin", -1);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "GPIO%d read", pin);
+
         if(pin < 0 || pin > 7) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: invalid pin", DETAIL_LEN - 1);
         } else {
             if(app->pin_mode[pin] == PinUnset) {
                 furi_hal_gpio_init(EXT_PINS[pin], GpioModeInput, GpioPullNo, GpioSpeedLow);
@@ -624,6 +972,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"ok\",\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
                 pin, val ? 1 : 0, id);
+            snprintf(app->detail2, DETAIL_LEN, "Pin %d = %d", pin, val ? 1 : 0);
+            snprintf(app->last_result, DETAIL_LEN, "GPIO%d=%d", pin, val ? 1 : 0);
+            app->op_phase = PhaseDone;
         }
         app->progress = 100; usb_send(app, resp);
 
@@ -631,6 +982,11 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "uart_init") == 0) {
         int baud = json_int(js, toks, n, "baud", 115200);
         bool uart_ok = false;
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "UART init %d baud", baud);
+        view_port_update(app->vp);
+
         if(!app->uart_ready) {
             app->serial = furi_hal_serial_control_acquire(FuriHalSerialIdUsart);
             if(app->serial) {
@@ -649,20 +1005,34 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
-            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
-            strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
+            app->app_mode = ModeBridge;
+            app->bridge_mode = true;
+            snprintf(app->detail2, DETAIL_LEN, "Bridge ON @ %d", baud);
+            strncpy(app->last_result, "UART Bridge", DETAIL_LEN - 1);
+            app->op_phase = PhaseActive;
+        } else {
+            strncpy(app->detail2, "UART acquire failed", DETAIL_LEN - 1);
+            app->op_phase = PhaseError;
         }
 
     /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
         static char data[128]; memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "UART TX: %.16s", data);
+
         if(!app->uart_ready) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: UART not init", DETAIL_LEN - 1);
         } else {
+            app->op_phase = PhaseActive;
+            strncpy(app->detail2, "Sending...", DETAIL_LEN - 1);
+            view_port_update(app->vp);
+
             furi_stream_buffer_reset(app->uart_rx_buf);
             furi_hal_serial_tx(app->serial, (uint8_t*)data, strlen(data));
             furi_hal_serial_tx_wait_complete(app->serial);
@@ -683,29 +1053,45 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             snprintf(resp, sizeof(resp),
                 "{\"status\":\"ok\",\"uart_rx\":\"%s\",\"id\":\"%s\"}\n", awok, id);
             app->progress = 100; usb_send(app, resp);
-            strncpy(app->rx_disp, awok_len > 0 ? awok : "(no rx)", sizeof(app->rx_disp) - 1);
+            snprintf(app->detail2, DETAIL_LEN, "RX: %.18s", awok_len > 0 ? awok : "(empty)");
+            snprintf(app->last_result, DETAIL_LEN, "UART:%zuB", awok_len);
+            app->op_phase = PhaseDone;
         }
 
     /* ── get_device_info ───────────────────────────────────────────── */
     } else if(strcmp(action, "get_device_info") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap_ver\":\"3.0\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
+        strncpy(app->detail1, "Device: Flipper Zero", DETAIL_LEN - 1);
+        strncpy(app->detail2, "FW:mntm FAP:v3.0", DETAIL_LEN - 1);
+        strncpy(app->last_result, "DevInfo OK", DETAIL_LEN - 1);
+        app->op_phase = PhaseDone;
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
     } else if(strcmp(action, "hw_stop") == 0) {
         hw_stop_all(app);
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, "hw stop", sizeof(app->rx_disp) - 1);
+        strncpy(app->detail1, "Hardware stopped", DETAIL_LEN - 1);
+        strncpy(app->detail2, "All modules idle", DETAIL_LEN - 1);
+        strncpy(app->last_result, "HW Stop", DETAIL_LEN - 1);
+        app->op_phase = PhaseDone;
 
     /* ── rfid_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "rfid_read") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
+        app->op_phase = PhaseInit;
+        strncpy(app->detail1, "RFID antenna: starting", DETAIL_LEN - 1);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
 
@@ -714,17 +1100,28 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         lfrfid_worker_read_start(app->rfid_worker, LFRFIDWorkerReadTypeAuto, rfid_cb, app);
         app->hw_state = HwRfidRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 25;
+        strncpy(app->detail1, "RFID antenna: ACTIVE", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Waiting for tag...", DETAIL_LEN - 1);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"reading\",\"hw\":\"rfid_antenna\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "RFID", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "rfid reading", sizeof(app->rx_disp) - 1);
 
     /* ── nfc_detect ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_detect") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
+        app->op_phase = PhaseInit;
+        strncpy(app->detail1, "NFC field: starting", DETAIL_LEN - 1);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
 
@@ -733,17 +1130,28 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         nfc_scanner_start(app->nfc_scanner, nfc_scanner_cb, app);
         app->hw_state = HwNfcDetect;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 25;
+        strncpy(app->detail1, "NFC field: ON", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Waiting for card...", DETAIL_LEN - 1);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"scanning\",\"hw\":\"nfc_field\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "NFC", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "nfc scanning", sizeof(app->rx_disp) - 1);
 
     /* ── ir_rx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_rx") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
+        app->op_phase = PhaseInit;
+        strncpy(app->detail1, "IR receiver: starting", DETAIL_LEN - 1);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
 
@@ -753,10 +1161,14 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         infrared_worker_rx_start(app->ir_worker);
         app->hw_state = HwIrRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 25;
+        strncpy(app->detail1, "IR receiver: ON", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Point remote at Flipper...", DETAIL_LEN - 1);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"reading\",\"hw\":\"ir_receiver\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "IR", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ir learning", sizeof(app->rx_disp) - 1);
 
     /* ── ir_tx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_tx") == 0) {
@@ -764,6 +1176,11 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         json_str(js, toks, n, "protocol", proto_name, sizeof(proto_name));
         long long address = json_ll(js, toks, n, "address", 0);
         long long command = json_ll(js, toks, n, "command", 0);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "IR TX: %s", proto_name);
+        snprintf(app->detail2, DETAIL_LEN, "Addr:0x%llX Cmd:0x%llX", address, command);
+        view_port_update(app->vp);
 
         InfraredProtocol proto = infrared_get_protocol_by_name(proto_name);
         if(proto == InfraredProtocolUnknown) proto = InfraredProtocolNEC;
@@ -774,6 +1191,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             .command  = (uint32_t)command,
             .repeat   = false,
         };
+
+        app->op_phase = PhaseActive;
+        strncpy(app->detail1, "IR LED: TRANSMITTING", DETAIL_LEN - 1);
+        view_port_update(app->vp);
 
         InfraredWorker* tx_worker = infrared_worker_alloc();
         infrared_worker_set_decoded_signal(tx_worker, &msg);
@@ -786,14 +1207,23 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, "ir tx ok", sizeof(app->rx_disp) - 1);
+        strncpy(app->detail1, "IR TX: sent", DETAIL_LEN - 1);
+        snprintf(app->last_result, DETAIL_LEN, "IR TX:%s", proto_name);
+        app->op_phase = PhaseDone;
 
     /* ── ikey_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_read") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
+        app->op_phase = PhaseInit;
+        strncpy(app->detail1, "1-Wire probe: starting", DETAIL_LEN - 1);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
 
@@ -805,21 +1235,35 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         ibutton_worker_read_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 25;
+        strncpy(app->detail1, "1-Wire probe: ACTIVE", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Touch key to reader...", DETAIL_LEN - 1);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"reading\",\"hw\":\"ibutton_probe\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status, "KEY", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ikey reading", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_rx ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_rx") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "Radio: tuning %.2fMHz",
+            (double)freq / 1000000.0);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
         app->subghz_rx_count   = 0;
+        app->subghz_freq       = (uint32_t)freq;
 
         furi_hal_subghz_reset();
         furi_hal_subghz_load_custom_preset(OOK650_PRESET);
@@ -832,23 +1276,39 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 25;
+        snprintf(app->detail1, DETAIL_LEN, "Radio: %.2fMHz ACTIVE",
+            (double)freq / 1000000.0);
+        strncpy(app->detail2, "0 signals received", DETAIL_LEN - 1);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"scanning\",\"hw\":\"cc1101_rx\",\"freq\":%lld,\"id\":\"%s\"}\n",
+            freq, id);
         usb_send(app, resp);
-        strncpy(app->status, "RF RX", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_record ────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_record") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "Record: tuning %.2fMHz",
+            (double)freq / 1000000.0);
+        view_port_update(app->vp);
+
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
         app->subghz_rx_count   = 0;
         app->rx_timings_count  = 0;
         app->subghz_record_mode = true;
+        app->subghz_freq       = (uint32_t)freq;
 
         furi_hal_subghz_reset();
         furi_hal_subghz_load_custom_preset(OOK650_PRESET);
@@ -861,19 +1321,33 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRecord;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
+        app->op_phase = PhaseActive;
+        app->progress = 5;
+        snprintf(app->detail1, DETAIL_LEN, "Recording %.2fMHz",
+            (double)freq / 1000000.0);
+        snprintf(app->detail2, DETAIL_LEN, "Captured 0/%d timings", RX_MAX_TIMES);
+
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"recording\",\"hw\":\"cc1101_rec\",\"freq\":%lld,\"id\":\"%s\"}\n",
+            freq, id);
         usb_send(app, resp);
-        strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
 
     /* ── subghz_tx_raw ─────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_tx_raw") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
         int repeat     = json_int(js, toks, n, "repeat", 3);
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "TX: tuning %.2fMHz",
+            (double)freq / 1000000.0);
+        view_port_update(app->vp);
 
         static char timings_str[1024]; memset(timings_str, 0, sizeof(timings_str));
         json_str(js, toks, n, "timings", timings_str, sizeof(timings_str));
@@ -886,7 +1360,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         if(app->tx_count == 0) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"NO_TIMINGS\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: no timings", DETAIL_LEN - 1);
+            return;
         }
 
         furi_hal_subghz_reset();
@@ -895,8 +1372,13 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_start_async_tx(subghz_tx_isr, app);
         app->hw_state = HwSubghzTx;
 
-        strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
+        app->op_phase = PhaseActive;
+        app->progress = 10;
+        snprintf(app->detail1, DETAIL_LEN, "TX: %.2fMHz ACTIVE",
+            (double)freq / 1000000.0);
+        snprintf(app->detail2, DETAIL_LEN, "Sending %zu samples x%d",
+            app->tx_count, repeat);
+        app->subghz_freq = (uint32_t)freq;
 
     /* ── storage_write ─────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_write") == 0) {
@@ -906,21 +1388,30 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         json_str(js, toks, n, "content", content, sizeof(content));
         json_unescape(content);
 
+        app->op_phase = PhaseActive;
+        snprintf(app->detail1, DETAIL_LEN, "Writing: %.20s", path);
+        view_port_update(app->vp);
+
         bool ok = storage_write_file(path, content, strlen(content));
         snprintf(resp, sizeof(resp), "{\"status\":\"%s\",\"id\":\"%s\"}\n",
             ok ? "ok" : "error", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, ok ? "write ok" : "write err", sizeof(app->rx_disp) - 1);
+        snprintf(app->detail2, DETAIL_LEN, "Write: %s", ok ? "OK" : "FAILED");
+        snprintf(app->last_result, DETAIL_LEN, "Write:%s", ok ? "OK" : "ERR");
+        app->op_phase = ok ? PhaseDone : PhaseError;
 
     /* ── storage_read ──────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_read") == 0) {
         static char path[128]; memset(path, 0, sizeof(path));
         json_str(js, toks, n, "path", path, sizeof(path));
 
+        app->op_phase = PhaseActive;
+        snprintf(app->detail1, DETAIL_LEN, "Reading: %.20s", path);
+        view_port_update(app->vp);
+
         static char content[512]; memset(content, 0, sizeof(content));
         size_t got = storage_read_file(path, content, sizeof(content));
 
-        /* Escape double quotes for JSON */
         static char escaped[512]; size_t elen = 0;
         for(size_t i = 0; i < got && elen < sizeof(escaped) - 2; i++) {
             if(content[i] == '"') { escaped[elen++] = '\\'; }
@@ -932,17 +1423,27 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"%s\",\"content\":\"%s\",\"id\":\"%s\"}\n",
             got > 0 ? "ok" : "error", escaped, id);
         app->progress = 100; usb_send(app, resp);
+        snprintf(app->detail2, DETAIL_LEN, "Read: %zuB", got);
+        snprintf(app->last_result, DETAIL_LEN, "Read:%zuB", got);
+        app->op_phase = got > 0 ? PhaseDone : PhaseError;
 
     /* ── rfid_emulate ─────────────────────────────────────────────── */
     } else if(strcmp(action, "rfid_emulate") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
         char type_str[32] = {0};
         char data_hex[65] = {0};
         json_str(js, toks, n, "type", type_str, sizeof(type_str));
         json_str(js, toks, n, "data", data_hex, sizeof(data_hex));
+
+        app->op_phase = PhaseInit;
+        snprintf(app->detail1, DETAIL_LEN, "RFID emu: %s", type_str);
+        view_port_update(app->vp);
 
         app->rfid_dict   = protocol_dict_alloc(lfrfid_protocols, LFRFIDProtocolMax);
         app->rfid_worker = lfrfid_worker_alloc(app->rfid_dict);
@@ -970,19 +1471,32 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "RFID EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "rfid emulate", sizeof(app->rx_disp) - 1);
+        strncpy(app->detail1, "RFID emulating", DETAIL_LEN - 1);
+        snprintf(app->detail2, DETAIL_LEN, "%s: %.16s", type_str, data_hex);
+        snprintf(app->last_result, DETAIL_LEN, "RFID emu:%s", type_str);
+        app->op_phase = PhaseActive;
 
     /* ── ikey_emulate ─────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_emulate") == 0) {
         if(app->hw_state != HwIdle) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: HW busy", DETAIL_LEN - 1);
+            return;
         }
         if(!app->ibutton_key) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"NO_KEY\",\"id\":\"%s\"}\n", id);
-            usb_send(app, resp); return;
+            usb_send(app, resp);
+            app->op_phase = PhaseError;
+            strncpy(app->detail2, "Error: no key cached", DETAIL_LEN - 1);
+            return;
         }
+
+        app->op_phase = PhaseInit;
+        strncpy(app->detail1, "iKey emulate: starting", DETAIL_LEN - 1);
+        view_port_update(app->vp);
+
         app->ibutton_protocols = ibutton_protocols_alloc();
         app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
@@ -991,8 +1505,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
         snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "KEY EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "ikey emulate", sizeof(app->rx_disp) - 1);
+        strncpy(app->detail1, "iKey: EMULATING", DETAIL_LEN - 1);
+        strncpy(app->detail2, "Touch reader to send", DETAIL_LEN - 1);
+        strncpy(app->last_result, "iKey emulate", DETAIL_LEN - 1);
+        app->op_phase = PhaseActive;
 
     /* ── nfc_emulate ──────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_emulate") == 0) {
@@ -1004,6 +1520,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
             "\"message\":\"nfc_emulate requires NFC app\",\"id\":\"%s\"}\n", id);
         app->progress = 0; usb_send(app, resp);
+        strncpy(app->detail2, "Not supported yet", DETAIL_LEN - 1);
+        app->op_phase = PhaseError;
 
     /* ── nfc_write ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_write") == 0) {
@@ -1011,6 +1529,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
             "\"message\":\"nfc_write requires NFC app\",\"id\":\"%s\"}\n", id);
         app->progress = 0; usb_send(app, resp);
+        strncpy(app->detail2, "Not supported yet", DETAIL_LEN - 1);
+        app->op_phase = PhaseError;
 
     /* ── unknown ───────────────────────────────────────────────────── */
     } else {
@@ -1018,7 +1538,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             "{\"status\":\"error\",\"code\":\"UNKNOWN\","
             "\"message\":\"%s\",\"id\":\"%s\"}\n", action, id);
         app->progress = 0; usb_send(app, resp);
-        strncpy(app->rx_disp, "unknown cmd", sizeof(app->rx_disp) - 1);
+        snprintf(app->detail2, DETAIL_LEN, "Unknown: %s", action);
+        app->op_phase = PhaseError;
     }
 
     view_port_update(app->vp);
@@ -1031,15 +1552,19 @@ static void process_usb_rx(Pen15App* app) {
     int32_t got = furi_hal_cdc_receive(0, buf, USB_PKT_LEN);
     furi_mutex_release(app->usb_mtx);
 
+    if(got > 0) {
+        app->total_rx += (uint32_t)got;
+        app->usb_active = true;
+        app->usb_last_rx_tick = furi_get_tick();
+    }
+
     for(int32_t i = 0; i < got; i++) {
         char c = (char)buf[i];
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
                 handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,8 +1579,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
-    app->menu_index = 0;
+    app->app_mode  = ModeJson;
     app->init_done = true;
 
     app->thread      = furi_thread_get_current();
@@ -1063,10 +1587,7 @@ int32_t pen15_app(void* p) {
     app->tx_sem      = furi_semaphore_alloc(1, 1);
     app->uart_rx_buf = furi_stream_buffer_alloc(UART_RX_BUF, 1);
     app->hw_state    = HwIdle;
-
-    strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
-    strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
-    strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
+    app->op_phase    = PhaseIdle;
 
     app->vp  = view_port_alloc();
     app->gui = furi_record_open(RECORD_GUI);
@@ -1078,28 +1599,76 @@ int32_t pen15_app(void* p) {
     cli_vcp_disable(app->cli_vcp);
     furi_hal_cdc_set_callbacks(0, (CdcCallbacks*)&CDC_CB, app);
 
-    /* Main event loop */
     while(true) {
         uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 250);
 
         if(evts & FuriFlagError) {
-            /* Timeout tick — check hw deadline */
+            /* ── Periodic tick (250ms timeout) ─────────────────────── */
+
+            /* Hardware deadline check */
             if(app->hw_state != HwIdle &&
                furi_get_tick() > app->hw_deadline_tick) {
-                static char tout[64];
+                static char tout[128];
                 snprintf(tout, sizeof(tout),
-                    "{\"status\":\"error\",\"code\":\"TIMEOUT\",\"id\":\"%s\"}\n",
+                    "{\"status\":\"error\",\"code\":\"TIMEOUT\","
+                    "\"elapsed_ms\":%lu,\"id\":\"%s\"}\n",
+                    (unsigned long)(furi_get_tick() - app->op_start_tick),
                     app->hw_id);
                 hw_stop_all(app);
                 usb_send(app, tout);
-                strncpy(app->rx_disp, "hw timeout", sizeof(app->rx_disp) - 1);
+                strncpy(app->detail1, "TIMEOUT", DETAIL_LEN - 1);
+                strncpy(app->detail2, "Operation timed out", DETAIL_LEN - 1);
+                strncpy(app->last_result, "TIMEOUT", DETAIL_LEN - 1);
+                app->op_phase = PhaseError;
+                app->progress = 0;
             }
-            app->spin++;
+
+            /* USB alive tracking */
+            if(app->usb_active &&
+               furi_get_tick() - app->usb_last_rx_tick > USB_ALIVE_TIMEOUT_MS) {
+                app->usb_active = false;
+            }
+
+            /* Progress reporting to phone (every PROGRESS_INTERVAL_MS) */
+            if(app->op_phase == PhaseActive && app->hw_state != HwIdle &&
+               furi_get_tick() - app->last_progress_tick > PROGRESS_INTERVAL_MS) {
+                send_progress(app);
+                app->last_progress_tick = furi_get_tick();
+            }
+
+            /* Auto-clear done/error phase after 5 seconds */
+            if((app->op_phase == PhaseDone || app->op_phase == PhaseError) &&
+               app->hw_state == HwIdle &&
+               furi_get_tick() - app->op_start_tick > 5000) {
+                app->op_phase = PhaseIdle;
+                app->progress = 0;
+                app->detail1[0] = '\0';
+                app->detail2[0] = '\0';
+            }
+
+            app->blink = !app->blink;
             view_port_update(app->vp);
             continue;
         }
 
         if(evts & EvtStop) break;
+
+        /* ── Manual hardware stop (OK button) ──────────────────── */
+        if(evts & EvtHwStop) {
+            if(app->hw_state != HwIdle) {
+                static char stop_resp[128];
+                snprintf(stop_resp, sizeof(stop_resp),
+                    "{\"status\":\"error\",\"code\":\"CANCELLED\","
+                    "\"id\":\"%s\"}\n", app->hw_id);
+                hw_stop_all(app);
+                usb_send(app, stop_resp);
+                strncpy(app->detail1, "Stopped by user", DETAIL_LEN - 1);
+                strncpy(app->detail2, "Hardware released", DETAIL_LEN - 1);
+                strncpy(app->last_result, "Cancelled", DETAIL_LEN - 1);
+                app->op_phase = PhaseError;
+                app->progress = 0;
+            }
+        }
 
         if(evts & EvtUsbRx) {
             if(app->bridge_mode) {
@@ -1107,8 +1676,13 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
-                    furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                if(got > 0) {
+                    app->total_rx += (uint32_t)got;
+                    app->usb_active = true;
+                    app->usb_last_rx_tick = furi_get_tick();
+                    if(app->uart_ready)
+                        furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                }
             } else {
                 process_usb_rx(app);
             }
@@ -1126,34 +1700,40 @@ int32_t pen15_app(void* p) {
         }
 
         if(evts & EvtBridgeExit) {
-            strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
-            strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
+            app->bridge_mode = false;
+            strncpy(app->detail1, "Bridge disconnected", DETAIL_LEN - 1);
+            strncpy(app->detail2, "", DETAIL_LEN - 1);
+            strncpy(app->last_result, "Bridge off", DETAIL_LEN - 1);
+            app->op_phase = PhaseDone;
             app->progress = 0;
             view_port_update(app->vp);
         }
 
         if(evts & EvtHwDone) {
-            /* Hardware read completed — result already in hw_result_json */
             hw_stop_all(app);
             usb_send(app, app->hw_result_json);
             app->progress = 100;
-            strncpy(app->rx_disp, "hw done", sizeof(app->rx_disp) - 1);
+            app->op_phase = PhaseDone;
         }
 
         if(evts & EvtTxDone) {
-            /* Async TX finished */
             furi_hal_subghz_stop_async_tx();
             furi_hal_subghz_sleep();
             app->hw_state = HwIdle;
-            static char txresp[64];
+            static char txresp[128];
             snprintf(txresp, sizeof(txresp),
-                "{\"status\":\"ok\",\"id\":\"%s\"}\n", app->hw_id);
+                "{\"status\":\"ok\",\"repeats\":%d,\"id\":\"%s\"}\n",
+                app->tx_repeat, app->hw_id);
             usb_send(app, txresp);
             app->progress = 100;
-            strncpy(app->rx_disp, "tx done", sizeof(app->rx_disp) - 1);
+            snprintf(app->detail1, DETAIL_LEN, "TX complete: %d repeats",
+                app->tx_repeat);
+            strncpy(app->detail2, "Radio off", DETAIL_LEN - 1);
+            snprintf(app->last_result, DETAIL_LEN, "TX:%dx", app->tx_repeat);
+            app->op_phase = PhaseDone;
         }
 
-        app->spin++;
+        app->blink = !app->blink;
         view_port_update(app->vp);
     }
 
