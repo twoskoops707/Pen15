@@ -84,6 +84,7 @@ typedef struct {
 
     char   status[DISP_STR_LEN];
     char   cmd_disp[DISP_STR_LEN];
+    char   detail_disp[DISP_STR_LEN];
     char   rx_disp[DISP_STR_LEN];
     uint8_t progress;
     uint8_t spin;
@@ -230,6 +231,77 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     furi_mutex_release(app->usb_mtx);
 }
 
+static void set_disp(char* dst, size_t dst_sz, const char* src) {
+    if(!dst || dst_sz == 0) return;
+    if(!src || !src[0]) src = "---";
+    strncpy(dst, src, dst_sz - 1);
+    dst[dst_sz - 1] = '\0';
+}
+
+static void json_escape_copy(char* dst, size_t dst_sz, const char* src) {
+    if(!dst || dst_sz == 0) return;
+    size_t w = 0;
+    if(!src) src = "";
+    for(size_t r = 0; src[r] && w + 2 < dst_sz; r++) {
+        char c = src[r];
+        if(c == '"' || c == '\\') {
+            dst[w++] = '\\';
+            dst[w++] = c;
+        } else if(c == '\r' || c == '\n' || (unsigned char)c < 32) {
+            dst[w++] = ' ';
+        } else {
+            dst[w++] = c;
+        }
+    }
+    dst[w] = '\0';
+}
+
+static void ui_state(
+    Pen15App* app,
+    const char* status,
+    const char* action,
+    const char* detail,
+    const char* evidence,
+    uint8_t progress) {
+    if(status) set_disp(app->status, sizeof(app->status), status);
+    if(action) set_disp(app->cmd_disp, sizeof(app->cmd_disp), action);
+    if(detail) set_disp(app->detail_disp, sizeof(app->detail_disp), detail);
+    if(evidence) set_disp(app->rx_disp, sizeof(app->rx_disp), evidence);
+    app->progress = progress;
+    view_port_update(app->vp);
+}
+
+static void emit_status(
+    Pen15App* app,
+    const char* id,
+    const char* action,
+    const char* status,
+    const char* message,
+    const char* detail,
+    const char* evidence,
+    uint8_t progress) {
+    char esc_msg[96];
+    char esc_detail[96];
+    char esc_evidence[96];
+    char resp[384];
+    json_escape_copy(esc_msg, sizeof(esc_msg), message);
+    json_escape_copy(esc_detail, sizeof(esc_detail), detail);
+    json_escape_copy(esc_evidence, sizeof(esc_evidence), evidence);
+    snprintf(
+        resp,
+        sizeof(resp),
+        "{\"status\":\"%s\",\"action\":\"%s\",\"message\":\"%s\","
+        "\"detail\":\"%s\",\"evidence\":\"%s\",\"progress\":%u,\"id\":\"%s\"}\n",
+        status ? status : "",
+        action ? action : "",
+        esc_msg,
+        esc_detail,
+        esc_evidence,
+        progress,
+        id ? id : "");
+    usb_send(app, resp);
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    GUI
    ═══════════════════════════════════════════════════════════════════ */
@@ -238,17 +310,19 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 2,  10, "PEN15 CTRL");
+    canvas_draw_str(canvas, 76, 10, SPIN_CHARS[app->spin & 3]);
+    canvas_draw_str(canvas, 88, 10, app->status);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
+    canvas_draw_str(canvas, 2,  22, "OP:");
+    canvas_draw_str(canvas, 26, 22, app->cmd_disp);
+    canvas_draw_str(canvas, 2,  34, "STEP:");
+    canvas_draw_str(canvas, 34, 34, app->detail_disp);
+    canvas_draw_str(canvas, 2,  46, "PROOF:");
+    canvas_draw_str(canvas, 38, 46, app->rx_disp);
+    canvas_draw_frame(canvas, 2, 52, 124, 6);
     uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
+    if(fill > 0) canvas_draw_box(canvas, 2, 52, fill, 6);
     canvas_draw_str(canvas, 2,  62, "[BACK] exit");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
@@ -414,8 +488,11 @@ static void rfid_cb(LFRFIDWorkerReadResult result, ProtocolId proto, void* ctx) 
             snprintf(hex + i * 2, 3, "%02X", data[i]);
 
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"type\":\"%s\",\"data\":\"%s\",\"id\":\"%s\"}\n",
-            name ? name : "RFID", hex, app->hw_id);
+            "{\"status\":\"ok\",\"action\":\"rfid_read\","
+            "\"message\":\"RFID credential captured\","
+            "\"detail\":\"LF reader decoded a nearby tag\","
+            "\"evidence\":\"%s %s\",\"type\":\"%s\",\"data\":\"%s\",\"progress\":100,\"id\":\"%s\"}\n",
+            name ? name : "RFID", hex, name ? name : "RFID", hex, app->hw_id);
 
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
@@ -427,7 +504,14 @@ static void ir_rx_cb(void* ctx, InfraredWorkerSignal* signal) {
     if(infrared_worker_signal_is_decoded(signal)) {
         const InfraredMessage* msg = infrared_worker_get_decoded_signal(signal);
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"protocol\":\"%s\",\"address\":%lu,\"command\":%lu,\"id\":\"%s\"}\n",
+            "{\"status\":\"ok\",\"action\":\"ir_rx\","
+            "\"message\":\"Infrared signal decoded\","
+            "\"detail\":\"Flipper IR receiver captured a valid frame\","
+            "\"evidence\":\"%s 0x%lX/0x%lX\",\"progress\":100,"
+            "\"protocol\":\"%s\",\"address\":%lu,\"command\":%lu,\"id\":\"%s\"}\n",
+            infrared_get_protocol_name(msg->protocol),
+            (unsigned long)msg->address,
+            (unsigned long)msg->command,
             infrared_get_protocol_name(msg->protocol),
             (unsigned long)msg->address,
             (unsigned long)msg->command,
@@ -446,8 +530,15 @@ static void ibutton_cb(void* ctx) {
     ibutton_protocols_render_brief_data(app->ibutton_protocols, app->ibutton_key, data_str);
 
     snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-        "{\"status\":\"ok\",\"type\":\"%s\",\"data\":\"%s\",\"id\":\"%s\"}\n",
-        name ? name : "iButton", furi_string_get_cstr(data_str), app->hw_id);
+        "{\"status\":\"ok\",\"action\":\"ikey_read\","
+        "\"message\":\"iButton credential captured\","
+        "\"detail\":\"1-Wire reader decoded the touched key\","
+        "\"evidence\":\"%s %s\",\"type\":\"%s\",\"data\":\"%s\",\"progress\":100,\"id\":\"%s\"}\n",
+        name ? name : "iButton",
+        furi_string_get_cstr(data_str),
+        name ? name : "iButton",
+        furi_string_get_cstr(data_str),
+        app->hw_id);
 
     furi_string_free(data_str);
     furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
@@ -462,8 +553,12 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
             proto_name = nfc_device_get_protocol_name(event.data.protocols[0]);
 
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"\",\"id\":\"%s\"}\n",
-            proto_name, app->hw_id);
+            "{\"status\":\"ok\",\"action\":\"nfc_detect\","
+            "\"message\":\"NFC tag detected\","
+            "\"detail\":\"Flipper field sensed a compatible NFC protocol\","
+            "\"evidence\":\"%s field interaction\",\"type\":\"%s\",\"uid\":\"\","
+            "\"progress\":100,\"id\":\"%s\"}\n",
+            proto_name, proto_name, app->hw_id);
 
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
@@ -484,7 +579,13 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
             char* p = app->hw_result_json;
             int remaining = (int)sizeof(app->hw_result_json);
             int written = snprintf(p, (size_t)remaining,
-                "{\"status\":\"ok\",\"count\":%zu,\"timings\":\"", app->rx_timings_count);
+                "{\"status\":\"ok\",\"action\":\"subghz_record\","
+                "\"message\":\"SubGHz recording complete\","
+                "\"detail\":\"Raw pulse timings captured from RF activity\","
+                "\"evidence\":\"%zu timings recorded\",\"progress\":100,"
+                "\"count\":%zu,\"timings\":\"",
+                app->rx_timings_count,
+                app->rx_timings_count);
             p += written; remaining -= written;
             for(size_t i = 0; i < app->rx_timings_count && remaining > 16; i++) {
                 written = snprintf(p, (size_t)remaining, i == 0 ? "%ld" : ",%ld",
@@ -500,8 +601,12 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     if(app->subghz_rx_count >= 50 && app->hw_state == HwSubghzRx) {
         app->hw_state = HwIdle;
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"count\":%u,\"timings\":\"\",\"id\":\"%s\"}\n",
-            (unsigned)app->subghz_rx_count, app->hw_id);
+            "{\"status\":\"ok\",\"action\":\"subghz_rx\","
+            "\"message\":\"SubGHz activity detected\","
+            "\"detail\":\"Receiver observed repeated OOK transitions\","
+            "\"evidence\":\"%u pulses counted\",\"progress\":100,"
+            "\"count\":%u,\"timings\":\"\",\"id\":\"%s\"}\n",
+            (unsigned)app->subghz_rx_count, (unsigned)app->subghz_rx_count, app->hw_id);
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
 }
@@ -557,28 +662,40 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     json_str(js, toks, n, "action", action, sizeof(action));
     json_str(js, toks, n, "id",     id,     sizeof(id));
 
-    app->progress = 50;
     app->spin++;
-    strncpy(app->cmd_disp, action, sizeof(app->cmd_disp) - 1);
-    view_port_update(app->vp);
+    ui_state(app, "RX OK", action, "json parsed", "USB CDC frame ok", 8);
+    emit_status(
+        app,
+        id,
+        action,
+        "received",
+        "Command received",
+        "JSON parsed on Flipper",
+        "USB CDC frame ok",
+        8);
 
     /* ── ping ──────────────────────────────────────────────────────── */
     if(strcmp(action, "ping") == 0) {
+        ui_state(app, "RUN", "ping", "handshake reply", "USB CDC alive", 40);
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"ok\",\"device\":\"flipper_zero\","
+            "{\"status\":\"ok\",\"action\":\"ping\",\"message\":\"Handshake complete\","
+            "\"detail\":\"Pen15 Controller responding\",\"evidence\":\"USB CDC alive\","
+            "\"progress\":100,\"device\":\"flipper_zero\","
             "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
-        strncpy(app->status,  "CONN", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
-        app->progress = 100;
+        ui_state(app, "CONN", "ping", "reply sent", "phone ack ready", 100);
 
     /* ── gpio_mode ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_mode") == 0) {
         int  pin  = json_int(js, toks, n, "pin", -1);
         char mode[16] = {0};
         json_str(js, toks, n, "mode", mode, sizeof(mode));
+        ui_state(app, "GPIO", action, "configuring pin", mode, 45);
         if(pin < 0 || pin > 7) {
-            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"action\":\"gpio_mode\",\"code\":\"BAD_PIN\","
+                "\"message\":\"Invalid GPIO index\",\"detail\":\"Expected pin 0-7\","
+                "\"evidence\":\"pin out of range\",\"progress\":100,\"id\":\"%s\"}\n", id);
         } else {
             if(strcmp(mode, "output") == 0) {
                 furi_hal_gpio_init(EXT_PINS[pin], GpioModeOutputPushPull, GpioPullNo, GpioSpeedMedium);
@@ -588,33 +705,51 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 app->pin_mode[pin] = PinInput;
             }
             snprintf(resp, sizeof(resp),
-                "{\"status\":\"ok\",\"pin\":%d,\"mode\":\"%s\",\"id\":\"%s\"}\n", pin, mode, id);
+                "{\"status\":\"ok\",\"action\":\"gpio_mode\",\"message\":\"GPIO mode set\","
+                "\"detail\":\"Pin configured on Flipper header\",\"evidence\":\"pin %d -> %s\","
+                "\"progress\":100,\"pin\":%d,\"mode\":\"%s\",\"id\":\"%s\"}\n",
+                pin, mode, pin, mode, id);
         }
-        app->progress = 100; usb_send(app, resp);
+        usb_send(app, resp);
+        ui_state(app, "GPIO", action, "pin configured", mode, 100);
 
     /* ── gpio_write ────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_write") == 0) {
         int pin   = json_int(js, toks, n, "pin",   -1);
         int value = json_int(js, toks, n, "value", -1);
+        ui_state(app, "GPIO", action, "driving output", value ? "HIGH" : "LOW", 55);
         if(pin < 0 || pin > 7) {
-            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"action\":\"gpio_write\",\"code\":\"BAD_PIN\","
+                "\"message\":\"Invalid GPIO index\",\"detail\":\"Expected pin 0-7\","
+                "\"evidence\":\"pin out of range\",\"progress\":100,\"id\":\"%s\"}\n", id);
         } else if(app->pin_mode[pin] != PinOutput) {
             snprintf(resp, sizeof(resp),
-                "{\"status\":\"error\",\"code\":\"NOT_OUTPUT\","
-                "\"message\":\"Call gpio_mode output first\",\"id\":\"%s\"}\n", id);
+                "{\"status\":\"error\",\"action\":\"gpio_write\",\"code\":\"NOT_OUTPUT\","
+                "\"message\":\"Pin is not configured for output\","
+                "\"detail\":\"Call gpio_mode output first\","
+                "\"evidence\":\"write blocked for safety\",\"progress\":100,\"id\":\"%s\"}\n", id);
         } else {
             furi_hal_gpio_write(EXT_PINS[pin], value != 0);
             snprintf(resp, sizeof(resp),
-                "{\"status\":\"ok\",\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
-                pin, value != 0 ? 1 : 0, id);
+                "{\"status\":\"ok\",\"action\":\"gpio_write\",\"message\":\"GPIO level driven\","
+                "\"detail\":\"Output changed on Flipper header\","
+                "\"evidence\":\"pin %d = %d\",\"progress\":100,"
+                "\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
+                pin, value != 0 ? 1 : 0, pin, value != 0 ? 1 : 0, id);
         }
-        app->progress = 100; usb_send(app, resp);
+        usb_send(app, resp);
+        ui_state(app, "GPIO", action, "write complete", value ? "HIGH" : "LOW", 100);
 
     /* ── gpio_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "gpio_read") == 0) {
         int pin = json_int(js, toks, n, "pin", -1);
+        ui_state(app, "GPIO", action, "sampling input", "waiting for level", 45);
         if(pin < 0 || pin > 7) {
-            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_PIN\",\"id\":\"%s\"}\n", id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"action\":\"gpio_read\",\"code\":\"BAD_PIN\","
+                "\"message\":\"Invalid GPIO index\",\"detail\":\"Expected pin 0-7\","
+                "\"evidence\":\"pin out of range\",\"progress\":100,\"id\":\"%s\"}\n", id);
         } else {
             if(app->pin_mode[pin] == PinUnset) {
                 furi_hal_gpio_init(EXT_PINS[pin], GpioModeInput, GpioPullNo, GpioSpeedLow);
@@ -622,15 +757,20 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             }
             bool val = furi_hal_gpio_read(EXT_PINS[pin]);
             snprintf(resp, sizeof(resp),
-                "{\"status\":\"ok\",\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
-                pin, val ? 1 : 0, id);
+                "{\"status\":\"ok\",\"action\":\"gpio_read\",\"message\":\"GPIO sampled\","
+                "\"detail\":\"Input level read from Flipper header\","
+                "\"evidence\":\"pin %d = %d\",\"progress\":100,"
+                "\"pin\":%d,\"value\":%d,\"id\":\"%s\"}\n",
+                pin, val ? 1 : 0, pin, val ? 1 : 0, id);
+            ui_state(app, "GPIO", action, "sample complete", val ? "HIGH" : "LOW", 100);
         }
-        app->progress = 100; usb_send(app, resp);
+        usb_send(app, resp);
 
     /* ── uart_init ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_init") == 0) {
         int baud = json_int(js, toks, n, "baud", 115200);
         bool uart_ok = false;
+        ui_state(app, "UART", action, "arming usart1", "pins 13/14", 35);
         if(!app->uart_ready) {
             app->serial = furi_hal_serial_control_acquire(FuriHalSerialIdUsart);
             if(app->serial) {
@@ -638,29 +778,62 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 furi_hal_serial_dma_rx_start(app->serial, uart_rx_dma_cb, app, false);
                 app->uart_ready = true;
                 uart_ok = true;
-                snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
+                snprintf(resp, sizeof(resp),
+                    "{\"status\":\"ok\",\"action\":\"uart_init\",\"message\":\"UART armed\","
+                    "\"detail\":\"USART1 ready for AWOK traffic\","
+                    "\"evidence\":\"pins 13/14 @ %d\",\"progress\":100,"
+                    "\"baud\":%d,\"id\":\"%s\"}\n", baud, baud, id);
             } else {
-                snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_BUSY\",\"id\":\"%s\"}\n", id);
+                snprintf(resp, sizeof(resp),
+                    "{\"status\":\"error\",\"action\":\"uart_init\",\"code\":\"UART_BUSY\","
+                    "\"message\":\"UART peripheral is busy\","
+                    "\"detail\":\"USART1 control acquisition failed\","
+                    "\"evidence\":\"another task owns UART\",\"progress\":100,\"id\":\"%s\"}\n", id);
             }
         } else {
             furi_hal_serial_set_br(app->serial, (uint32_t)baud);
             uart_ok = true;
-            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"ok\",\"action\":\"uart_init\",\"message\":\"UART speed updated\","
+                "\"detail\":\"USART1 already active and reconfigured\","
+                "\"evidence\":\"pins 13/14 @ %d\",\"progress\":100,"
+                "\"baud\":%d,\"id\":\"%s\"}\n", baud, baud, id);
         }
-        app->progress = 100; usb_send(app, resp);
-        if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
-            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
-            strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
+        usb_send(app, resp);
+        if(uart_ok) ui_state(app, "UART", action, "ready", "awaiting bridge open", 100);
+
+    /* ── bridge_open ───────────────────────────────────────────────── */
+    } else if(strcmp(action, "bridge_open") == 0) {
+        if(!app->uart_ready) {
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"action\":\"bridge_open\",\"code\":\"UART_NOT_INIT\","
+                "\"message\":\"UART not ready for bridge mode\","
+                "\"detail\":\"Run uart_init before opening the bridge\","
+                "\"evidence\":\"JSON mode retained\",\"progress\":100,\"id\":\"%s\"}\n", id);
+            usb_send(app, resp);
+            ui_state(app, "ERR", action, "bridge blocked", "uart init required", 100);
+        } else {
+            app->bridge_mode = true;
+            app->app_mode = ModeBridge;
+            app->bridge_exit_tick = 0;
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"ok\",\"action\":\"bridge_open\",\"message\":\"USB/UART bridge live\","
+                "\"detail\":\"Raw AWOK traffic now streams through Flipper\","
+                "\"evidence\":\"DTR low exits bridge\",\"progress\":100,\"id\":\"%s\"}\n", id);
+            usb_send(app, resp);
+            ui_state(app, "BRIDGE", action, "usb <-> awok live", "DTR low exits", 100);
         }
 
     /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
         static char data[128]; memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
+        ui_state(app, "UART", action, "forwarding bytes", data, 45);
         if(!app->uart_ready) {
-            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"action\":\"uart_send\",\"code\":\"UART_NOT_INIT\","
+                "\"message\":\"UART not initialized\",\"detail\":\"Run uart_init first\","
+                "\"evidence\":\"AWOK bytes not sent\",\"progress\":100,\"id\":\"%s\"}\n", id);
             usb_send(app, resp);
         } else {
             furi_stream_buffer_reset(app->uart_rx_buf);
@@ -681,24 +854,35 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 if((unsigned char)awok[i] < 32) awok[i] = ' ';
             }
             snprintf(resp, sizeof(resp),
-                "{\"status\":\"ok\",\"uart_rx\":\"%s\",\"id\":\"%s\"}\n", awok, id);
-            app->progress = 100; usb_send(app, resp);
-            strncpy(app->rx_disp, awok_len > 0 ? awok : "(no rx)", sizeof(app->rx_disp) - 1);
+                "{\"status\":\"ok\",\"action\":\"uart_send\",\"message\":\"UART exchange complete\","
+                "\"detail\":\"Bytes forwarded across Flipper GPIO bridge\","
+                "\"evidence\":\"%s\",\"progress\":100,\"uart_rx\":\"%s\",\"id\":\"%s\"}\n",
+                awok_len > 0 ? awok : "(no rx)", awok, id);
+            usb_send(app, resp);
+            ui_state(app, "UART", action, "exchange complete", awok_len > 0 ? awok : "(no rx)", 100);
         }
 
     /* ── get_device_info ───────────────────────────────────────────── */
     } else if(strcmp(action, "get_device_info") == 0) {
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"ok\",\"device\":\"flipper_zero\","
+            "{\"status\":\"ok\",\"action\":\"get_device_info\","
+            "\"message\":\"Device inventory ready\",\"detail\":\"Reporting Flipper + FAP build\","
+            "\"evidence\":\"controller online\",\"progress\":100,\"device\":\"flipper_zero\","
             "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
-        app->progress = 100; usb_send(app, resp);
+        usb_send(app, resp);
+        ui_state(app, "INFO", action, "inventory sent", "controller online", 100);
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
     } else if(strcmp(action, "hw_stop") == 0) {
+        app->bridge_mode = false;
+        app->app_mode = ModeJson;
         hw_stop_all(app);
-        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
-        app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, "hw stop", sizeof(app->rx_disp) - 1);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"action\":\"hw_stop\",\"message\":\"Hardware activity stopped\","
+            "\"detail\":\"Bridge and active workers returned to idle\","
+            "\"evidence\":\"safe idle state\",\"progress\":100,\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        ui_state(app, "IDLE", action, "all activity stopped", "safe idle state", 100);
 
     /* ── rfid_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "rfid_read") == 0) {
@@ -714,10 +898,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         lfrfid_worker_read_start(app->rfid_worker, LFRFIDWorkerReadTypeAuto, rfid_cb, app);
         app->hw_state = HwRfidRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status, "RFID", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "rfid reading", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "reading", "RFID reader armed", "Waiting for LF tag energy", "reader active", 25);
+        ui_state(app, "RFID", action, "reader armed", "present LF tag", 25);
 
     /* ── nfc_detect ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_detect") == 0) {
@@ -733,10 +915,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         nfc_scanner_start(app->nfc_scanner, nfc_scanner_cb, app);
         app->hw_state = HwNfcDetect;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status, "NFC", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "nfc scanning", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "scanning", "NFC field active", "Scanning for nearby tag", "field energized", 25);
+        ui_state(app, "NFC", action, "field active", "tap tag now", 25);
 
     /* ── ir_rx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_rx") == 0) {
@@ -753,10 +933,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         infrared_worker_rx_start(app->ir_worker);
         app->hw_state = HwIrRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status, "IR", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ir learning", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "reading", "IR learner armed", "Waiting for remote transmission", "sensor listening", 25);
+        ui_state(app, "IR", action, "sensor listening", "point remote now", 25);
 
     /* ── ir_tx ─────────────────────────────────────────────────────── */
     } else if(strcmp(action, "ir_tx") == 0) {
@@ -764,6 +942,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         json_str(js, toks, n, "protocol", proto_name, sizeof(proto_name));
         long long address = json_ll(js, toks, n, "address", 0);
         long long command = json_ll(js, toks, n, "command", 0);
+        ui_state(app, "IR", action, "transmitting", proto_name, 55);
 
         InfraredProtocol proto = infrared_get_protocol_by_name(proto_name);
         if(proto == InfraredProtocolUnknown) proto = InfraredProtocolNEC;
@@ -784,9 +963,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         infrared_worker_tx_stop(tx_worker);
         infrared_worker_free(tx_worker);
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
-        app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, "ir tx ok", sizeof(app->rx_disp) - 1);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"action\":\"ir_tx\",\"message\":\"IR burst transmitted\","
+            "\"detail\":\"Flipper IR LED completed requested send\","
+            "\"evidence\":\"protocol %s\",\"progress\":100,\"id\":\"%s\"}\n", proto_name, id);
+        usb_send(app, resp);
+        ui_state(app, "IR", action, "transmit complete", proto_name, 100);
 
     /* ── ikey_read ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_read") == 0) {
@@ -805,10 +987,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         ibutton_worker_read_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyRead;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"reading\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status, "KEY", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "ikey reading", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "reading", "iButton reader armed", "Waiting for key contact", "1-Wire active", 25);
+        ui_state(app, "KEY", action, "reader armed", "touch key now", 25);
 
     /* ── subghz_rx ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_rx") == 0) {
@@ -832,10 +1012,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status, "RF RX", sizeof(app->status) - 1);
-        strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "scanning", "SubGHz receiver armed", "Listening for OOK activity", "CC1101 in RX", 25);
+        ui_state(app, "RF RX", action, "receiver armed", "listening for RF", 25);
 
     /* ── subghz_record ────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_record") == 0) {
@@ -861,10 +1039,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRecord;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
-        usb_send(app, resp);
-        strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "recording", "SubGHz recorder armed", "Capturing raw pulse timings", "CC1101 recording", 25);
+        ui_state(app, "RF REC", action, "recording pulses", "waiting for RF", 25);
 
     /* ── subghz_tx_raw ─────────────────────────────────────────────── */
     } else if(strcmp(action, "subghz_tx_raw") == 0) {
@@ -895,8 +1071,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_start_async_tx(subghz_tx_isr, app);
         app->hw_state = HwSubghzTx;
 
-        strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
+        emit_status(app, id, action, "running", "SubGHz transmitter active", "Broadcasting requested raw timings", "carrier active", 30);
+        ui_state(app, "RF TX", action, "broadcasting", "carrier active", 30);
 
     /* ── storage_write ─────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_write") == 0) {
@@ -907,10 +1083,16 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         json_unescape(content);
 
         bool ok = storage_write_file(path, content, strlen(content));
-        snprintf(resp, sizeof(resp), "{\"status\":\"%s\",\"id\":\"%s\"}\n",
-            ok ? "ok" : "error", id);
-        app->progress = 100; usb_send(app, resp);
-        strncpy(app->rx_disp, ok ? "write ok" : "write err", sizeof(app->rx_disp) - 1);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"%s\",\"action\":\"storage_write\","
+            "\"message\":\"%s\",\"detail\":\"Flipper storage operation finished\","
+            "\"evidence\":\"%s\",\"progress\":100,\"id\":\"%s\"}\n",
+            ok ? "ok" : "error",
+            ok ? "File written" : "File write failed",
+            ok ? "storage write ok" : "storage write err",
+            id);
+        usb_send(app, resp);
+        ui_state(app, ok ? "FILE" : "ERR", action, ok ? "write complete" : "write failed", ok ? "storage write ok" : "storage write err", 100);
 
     /* ── storage_read ──────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_read") == 0) {
@@ -929,9 +1111,15 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         escaped[elen] = '\0';
 
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"%s\",\"content\":\"%s\",\"id\":\"%s\"}\n",
-            got > 0 ? "ok" : "error", escaped, id);
-        app->progress = 100; usb_send(app, resp);
+            "{\"status\":\"%s\",\"action\":\"storage_read\","
+            "\"message\":\"%s\",\"detail\":\"Flipper storage read finished\","
+            "\"evidence\":\"%s\",\"progress\":100,\"content\":\"%s\",\"id\":\"%s\"}\n",
+            got > 0 ? "ok" : "error",
+            got > 0 ? "File read complete" : "File read failed",
+            got > 0 ? "storage read ok" : "storage read err",
+            escaped, id);
+        usb_send(app, resp);
+        ui_state(app, got > 0 ? "FILE" : "ERR", action, got > 0 ? "read complete" : "read failed", got > 0 ? "storage read ok" : "storage read err", 100);
 
     /* ── rfid_emulate ─────────────────────────────────────────────── */
     } else if(strcmp(action, "rfid_emulate") == 0) {
@@ -968,10 +1156,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         lfrfid_worker_emulate_start(app->rfid_worker, proto);
         app->hw_state = HwRfidEmulate;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
-        app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "RFID EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "rfid emulate", sizeof(app->rx_disp) - 1);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"action\":\"rfid_emulate\",\"message\":\"RFID emulation active\","
+            "\"detail\":\"Flipper LF hardware is replaying the supplied credential\","
+            "\"evidence\":\"credential loaded\",\"progress\":100,\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        ui_state(app, "RFID EM", action, "credential loaded", "emulation active", 100);
 
     /* ── ikey_emulate ─────────────────────────────────────────────── */
     } else if(strcmp(action, "ikey_emulate") == 0) {
@@ -989,10 +1179,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         ibutton_worker_emulate_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyEmulate;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
-        app->progress = 100; usb_send(app, resp);
-        strncpy(app->status,  "KEY EM", sizeof(app->status)  - 1);
-        strncpy(app->rx_disp, "ikey emulate", sizeof(app->rx_disp) - 1);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"action\":\"ikey_emulate\",\"message\":\"iButton emulation active\","
+            "\"detail\":\"Stored iButton credential is being replayed\","
+            "\"evidence\":\"1-Wire emulation active\",\"progress\":100,\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        ui_state(app, "KEY EM", action, "credential loaded", "1-wire active", 100);
 
     /* ── nfc_emulate ──────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_emulate") == 0) {
@@ -1001,24 +1193,32 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         json_str(js, toks, n, "uid",  uid_hex,  sizeof(uid_hex));
         json_str(js, toks, n, "type", type_str, sizeof(type_str));
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
-            "\"message\":\"nfc_emulate requires NFC app\",\"id\":\"%s\"}\n", id);
-        app->progress = 0; usb_send(app, resp);
+            "{\"status\":\"error\",\"action\":\"nfc_emulate\",\"code\":\"NOT_SUPPORTED\","
+            "\"message\":\"nfc_emulate requires NFC app\","
+            "\"detail\":\"Current controller does not own Flipper NFC emulation stack\","
+            "\"evidence\":\"use dedicated NFC app\",\"progress\":100,\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        ui_state(app, "ERR", action, "not supported", "use NFC app", 100);
 
     /* ── nfc_write ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_write") == 0) {
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
-            "\"message\":\"nfc_write requires NFC app\",\"id\":\"%s\"}\n", id);
-        app->progress = 0; usb_send(app, resp);
+            "{\"status\":\"error\",\"action\":\"nfc_write\",\"code\":\"NOT_SUPPORTED\","
+            "\"message\":\"nfc_write requires NFC app\","
+            "\"detail\":\"Controller cannot write NFC tags directly\","
+            "\"evidence\":\"use dedicated NFC app\",\"progress\":100,\"id\":\"%s\"}\n", id);
+        usb_send(app, resp);
+        ui_state(app, "ERR", action, "not supported", "use NFC app", 100);
 
     /* ── unknown ───────────────────────────────────────────────────── */
     } else {
         snprintf(resp, sizeof(resp),
-            "{\"status\":\"error\",\"code\":\"UNKNOWN\","
-            "\"message\":\"%s\",\"id\":\"%s\"}\n", action, id);
-        app->progress = 0; usb_send(app, resp);
-        strncpy(app->rx_disp, "unknown cmd", sizeof(app->rx_disp) - 1);
+            "{\"status\":\"error\",\"action\":\"%s\",\"code\":\"UNKNOWN\","
+            "\"message\":\"Unknown command\","
+            "\"detail\":\"Controller does not implement this action\","
+            "\"evidence\":\"%s\",\"progress\":100,\"id\":\"%s\"}\n", action, action, id);
+        usb_send(app, resp);
+        ui_state(app, "ERR", action, "unknown command", action, 100);
     }
 
     view_port_update(app->vp);
@@ -1036,10 +1236,10 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->app_mode == ModeJson) {
+                    handle_json(app, app->json_buf, app->json_len);
+                }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,7 +1254,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
 
@@ -1066,6 +1266,7 @@ int32_t pen15_app(void* p) {
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
+    strncpy(app->detail_disp, "launch app", sizeof(app->detail_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
 
     app->vp  = view_port_alloc();
@@ -1086,13 +1287,17 @@ int32_t pen15_app(void* p) {
             /* Timeout tick — check hw deadline */
             if(app->hw_state != HwIdle &&
                furi_get_tick() > app->hw_deadline_tick) {
-                static char tout[64];
+                static char tout[256];
                 snprintf(tout, sizeof(tout),
-                    "{\"status\":\"error\",\"code\":\"TIMEOUT\",\"id\":\"%s\"}\n",
+                    "{\"status\":\"error\",\"action\":\"%s\",\"code\":\"TIMEOUT\","
+                    "\"message\":\"Hardware activity timed out\","
+                    "\"detail\":\"No device-side completion before deadline\","
+                    "\"evidence\":\"hardware watchdog expired\",\"progress\":100,\"id\":\"%s\"}\n",
+                    app->cmd_disp,
                     app->hw_id);
                 hw_stop_all(app);
                 usb_send(app, tout);
-                strncpy(app->rx_disp, "hw timeout", sizeof(app->rx_disp) - 1);
+                ui_state(app, "TIMEOUT", app->cmd_disp, "hardware watchdog", "no completion", 100);
             }
             app->spin++;
             view_port_update(app->vp);
@@ -1126,18 +1331,14 @@ int32_t pen15_app(void* p) {
         }
 
         if(evts & EvtBridgeExit) {
-            strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
-            strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
-            app->progress = 0;
-            view_port_update(app->vp);
+            ui_state(app, "WAIT", "bridge_open", "bridge closed", "DTR low detected", 0);
         }
 
         if(evts & EvtHwDone) {
             /* Hardware read completed — result already in hw_result_json */
             hw_stop_all(app);
             usb_send(app, app->hw_result_json);
-            app->progress = 100;
-            strncpy(app->rx_disp, "hw done", sizeof(app->rx_disp) - 1);
+            ui_state(app, "DONE", app->cmd_disp, "result sent", "device finished", 100);
         }
 
         if(evts & EvtTxDone) {
@@ -1145,12 +1346,14 @@ int32_t pen15_app(void* p) {
             furi_hal_subghz_stop_async_tx();
             furi_hal_subghz_sleep();
             app->hw_state = HwIdle;
-            static char txresp[64];
+            static char txresp[256];
             snprintf(txresp, sizeof(txresp),
-                "{\"status\":\"ok\",\"id\":\"%s\"}\n", app->hw_id);
+                "{\"status\":\"ok\",\"action\":\"subghz_tx_raw\","
+                "\"message\":\"SubGHz transmit complete\","
+                "\"detail\":\"Requested raw timing sequence finished\","
+                "\"evidence\":\"carrier stopped\",\"progress\":100,\"id\":\"%s\"}\n", app->hw_id);
             usb_send(app, txresp);
-            app->progress = 100;
-            strncpy(app->rx_disp, "tx done", sizeof(app->rx_disp) - 1);
+            ui_state(app, "DONE", "subghz_tx_raw", "carrier stopped", "transmit complete", 100);
         }
 
         app->spin++;
