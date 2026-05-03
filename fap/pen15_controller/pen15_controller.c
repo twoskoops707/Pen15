@@ -123,6 +123,7 @@ typedef struct {
     /* SubGHz RX / Record */
     SubGhzWorker* subghz_worker;
     uint32_t      subghz_rx_count;
+    uint32_t      subghz_progress_last_report;
     bool          subghz_record_mode;
     int32_t       rx_timings[RX_MAX_TIMES];
     size_t        rx_timings_count;
@@ -133,6 +134,7 @@ typedef struct {
     size_t   tx_idx;
     int      tx_repeat;
     int      tx_repeat_cnt;
+    int      tx_repeat_last_report;
 
 } Pen15App;
 
@@ -820,6 +822,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
         app->subghz_rx_count   = 0;
+        app->subghz_progress_last_report = 0;
 
         furi_hal_subghz_reset();
         furi_hal_subghz_load_custom_preset(OOK650_PRESET);
@@ -832,7 +835,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRx;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"scanning\",\"id\":\"%s\"}\n", id);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"scanning\",\"count\":0,\"freq\":%lld,\"id\":\"%s\"}\n",
+            freq, id);
         usb_send(app, resp);
         strncpy(app->status, "RF RX", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "subghz rx", sizeof(app->rx_disp) - 1);
@@ -848,6 +853,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
         app->subghz_rx_count   = 0;
         app->rx_timings_count  = 0;
+        app->subghz_progress_last_report = 0;
         app->subghz_record_mode = true;
 
         furi_hal_subghz_reset();
@@ -861,7 +867,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         subghz_worker_start(app->subghz_worker);
         app->hw_state = HwSubghzRecord;
 
-        snprintf(resp, sizeof(resp), "{\"status\":\"recording\",\"id\":\"%s\"}\n", id);
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"recording\",\"count\":0,\"freq\":%lld,\"id\":\"%s\"}\n",
+            freq, id);
         usb_send(app, resp);
         strncpy(app->status,  "RF REC",    sizeof(app->status)  - 1);
         strncpy(app->rx_disp, "subghz rec", sizeof(app->rx_disp) - 1);
@@ -882,6 +890,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->tx_idx        = 0;
         app->tx_repeat     = repeat;
         app->tx_repeat_cnt = 0;
+        app->tx_repeat_last_report = 0;
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
 
         if(app->tx_count == 0) {
@@ -895,6 +904,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         furi_hal_subghz_start_async_tx(subghz_tx_isr, app);
         app->hw_state = HwSubghzTx;
 
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"transmitting\",\"repeat_done\":0,\"repeat_total\":%d,\"id\":\"%s\"}\n",
+            app->tx_repeat, id);
+        usb_send(app, resp);
         strncpy(app->status,  "RF TX",   sizeof(app->status)  - 1);
         strncpy(app->rx_disp, "tx raw",  sizeof(app->rx_disp) - 1);
 
@@ -1093,6 +1106,32 @@ int32_t pen15_app(void* p) {
                 hw_stop_all(app);
                 usb_send(app, tout);
                 strncpy(app->rx_disp, "hw timeout", sizeof(app->rx_disp) - 1);
+            }
+
+            if(app->hw_state == HwSubghzRx &&
+               app->subghz_rx_count > app->subghz_progress_last_report) {
+                static char rx_progress[128];
+                app->subghz_progress_last_report = app->subghz_rx_count;
+                snprintf(rx_progress, sizeof(rx_progress),
+                    "{\"status\":\"scanning\",\"count\":%u,\"id\":\"%s\"}\n",
+                    (unsigned)app->subghz_rx_count, app->hw_id);
+                usb_send(app, rx_progress);
+            } else if(app->hw_state == HwSubghzRecord &&
+                      app->subghz_rx_count > app->subghz_progress_last_report) {
+                static char rec_progress[128];
+                app->subghz_progress_last_report = app->subghz_rx_count;
+                snprintf(rec_progress, sizeof(rec_progress),
+                    "{\"status\":\"recording\",\"count\":%u,\"id\":\"%s\"}\n",
+                    (unsigned)app->subghz_rx_count, app->hw_id);
+                usb_send(app, rec_progress);
+            } else if(app->hw_state == HwSubghzTx &&
+                      app->tx_repeat_cnt > app->tx_repeat_last_report) {
+                static char tx_progress[128];
+                app->tx_repeat_last_report = app->tx_repeat_cnt;
+                snprintf(tx_progress, sizeof(tx_progress),
+                    "{\"status\":\"transmitting\",\"repeat_done\":%d,\"repeat_total\":%d,\"id\":\"%s\"}\n",
+                    app->tx_repeat_cnt, app->tx_repeat, app->hw_id);
+                usb_send(app, tx_progress);
             }
             app->spin++;
             view_port_update(app->vp);
