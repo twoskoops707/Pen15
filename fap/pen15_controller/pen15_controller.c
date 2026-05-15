@@ -649,40 +649,55 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
-            strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
-            strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
+            /* Stay in JSON USB mode — Marauder uses uart_send; raw CDC bridge is optional */
+            app->app_mode = ModeJson;
+            app->bridge_exit_tick = 0;
+            strncpy(app->status, "UART", sizeof(app->status) - 1);
+            strncpy(app->rx_disp, "awok uart", sizeof(app->rx_disp) - 1);
         }
 
     /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
-        static char data[128]; memset(data, 0, sizeof(data));
+        static char data[256];
+        static char uart_resp[3072];
+        memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
+        json_unescape(data);
+        int wait_ms = json_int(js, toks, n, "wait_ms", UART_RX_WAIT);
+        if(wait_ms < 100) wait_ms = 100;
+        if(wait_ms > 15000) wait_ms = 15000;
         if(!app->uart_ready) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp);
         } else {
             furi_stream_buffer_reset(app->uart_rx_buf);
-            furi_hal_serial_tx(app->serial, (uint8_t*)data, strlen(data));
-            furi_hal_serial_tx_wait_complete(app->serial);
-            static char awok[200]; memset(awok, 0, sizeof(awok));
+            size_t dlen = strlen(data);
+            if(dlen > 0) {
+                furi_hal_serial_tx(app->serial, (uint8_t*)data, dlen);
+                furi_hal_serial_tx_wait_complete(app->serial);
+            }
+            static char awok[1400];
+            memset(awok, 0, sizeof(awok));
             size_t awok_len = 0;
-            uint32_t deadline = furi_get_tick() + furi_ms_to_ticks(UART_RX_WAIT);
+            uint32_t deadline = furi_get_tick() + furi_ms_to_ticks((uint32_t)wait_ms);
             while(furi_get_tick() < deadline && awok_len < sizeof(awok) - 1) {
-                uint8_t b; size_t got = furi_stream_buffer_receive(app->uart_rx_buf, &b, 1, 0);
-                if(got > 0) awok[awok_len++] = (char)b;
-                else furi_delay_ms(5);
+                uint8_t b;
+                size_t got = furi_stream_buffer_receive(app->uart_rx_buf, &b, 1, 0);
+                if(got > 0)
+                    awok[awok_len++] = (char)b;
+                else
+                    furi_delay_ms(5);
             }
             for(size_t i = 0; i < awok_len; i++) {
-                if(awok[i] == '"')  awok[i] = '\'';
+                if(awok[i] == '"') awok[i] = '\'';
                 if(awok[i] == '\r') awok[i] = ' ';
                 if(awok[i] == '\n') awok[i] = '|';
                 if((unsigned char)awok[i] < 32) awok[i] = ' ';
             }
-            snprintf(resp, sizeof(resp),
+            snprintf(uart_resp, sizeof(uart_resp),
                 "{\"status\":\"ok\",\"uart_rx\":\"%s\",\"id\":\"%s\"}\n", awok, id);
-            app->progress = 100; usb_send(app, resp);
+            app->progress = 100;
+            usb_send(app, uart_resp);
             strncpy(app->rx_disp, awok_len > 0 ? awok : "(no rx)", sizeof(app->rx_disp) - 1);
         }
 
@@ -1036,10 +1051,13 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
-                handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                if(app->json_buf[0] == '{') {
+                    handle_json(app, app->json_buf, app->json_len);
+                } else if(app->uart_ready && app->serial) {
+                    furi_hal_serial_tx(app->serial, (uint8_t*)app->json_buf, app->json_len);
+                    furi_hal_serial_tx(app->serial, (uint8_t*)"\r\n", 2);
+                }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,7 +1072,7 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
+    app->app_mode = ModeJson;
     app->menu_index = 0;
     app->init_done = true;
 

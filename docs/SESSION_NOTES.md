@@ -4,11 +4,19 @@
 
 ---
 
-## Current Status: FAP BUILDS BUT STILL NOT COMMUNICATING
+## Current Status (2026-05-15)
 
-Build: PASSING ✅
-FAP + APK both in GitHub Release v3.0.288 ✅
-Runtime communication: BROKEN ❌
+Runtime fixes landed on `main` / release branch: FAP `process_usb_rx` now dispatches any line starting with `{` to `handle_json` (startup was `ModeMenu` so JSON was never parsed). `uart_init` keeps USB in JSON mode (`ModeJson`) and enables optional `wait_ms` on `uart_send` with a larger RX buffer. Android uses `FapProtocol.uartSend` for all Marauder traffic (no raw CDC mixing), USB `reopenPort` after failed session probe, and clearer AWOK GPIO vs USB-direct hints on the dashboard.
+
+**You still need:** matching APK from CI **and** matching `pen15_controller.fap` from the same release on the Flipper (Apps → Tools → Pen15 Controller).
+
+---
+
+## Historical Status (2026-02-22)
+
+Build: PASSING ✅  
+FAP + APK both in GitHub Release v3.0.288 ✅  
+Runtime communication: was BROKEN ❌ (see root-cause sections below — several items addressed in 2026-05-15 patch)
 
 ---
 
