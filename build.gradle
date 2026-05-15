@@ -1,16 +1,20 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Top-level build file. Pen15 v4.
 buildscript {
+    ext {
+        kotlin_version = '1.9.22'
+        compose_compiler_version = '1.5.10'
+        compose_bom_version = '2024.02.02'
+    }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20'
+        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
     }
 }
-
-// Repositories configured in settings.gradle
 
 task clean(type: Delete) {
     delete rootProject.buildDir

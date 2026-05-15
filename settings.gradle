@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "Pentest Dashboard"
+rootProject.name = "Pen15"
 include ':app'

@@ -1,5 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PEN15</string>
-    <string name="warning_message">⚠️ Only use on networks/devices you OWN</string>
-    <string name="target_hint">Target IP/Network (e.g., 192.168.1.0/24)</string>
+    <string name="connection_notification_channel">Pen15 connection</string>
+    <string name="connection_notification_channel_desc">Tracks Flipper / AWOK USB connection</string>
+    <string name="connection_notification_title">Pen15 connected</string>
+    <string name="connection_notification_text">Tap to open</string>
+
+    <!-- Legal -->
+    <string name="legal_warning">Only use on hardware and networks that you own, or that a client has authorized you in writing to test.</string>
+
+    <!-- Hardware status -->
+    <string name="status_idle">No hardware</string>
+    <string name="status_searching">Looking…</string>
+    <string name="status_flipper_only">Flipper ready</string>
+    <string name="status_awok_only">AWOK ready</string>
+    <string name="status_both">All hardware ready</string>
+    <string name="status_error">Connection problem</string>
+
+    <!-- Generic action labels -->
+    <string name="btn_continue">Continue</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_help">Help</string>
+    <string name="btn_done">Done</string>
+    <string name="btn_retry">Try again</string>
 </resources>
