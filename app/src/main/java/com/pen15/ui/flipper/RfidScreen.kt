@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContactlessOutlined
+import androidx.compose.material.icons.rounded.Contactless
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -120,7 +120,7 @@ fun RfidScreen(nav: NavController) {
                         }
                     }
                 },
-                icon = Icons.Rounded.ContactlessOutlined,
+                icon = Icons.Rounded.Contactless,
             )
         },
     )
@@ -138,7 +138,7 @@ private fun ResultCard(type: String, data: String) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Rounded.ContactlessOutlined,
+                imageVector = Icons.Rounded.Contactless,
                 contentDescription = null,
                 tint = Pen15Palette.Cyan,
             )

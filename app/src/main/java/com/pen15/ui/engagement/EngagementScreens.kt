@@ -18,7 +18,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -222,14 +221,6 @@ private fun LabeledField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Pen15Palette.SurfaceLow,
-            unfocusedContainerColor = Pen15Palette.SurfaceLow,
-            focusedTextColor = Pen15Palette.TextPrimary,
-            unfocusedTextColor = Pen15Palette.TextPrimary,
-            focusedBorderColor = Pen15Palette.Cyan,
-            unfocusedBorderColor = Pen15Palette.Outline,
-        ),
         shape = RoundedCornerShape(14.dp),
     )
 }

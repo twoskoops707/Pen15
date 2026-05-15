@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BluetoothSearching
-import androidx.compose.material.icons.rounded.ContactlessOutlined
+import androidx.compose.material.icons.rounded.Contactless
 import androidx.compose.material.icons.rounded.Dns
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Key
@@ -45,7 +45,7 @@ fun FlipperHomeScreen(nav: NavController) {
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         MissionTile("RFID", "125 kHz read / emulate / brute",
-                            Icons.Rounded.ContactlessOutlined, Pen15Palette.Cyan, ready,
+                            Icons.Rounded.Contactless, Pen15Palette.Cyan, ready,
                             { nav.navigate(Routes.FLIPPER_RFID) }, Modifier.weight(1f))
                         MissionTile("NFC", "13.56 MHz read / write / emulate",
                             Icons.Rounded.Sensors, Pen15Palette.Cyan, ready,
