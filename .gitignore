@@ -116,3 +116,4 @@ lint-results*.html
 build_output.log
 *.log
 .env
+.worktrees/
