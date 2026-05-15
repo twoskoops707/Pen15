@@ -1,0 +1,13 @@
+App(
+    appid="pen15_controller",
+    name="Pen15 Controller",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="pen15_app",
+    requires=["gui", "storage"],
+    stack_size=16 * 1024,
+    fap_version=(2, 0),
+    fap_category="Tools",
+    fap_description="Phone-to-Flipper JSON control bridge — RFID/NFC/IR/iButton/SubGHz/GPIO/UART",
+    fap_author="Pen15",
+    fap_weburl="https://github.com/twoskoops707/Pen15",
+)

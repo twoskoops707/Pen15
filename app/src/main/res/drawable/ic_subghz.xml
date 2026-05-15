@@ -1,47 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <!-- Antenna mast -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M12,20 L12,10" />
-    <!-- Antenna top fans -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.8"
-        android:strokeLineCap="round"
-        android:pathData="M8,13 Q12,7 16,13" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M5.5,15 Q12,5.5 18.5,15" />
-    <!-- Ground radials -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M7,20 L12,20 L17,20" />
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M8,22 L12,20 M16,22 L12,20" />
-    <!-- Sine wave -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:pathData="M3,9 Q4.5,6 6,9 Q7.5,12 9,9" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+<path android:fillColor="#FFFFFF" android:pathData="M12,1L8,5h3v9h2L13,5h3L12,1zM18.92,7.08L17.5,8.5C18.46,9.45 19,10.69 19,12c0,1.31 -.54,2.55 -1.5,3.5l1.42,1.42C20.23,15.61 21,13.86 21,12s-.77,-3.61 -2.08,-4.92zM7.08,7.08C5.77,8.39 5,10.14 5,12s.77,3.61 2.08,4.92l1.42,-1.42C7.54,14.55 7,13.31 7,12c0,-1.31 .54,-2.55 1.5,-3.5L7.08,7.08z"/>
 </vector>
