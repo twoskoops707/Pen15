@@ -116,3 +116,6 @@ lint-results*.html
 build_output.log
 *.log
 .env
+
+# Git worktrees (project-local isolation; never commit worktree contents)
+.worktrees/
