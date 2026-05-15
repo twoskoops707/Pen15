@@ -1,5 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PEN15</string>
-    <string name="warning_message">⚠️ Only use on networks/devices you OWN</string>
-    <string name="target_hint">Target IP/Network (e.g., 192.168.1.0/24)</string>
+    <string name="app_name">PenX</string>
 </resources>
