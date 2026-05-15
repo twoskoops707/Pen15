@@ -109,6 +109,9 @@ lint/tmp/
 lint-results*.xml
 lint-results*.html
 
+# Git worktrees
+.worktrees/
+
 # Android Profiling
 *.hprof
 
