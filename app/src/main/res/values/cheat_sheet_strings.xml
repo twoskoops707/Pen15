@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cheat_sheet_body" translatable="false"><![CDATA[AUTHORIZED TESTING ONLY — document client approval before any engagement.
+
+FLIPPER + AWOK
+• USB: 115200 8N1, DTR/RTS on. Open Pen15 Controller FAP before heavy use.
+• AWOK on GPIO: use Wi‑Fi / Marauder cards; AWOK USB chip is a separate path.
+
+FLIPPER CLI (FAP / JSON path in app)
+• RFID read: rfid read
+• NFC: use on-device UI; field: nfc field on|off
+• SubGHz RX: subghz rx <freq_hz>
+• IR RX: ir rx
+• Storage: storage list /ext/
+
+MARAUDER (AWOK UART)
+• scanap — list APs
+• stopscan — stop scan
+• select -a <n> — pick row
+• attack -t deauth — lab only, written consent
+• sniffpmkid — capture lab hashes
+
+TERMUX / OSINT
+• Install from F-Droid; allow-external-apps in ~/.termux/termux.properties
+• Files permission: Settings → Apps → Termux → Files and media → Allow
+• pkg install curl python (minimal for OSINT scripts in PEN15)
+
+GOOGLE DORKS
+• Use Builder tab; open in browser; respect robots + law.
+• Prefer scoped site: queries on assets you are allowed to assess.
+
+ANDROID
+• Logcat tags: FlipperUSBManager, FapProtocol, FlipperGPIOBridge for USB issues.
+• Export logs from app storage under recon / captures paths where applicable.
+]]></string>
+</resources>

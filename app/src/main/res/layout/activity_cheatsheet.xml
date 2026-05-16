@@ -46,9 +46,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="Pentest Cheat Sheet Content Coming Soon..."
+            android:text="@string/cheat_sheet_body"
             android:textColor="@color/white"
-            android:fontFamily="monospace" />
+            android:textSize="12sp"
+            android:lineSpacingMultiplier="1.15"
+            android:fontFamily="monospace"
+            android:textIsSelectable="true" />
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
