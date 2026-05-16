@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.PentestDashboard" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.PentestDashboard" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
-        <item name="colorOnPrimary">@color/background</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
         <item name="colorSecondary">@color/info</item>
         <item name="colorOnSecondary">@color/background</item>
         <item name="android:colorBackground">@color/background</item>
@@ -15,16 +14,17 @@
         <item name="android:navigationBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="materialButtonStyle">@style/Widget.Pen15.Button</item>
-        <item name="cardViewStyle">@style/Widget.Pen15.CardView</item>
+        <item name="materialCardViewStyle">@style/Widget.Pen15.CardView</item>
+        <item name="bottomNavigationStyle">@style/Widget.Pen15.BottomNav</item>
     </style>
 
     <!-- Buttons -->
-    <style name="Widget.Pen15.Button" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.Pen15.Button" parent="Widget.Material3.Button">
         <item name="backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/background</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:minHeight">44dp</item>
-        <item name="android:letterSpacing">0.05</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
     <style name="Widget.Pen15.Button.Danger" parent="Widget.Pen15.Button">
@@ -37,21 +37,27 @@
         <item name="android:textColor">@color/background</item>
     </style>
 
-    <style name="Widget.Pen15.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Widget.Pen15.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="strokeColor">@color/primary</item>
         <item name="android:textColor">@color/primary</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:minHeight">44dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 
     <!-- Cards -->
-    <style name="Widget.Pen15.CardView" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.Pen15.CardView" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/surface</item>
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">0dp</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">2dp</item>
         <item name="strokeColor">@color/border</item>
         <item name="strokeWidth">1dp</item>
         <item name="contentPadding">16dp</item>
+    </style>
+
+    <style name="Widget.Pen15.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:minHeight">64dp</item>
+        <item name="elevation">10dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
     <style name="Widget.Pen15.CardView.Danger" parent="Widget.Pen15.CardView">
@@ -59,20 +65,20 @@
     </style>
 
     <!-- Text styles -->
-    <style name="TextAppearance.Pen15.SectionHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
+    <style name="TextAppearance.Pen15.SectionHeader" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">13sp</item>
         <item name="android:letterSpacing">0.1</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="TextAppearance.Pen15.Terminal" parent="TextAppearance.MaterialComponents.Body2">
+    <style name="TextAppearance.Pen15.Terminal" parent="TextAppearance.Material3.BodySmall">
         <item name="android:textColor">@color/terminal_text</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">monospace</item>
     </style>
 
-    <style name="TextAppearance.Pen15.StatusBadge" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Pen15.StatusBadge" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.05</item>
@@ -80,14 +86,14 @@
     </style>
 
     <!-- Module card title -->
-    <style name="TextAppearance.Pen15.ModuleTitle" parent="TextAppearance.MaterialComponents.Subtitle2">
+    <style name="TextAppearance.Pen15.ModuleTitle" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- Alert dialog dark theme -->
-    <style name="AlertDialogDark" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="AlertDialogDark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:background">@color/surface</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>

@@ -7,6 +7,24 @@ A Kotlin Android app that provides a **graphical user interface** for Termux pen
 - **Flipper Zero** (portable multi-tool hacking device)
 - **AWOK Dual Mini v3** (ESP32-based WiFi wardriving device with Marauder firmware)
 
+## Active development: `cursor/pen15-app-polish-4acf`
+
+This branch is the **polish + reliability** line. It includes:
+
+| Area | What changed |
+|------|----------------|
+| **Flipper ↔ phone** | JSON-RPC buffered until full lines (USB/BLE split packets). `initSession` messaging works for USB or Bluetooth. |
+| **Pen15 Controller FAP** | `uart_send` payload buffer widened; Marauder commands get proper **CRLF** on USART from the Android bridge. |
+| **AWOK / Marauder** | GPIO/UART path uses `FapProtocol.uartSend` with sane timeouts; probe uses the same framing as live commands. |
+| **OSINT** | In-app log via Termux background runner, browser fallback if Termux missing, STOP / TERMUX controls. |
+| **Cheat sheet** | Real content from `cheat_sheet_strings.xml` (authorized testing, Flipper CLI, Marauder, Termux). |
+| **Google Dorks** | Search opens with a system **app chooser** (pick browser). |
+| **UI** | Material **3** theme, gradient shell, elevated bottom nav, larger module tiles and refined card strokes. |
+
+**APK builds:** GitHub Actions workflow **Android Debug Build - Creates Release** runs on pushes to `main`, `awok-only`, `ux-redesign`, and **`cursor/**`** (including this branch). Open **Actions → Run workflow** to build manually from any default branch that contains the workflow file.
+
+**FAP:** Rebuild `fap/pen15_controller` with your usual Flipper toolchain (UFBT / official SDK) after pulling this branch; install the `.fap` on the Flipper, then open **Pen15 Controller** before heavy USB JSON use.
+
 ## 🚨 Legal Disclaimer
 
 **CRITICAL WARNING:** This app is for **AUTHORIZED TESTING ONLY**
@@ -28,20 +46,17 @@ A Kotlin Android app that provides a **graphical user interface** for Termux pen
 
 ## 📥 How to Get the APK
 
-### Download Pre-Built APK (Easiest)
+### Download from GitHub Actions (recommended)
 
-1. **Go to the GitHub Actions page:**
-   - https://github.com/twoskoops707/Pen15/actions
+1. Open **Actions**: https://github.com/twoskoops707/Pen15/actions  
+2. Select workflow **Android Debug Build - Creates Release**.  
+3. Pick the latest run for your branch (e.g. **`cursor/pen15-app-polish-4acf`**) with a green checkmark, **or** use **Run workflow** on a branch that includes `.github/workflows/build.yml`.  
+4. Under **Artifacts**, download **`pentest-dashboard-debug-apk`** (or the run’s renamed APK).  
+5. Unzip → install **`app-debug.apk`** (or the SHA-named APK) on Android **11+**.
 
-2. **Click on the latest successful workflow** (green checkmark ✅)
+**Manual CI run:** Workflow **Emergency Build & Release** is also available (`workflow_dispatch`) for a one-off APK when you need it from the default branch checkout.
 
-3. **Scroll down to "Artifacts"**
-
-4. **Download:** `pentest-dashboard-debug-apk`
-
-5. **Extract the ZIP file** → You'll get `app-debug.apk`
-
-6. **Transfer to your phone** and install
+> **Note:** Pushes to `cursor/**` trigger this workflow so feature branches get CI builds without merging to `main`.
 
 ---
 
@@ -261,6 +276,19 @@ make install
 
 ## 🔧 Troubleshooting
 
+### Flipper shows "Pen15 Controller not responding"
+
+1. On the Flipper, open **Apps → Tools → Pen15 Controller** (FAP must be running).  
+2. USB: use a data-capable cable; grant USB permission on the phone. Unofficial firmware (e.g. Momentum) may spoof VID/PID — the app falls back to CDC probing.  
+3. Bluetooth: pair the Flipper, connect from the app, then retry **init session** (same FAP requirement).  
+4. Logs: `adb logcat | grep -E 'FlipperUSBManager|FapProtocol|FlipperGPIOBridge'`
+
+### AWOK / Marauder silent on GPIO path
+
+1. Power the AWOK module; confirm **USART** to the Flipper (not only USB-C to the phone).  
+2. Open **Pen15 Controller** on the Flipper, then use **WiFi Deauth / GPIO / Marauder** cards in the app so `uart_init` + `uart_send` run.  
+3. If scans return empty, increase wait times in code paths or check Marauder baud (default **115200**).
+
 ### "Termux not installed"
 - Install Termux from F-Droid: https://f-droid.org/en/packages/com.termux/
 - DO NOT use Google Play Store version
@@ -316,41 +344,48 @@ pkg install build-essential clang make autoconf automake libtool pkg-config
 
 ## 🏗️ Building from Source
 
-### Build APK with GitHub Actions (Recommended)
+### GitHub Actions (recommended — matches release APK)
 
-1. Fork this repository
-2. Go to Actions tab
-3. Click "Android CI Build with Debugging"
-4. Click "Run workflow"
-5. Wait 10-15 minutes
-6. Download APK from Artifacts
+1. Ensure your branch includes `.github/workflows/build.yml` (e.g. merge or cherry-pick from `cursor/pen15-app-polish-4acf` / `main`).
+2. **Actions** → **Android Debug Build - Creates Release** → **Run workflow** (or push to `main`, `awok-only`, `ux-redesign`, or `cursor/**`).
+3. Wait for the job to finish; download the **artifact** APK from the run page.
 
-### Build APK Locally (Requires Android Studio)
+### Local build (Android Studio)
 
 ```bash
 git clone https://github.com/twoskoops707/Pen15.git
 cd Pen15
-# Open in Android Studio
-# Build → Build Bundle(s) / APK(s) → Build APK(s)
+# Open in Android Studio → Build → Build Bundle(s) / APK(s) → Build APK(s)
 ```
+
+### Flipper FAP (Pen15 Controller)
+
+```text
+fap/pen15_controller/   — C source for the Flipper app (JSON over USB CDC, USART to AWOK)
+```
+
+Build with your Flipper SDK / UFBT; install the resulting `.fap` on the device. The Android app expects this FAP for JSON actions (`ping`, `uart_init`, `uart_send`, RFID/NFC/SubGHz, etc.).
 
 ---
 
-## 📁 Project Structure
+## 📁 Project structure (overview)
 
-```
+```text
 Pen15/
-├── app/
-│   ├── src/main/
-│   │   ├── java/com/pentest/dashboard/
-│   │   │   └── MainActivity.kt      # App logic
-│   │   ├── res/layout/
-│   │   │   └── activity_main.xml    # UI layout
-│   │   └── AndroidManifest.xml      # Permissions
-│   └── build.gradle                 # Dependencies
-├── .github/workflows/
-│   └── build.yml                    # Auto-build config
-└── README.md                        # This file
+├── app/src/main/java/com/pentest/dashboard/   # Kotlin UI + Flipper/ESP32/Termux glue
+│   ├── MainActivity.kt
+│   ├── FlipperUSBManager.kt / FlipperBluetoothManager.kt
+│   ├── FlipperConnectionManager.kt / FapProtocol.kt
+│   ├── FlipperGPIOBridge.kt                    # AWOK over Flipper USART (FAP uart_send)
+│   ├── ESP32SerialManager.kt                   # Direct AWOK USB (CP2102/CH340/…)
+│   └── OSINTActivity.kt, GoogleDorkActivity.kt, …
+├── app/src/main/res/
+│   ├── layout/activity_main.xml
+│   ├── values/themes.xml, colors.xml
+│   └── drawable/                               # Cards, chips, gradients
+├── fap/pen15_controller/                       # Flipper Zero FAP (C)
+├── .github/workflows/build.yml                 # Debug APK CI
+└── README.md
 ```
 
 ---

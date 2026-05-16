@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@drawable/bg_main_gradient">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"
+        android:background="@android:color/transparent"
         app:elevation="0dp">
 
         <!-- HEADER -->
@@ -43,7 +43,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pentest Dashboard"
+                    android:text="Flipper · AWOK · Termux — one console"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif"
@@ -279,7 +279,7 @@
                 <LinearLayout
                     android:id="@+id/cardRFID"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -316,7 +316,7 @@
                 <LinearLayout
                     android:id="@+id/cardNFC"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -360,7 +360,7 @@
                 <LinearLayout
                     android:id="@+id/cardSubGHz"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -397,7 +397,7 @@
                 <LinearLayout
                     android:id="@+id/cardBadUSB"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -441,7 +441,7 @@
                 <LinearLayout
                     android:id="@+id/cardIR"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -478,7 +478,7 @@
                 <LinearLayout
                     android:id="@+id/cardIButton"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -522,7 +522,7 @@
                 <LinearLayout
                     android:id="@+id/cardBluetooth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -559,7 +559,7 @@
                 <LinearLayout
                     android:id="@+id/cardGPIO"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_flipper"
@@ -618,7 +618,7 @@
                 <LinearLayout
                     android:id="@+id/cardWifiDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_awok"
@@ -655,7 +655,7 @@
                 <LinearLayout
                     android:id="@+id/cardMarauder"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_awok"
@@ -714,7 +714,7 @@
                 <LinearLayout
                     android:id="@+id/cardOSINT"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -751,7 +751,7 @@
                 <LinearLayout
                     android:id="@+id/cardDork"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -795,7 +795,7 @@
                 <LinearLayout
                     android:id="@+id/cardNetScan"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -832,7 +832,7 @@
                 <LinearLayout
                     android:id="@+id/cardExploit"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -876,7 +876,7 @@
                 <LinearLayout
                     android:id="@+id/cardPacket"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -913,7 +913,7 @@
                 <LinearLayout
                     android:id="@+id/cardHash"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -957,7 +957,7 @@
                 <LinearLayout
                     android:id="@+id/cardPhone"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_recon"
@@ -994,7 +994,7 @@
                 <LinearLayout
                     android:id="@+id/cardSettings"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="108dp"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
                     android:background="@drawable/bg_hardware_card_default"
@@ -1041,9 +1041,11 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/surface"
+        android:background="@drawable/bg_bottom_nav"
+        android:paddingTop="6dp"
+        app:elevation="12dp"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
         app:labelVisibilityMode="labeled"
