@@ -658,7 +658,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
     /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
-        static char data[256];
+        static char data[512];
         static char uart_resp[3072];
         memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
