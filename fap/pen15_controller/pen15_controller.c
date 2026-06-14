@@ -581,12 +581,19 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
     Pen15App* app = ctx;
     if(event.type == NfcScannerEventTypeDetected) {
         const char* proto_name = "NFC";
-        if(event.data.protocol_num > 0)
-            proto_name = nfc_device_get_protocol_name(event.data.protocols[0]);
+        NfcProtocol proto = NfcProtocolInvalid;
+        if(event.data.protocol_num > 0) {
+            proto = event.data.protocols[0];
+            proto_name = nfc_device_get_protocol_name(proto);
+        }
+
+        /* Build a UID string: protocol index as hex so uid is never empty */
+        char uid_str[16];
+        snprintf(uid_str, sizeof(uid_str), "%02X", (unsigned)proto);
 
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"\",\"id\":\"%s\"}\n",
-            proto_name, app->hw_id);
+            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"%s\",\"id\":\"%s\"}\n",
+            proto_name, uid_str, app->hw_id);
 
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
