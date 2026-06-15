@@ -16,6 +16,11 @@
 #include <nfc/nfc.h>
 #include <nfc/nfc_scanner.h>
 #include <nfc/nfc_device.h>
+#include <nfc/nfc_poller.h>
+#include <nfc/nfc_listener.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a_poller.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a_listener.h>
 #include <subghz/subghz_worker.h>
 #include <string.h>
 #include <stdio.h>
@@ -41,8 +46,9 @@ typedef enum {
     EvtHwDone     = (1 << 3),
     EvtTxDone     = (1 << 4),
     EvtBridgeExit = (1 << 5),
+    EvtNfcPhase2  = (1 << 6),
 } Pen15Evt;
-#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit)
+#define ALL_EVENTS (EvtStop | EvtUsbRx | EvtUartRx | EvtHwDone | EvtTxDone | EvtBridgeExit | EvtNfcPhase2)
 
 /* ── Hardware state ───────────────────────────────────────────────── */
 typedef enum {
@@ -50,6 +56,8 @@ typedef enum {
     HwRfidRead,
     HwRfidEmulate,
     HwNfcDetect,
+    HwNfcRead,
+    HwNfcEmulate,
     HwIrRx,
     HwIkeyRead,
     HwIkeyEmulate,
@@ -135,8 +143,11 @@ typedef struct {
     iButtonKey*       ibutton_key;
 
     /* NFC */
-    Nfc*        nfc;
-    NfcScanner* nfc_scanner;
+    Nfc*         nfc;
+    NfcScanner*  nfc_scanner;
+    NfcPoller*   nfc_poller;
+    NfcListener* nfc_listener;
+    NfcProtocol  nfc_detected_proto;
 
     /* SubGHz RX / Record */
     SubGhzWorker* subghz_worker;
@@ -546,10 +557,24 @@ static void hw_stop_all(Pen15App* app) {
         if(app->ibutton_protocols) { ibutton_protocols_free(app->ibutton_protocols); app->ibutton_protocols = NULL; }
         /* ibutton_key is kept alive after read so ikey_emulate can reuse it */
     }
-    if(app->hw_state == HwNfcDetect && app->nfc_scanner) {
-        nfc_scanner_stop(app->nfc_scanner);
-        nfc_scanner_free(app->nfc_scanner);
-        app->nfc_scanner = NULL;
+    if(app->hw_state == HwNfcDetect ||
+       app->hw_state == HwNfcRead   ||
+       app->hw_state == HwNfcEmulate) {
+        if(app->nfc_scanner) {
+            nfc_scanner_stop(app->nfc_scanner);
+            nfc_scanner_free(app->nfc_scanner);
+            app->nfc_scanner = NULL;
+        }
+        if(app->nfc_poller) {
+            nfc_poller_stop(app->nfc_poller);
+            nfc_poller_free(app->nfc_poller);
+            app->nfc_poller = NULL;
+        }
+        if(app->nfc_listener) {
+            nfc_listener_stop(app->nfc_listener);
+            nfc_listener_free(app->nfc_listener);
+            app->nfc_listener = NULL;
+        }
         if(app->nfc) { nfc_free(app->nfc); app->nfc = NULL; }
     }
     if((app->hw_state == HwSubghzRx || app->hw_state == HwSubghzRecord) && app->subghz_worker) {
@@ -654,27 +679,45 @@ static void ibutton_cb(void* ctx) {
     furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
 }
 
-/* NFC scanner */
+/* NFC phase-1 scanner — detects protocol only, fires EvtNfcPhase2 */
 static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
     Pen15App* app = ctx;
     if(event.type == NfcScannerEventTypeDetected) {
-        const char* proto_name = "NFC";
-        NfcProtocol proto = NfcProtocolInvalid;
-        if(event.data.protocol_num > 0) {
-            proto = event.data.protocols[0];
-            proto_name = nfc_device_get_protocol_name(proto);
-        }
+        app->nfc_detected_proto = (event.data.protocol_num > 0)
+            ? event.data.protocols[0]
+            : NfcProtocolInvalid;
+        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtNfcPhase2);
+    }
+}
 
-        /* Build a UID string: protocol index as hex so uid is never empty */
-        char uid_str[16];
-        snprintf(uid_str, sizeof(uid_str), "%02X", (unsigned)proto);
+/* NFC phase-2 poller — reads real ISO14443-3A UID bytes */
+static NfcCommand nfc_poller_cb(NfcPollerEvent event, void* ctx) {
+    Pen15App* app = ctx;
+    if(app->hw_state != HwNfcRead) return NfcCommandStop;
 
+    Iso14443_3aPollerEvent* iso_ev = (Iso14443_3aPollerEvent*)event;
+
+    if(iso_ev->type == Iso14443_3aPollerEventTypeReady) {
+        const Iso14443_3aData* d = iso_ev->data;
+        char uid_hex[24] = {0};
+        for(uint8_t i = 0; i < d->uid_len && i < 10; i++)
+            snprintf(uid_hex + i * 2, 3, "%02X", d->uid[i]);
+
+        const char* proto_name = nfc_device_get_protocol_name(NfcProtocolIso14443_3a);
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"%s\",\"id\":\"%s\"}\n",
-            proto_name, uid_str, app->hw_id);
+            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"%s\","
+            "\"atqa\":\"%04X\",\"sak\":\"%02X\",\"id\":\"%s\"}\n",
+            proto_name ? proto_name : "ISO14443-3A",
+            uid_hex,
+            (unsigned)d->atqa,
+            (unsigned)d->sak,
+            app->hw_id);
 
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
+        return NfcCommandStop;
     }
+
+    return NfcCommandContinue;
 }
 
 /* SubGHz RX pair callback */
@@ -1204,14 +1247,38 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 
     /* ── nfc_emulate ──────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_emulate") == 0) {
+        if(app->hw_state != HwIdle) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp); return;
+        }
         char uid_hex[32] = {0};
-        char type_str[32] = {0};
-        json_str(js, toks, n, "uid",  uid_hex,  sizeof(uid_hex));
-        json_str(js, toks, n, "type", type_str, sizeof(type_str));
-        snprintf(resp, sizeof(resp),
-            "{\"status\":\"error\",\"code\":\"NOT_SUPPORTED\","
-            "\"message\":\"nfc_emulate requires NFC app\",\"id\":\"%s\"}\n", id);
-        app->progress = 0; usb_send(app, resp);
+        json_str(js, toks, n, "uid", uid_hex, sizeof(uid_hex));
+
+        Iso14443_3aData iso_data;
+        memset(&iso_data, 0, sizeof(iso_data));
+        size_t hex_len = strlen(uid_hex);
+        for(size_t i = 0; i + 1 < hex_len && iso_data.uid_len < 10; i += 2) {
+            char bs[3] = { uid_hex[i], uid_hex[i+1], '\0' };
+            iso_data.uid[iso_data.uid_len++] = (uint8_t)strtol(bs, NULL, 16);
+        }
+        if(iso_data.uid_len == 0) {
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"error\",\"code\":\"BAD_UID\",\"id\":\"%s\"}\n", id);
+            app->progress = 0; usb_send(app, resp);
+        } else {
+            /* Default ATQA/SAK for ISO14443-3A (NTAG-compatible) */
+            iso_data.atqa = 0x4400;
+            iso_data.sak  = 0x00;
+            strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+            app->nfc = nfc_alloc();
+            app->nfc_listener = nfc_listener_alloc(app->nfc, NfcProtocolIso14443_3a, &iso_data);
+            nfc_listener_start(app->nfc_listener, NULL, NULL);
+            app->hw_state = HwNfcEmulate;
+            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"id\":\"%s\"}\n", id);
+            app->progress = 100; usb_send(app, resp);
+            strncpy(app->status,  "NFC EM",     sizeof(app->status)  - 1);
+            strncpy(app->rx_disp, "nfc emulate", sizeof(app->rx_disp) - 1);
+        }
 
     /* ── nfc_write ────────────────────────────────────────────────── */
     } else if(strcmp(action, "nfc_write") == 0) {
@@ -1336,6 +1403,34 @@ int32_t pen15_app(void* p) {
             strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
             app->progress = 0;
             view_port_update(app->vp);
+        }
+
+        /* NFC phase 2: scanner detected protocol, now start poller for real UID */
+        if(evts & EvtNfcPhase2) {
+            if(app->hw_state == HwNfcDetect && app->nfc_scanner) {
+                nfc_scanner_stop(app->nfc_scanner);
+                nfc_scanner_free(app->nfc_scanner);
+                app->nfc_scanner = NULL;
+
+                if(app->nfc_detected_proto == NfcProtocolIso14443_3a) {
+                    app->nfc_poller = nfc_poller_alloc(app->nfc, NfcProtocolIso14443_3a);
+                    nfc_poller_start(app->nfc_poller, nfc_poller_cb, app);
+                    app->hw_state = HwNfcRead;
+                    strncpy(app->rx_disp, "nfc uid read", sizeof(app->rx_disp) - 1);
+                } else {
+                    /* Non-ISO14443-3A: return protocol name + proto-index as UID */
+                    NfcProtocol proto = app->nfc_detected_proto;
+                    const char* pname = (proto != NfcProtocolInvalid)
+                        ? nfc_device_get_protocol_name(proto) : "NFC";
+                    char uid_str[8];
+                    snprintf(uid_str, sizeof(uid_str), "%02X", (unsigned)proto);
+                    snprintf(app->hw_result_json, sizeof(app->hw_result_json),
+                        "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"%s\",\"id\":\"%s\"}\n",
+                        pname ? pname : "NFC", uid_str, app->hw_id);
+                    if(app->nfc) { nfc_free(app->nfc); app->nfc = NULL; }
+                    furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
+                }
+            }
         }
 
         if(evts & EvtHwDone) {
