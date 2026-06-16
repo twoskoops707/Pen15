@@ -61,6 +61,14 @@
                 app:tint="@color/text_secondary" />
         </LinearLayout>
 
+        <include
+            layout="@layout/view_setup_instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="8dp" />
+
         <!-- STATUS CHIPS -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -216,8 +224,6 @@
             android:orientation="vertical"
             android:paddingHorizontal="12dp"
             android:paddingBottom="100dp">
-
-            <include layout="@layout/view_setup_instructions" />
 
             <!-- MISSION WIZARD -->
             <LinearLayout
