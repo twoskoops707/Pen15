@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardSetupHelp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="@color/surface_raised"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/primary"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="START HERE"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.06" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
+            android:text="Do these once. Tap YES when the phone asks."
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="6dp"
+            android:textColor="@color/text_primary"
+            android:textSize="13sp"
+            android:text="1. Plug Flipper or AWOK into your phone with the USB cable.\n\n2. Phone says Allow USB? Tap YES.\n\n3. On Flipper: Apps → Tools → Pen15 Controller (open it).\n\n4. Phone says Allow Bluetooth? Tap ALLOW.\n\n5. Phone says Allow Location? Tap ALLOW (needed for WiFi tools).\n\n6. For green Recon tools: install Termux from F-Droid (not Play Store). Open Termux once, then come back here.\n\n7. Tap the FLIPPER or AWOK box at the top when you are ready." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenTermuxHelp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Get Termux (F-Droid)"
+            android:textColor="@color/section_recon"
+            app:strokeColor="@color/section_recon" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

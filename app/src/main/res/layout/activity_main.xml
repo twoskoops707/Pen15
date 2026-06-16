@@ -217,6 +217,8 @@
             android:paddingHorizontal="12dp"
             android:paddingBottom="100dp">
 
+            <include layout="@layout/view_setup_instructions" />
+
             <!-- MISSION WIZARD -->
             <LinearLayout
                 android:id="@+id/cardWizard"
