@@ -1,0 +1,73 @@
+name: Cyber Refined Build
+
+on:
+  push:
+    branches: [ cursor/cyber-refined-ui-1082 ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4.7.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: |
+          ./gradlew assembleDebug --stacktrace 2>&1 | tee /tmp/build_full.log
+          BUILD_EXIT="${PIPESTATUS[0]}"
+          echo ""
+          echo "========== KOTLIN COMPILER ERRORS =========="
+          grep -E "^e: |: error:" /tmp/build_full.log | head -100 || echo "(no Kotlin error lines found)"
+          echo "============================================="
+          exit "$BUILD_EXIT"
+
+      - name: Rename APK
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             app/build/outputs/apk/debug/pen15-cyber-${SHORT_SHA}.apk
+          ls -lh app/build/outputs/apk/debug/
+
+      - name: Build Pen15 FAP
+        uses: flipperdevices/flipperzero-ufbt-action@v0.1
+        id: build-fap
+        with:
+          sdk-channel: release
+          app-dir: fap/pen15_controller
+
+      - name: Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: cyber-${{ github.run_number }}
+          name: Pen15 Cyber Refined #${{ github.run_number }} (${{ github.sha }})
+          body: |
+            ## Pen15 Cyber Refined UI Branch
+
+            **Branch:** `cursor/cyber-refined-ui-1082`
+            **Commit:** `${{ github.sha }}`
+
+            ### Downloads
+            - **pen15-cyber-*.apk** — Android app
+            - **pen15_controller.fap** — Flipper controller (live link + progress UI)
+
+            Install FAP to `/apps/Tools/pen15_controller.fap` on Flipper SD card.
+          files: |
+            app/build/outputs/apk/debug/pen15-cyber-*.apk
+            ${{ steps.build-fap.outputs.fap-artifacts }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

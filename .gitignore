@@ -119,3 +119,5 @@ lint-results*.html
 build_output.log
 *.log
 .env
+android-sdk/
+local.properties

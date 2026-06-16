@@ -195,6 +195,12 @@
                     android:background="@drawable/glow_dot_red" />
             </LinearLayout>
         </LinearLayout>
+
+        <include
+            android:id="@+id/dashboardLink"
+            layout="@layout/view_data_flow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- MAIN CONTENT -->

@@ -111,6 +111,13 @@ typedef struct {
     uint8_t progress;
     uint8_t spin;
 
+    uint32_t tx_bytes;
+    uint32_t rx_bytes;
+    uint32_t tx_burst_tick;
+    uint32_t rx_burst_tick;
+    uint32_t hw_start_tick;
+    uint32_t last_progress_tick;
+
     PinMode pin_mode[8];
 
     Gui*      gui;
@@ -231,8 +238,48 @@ static void uart_rx_dma_cb(FuriHalSerialHandle* h, FuriHalSerialRxEvent ev,
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   USB send
+   USB send + byte accounting
    ═══════════════════════════════════════════════════════════════════ */
+static void pen15_note_tx(Pen15App* app, uint16_t len) {
+    app->tx_bytes += len;
+    app->tx_burst_tick = furi_get_tick() + furi_ms_to_ticks(200);
+}
+
+static void pen15_note_rx(Pen15App* app, uint16_t len) {
+    app->rx_bytes += len;
+    app->rx_burst_tick = furi_get_tick() + furi_ms_to_ticks(200);
+}
+
+static void usb_send(Pen15App* app, const char* str);
+static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len);
+
+static void pen15_send_progress(Pen15App* app, const char* phase) {
+    if(!app->hw_id[0]) return;
+    uint32_t remain_ms = 0;
+    if(app->hw_deadline_tick > app->hw_start_tick) {
+        uint32_t now = furi_get_tick();
+        uint32_t total = app->hw_deadline_tick - app->hw_start_tick;
+        uint32_t elapsed = (now > app->hw_start_tick) ? (now - app->hw_start_tick) : 0;
+        if(total > 0) {
+            uint8_t pct = (uint8_t)(20 + (elapsed * 70) / total);
+            if(pct > 90) pct = 90;
+            app->progress = pct;
+        }
+        if(app->hw_deadline_tick > now) {
+            remain_ms = ((app->hw_deadline_tick - now) * 1000) /
+                        furi_kernel_get_tick_frequency();
+        }
+    }
+    char buf[160];
+    snprintf(buf, sizeof(buf),
+        "{\"status\":\"progress\",\"id\":\"%s\",\"phase\":\"%s\",\"pct\":%u,"
+        "\"eta_ms\":%lu,\"tx_b\":%lu,\"rx_b\":%lu}\n",
+        app->hw_id, phase ? phase : "working", (unsigned)app->progress,
+        (unsigned long)remain_ms, (unsigned long)app->tx_bytes,
+        (unsigned long)app->rx_bytes);
+    usb_send(app, buf);
+}
+
 static void usb_send(Pen15App* app, const char* str) {
     uint16_t len = (uint16_t)strlen(str);
     if(len == 0) return;
@@ -240,6 +287,7 @@ static void usb_send(Pen15App* app, const char* str) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)str, len);
     furi_mutex_release(app->usb_mtx);
+    pen15_note_tx(app, len);
 }
 
 static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
@@ -248,6 +296,7 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
     furi_hal_cdc_send(0, (uint8_t*)data, len);
     furi_mutex_release(app->usb_mtx);
+    pen15_note_tx(app, len);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -397,7 +446,11 @@ static void draw_cb(Canvas* canvas, void* ctx) {
         canvas_draw_str(canvas, 66, 50, "UART");
         canvas_set_color(canvas, ColorBlack);
 
-        /* Bottom hint */
+        /* Bottom hint + byte counters */
+        char brg[24];
+        snprintf(brg, sizeof(brg), "TX:%lu RX:%lu",
+            (unsigned long)app->tx_bytes, (unsigned long)app->rx_bytes);
+        canvas_draw_str(canvas, 4, 56, brg);
         canvas_draw_str(canvas, 10, 63, "Hold OK 3s to exit");
         return;
     }
@@ -425,6 +478,31 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_draw_str(canvas, 4, 43, "RX");
     canvas_draw_line(canvas, 4, 44, 18, 44);
     canvas_draw_str(canvas, 4, 53, app->rx_disp[0] ? app->rx_disp : "---");
+
+    /* Live link: TX/RX byte counters + burst arrows */
+    {
+        uint32_t now = furi_get_tick();
+        char link[28];
+        snprintf(link, sizeof(link), "TX:%lu%c RX:%lu%c",
+            (unsigned long)app->tx_bytes,
+            (now < app->tx_burst_tick) ? '>' : ' ',
+            (unsigned long)app->rx_bytes,
+            (now < app->rx_burst_tick) ? '<' : ' ');
+        canvas_draw_str(canvas, 70, 53, link);
+    }
+
+    /* ETA bottom-left when hw active */
+    if(app->hw_state != HwIdle && app->hw_deadline_tick > app->hw_start_tick) {
+        uint32_t now = furi_get_tick();
+        uint32_t remain_ms = 0;
+        if(app->hw_deadline_tick > now) {
+            remain_ms = ((app->hw_deadline_tick - now) * 1000) /
+                        furi_kernel_get_tick_frequency();
+        }
+        char eta[12];
+        snprintf(eta, sizeof(eta), "~%lus", (unsigned long)(remain_ms / 1000));
+        canvas_draw_str(canvas, 4, 63, eta);
+    }
 
     /* Vertical progress bar on right edge */
     canvas_draw_frame(canvas, 118, 14, 8, 48);
@@ -915,7 +993,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             usb_send(app, resp); return;
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
 
         app->rfid_dict   = protocol_dict_alloc(lfrfid_protocols, LFRFIDProtocolMax);
         app->rfid_worker = lfrfid_worker_alloc(app->rfid_dict);
@@ -934,7 +1015,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             usb_send(app, resp); return;
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
 
         app->nfc         = nfc_alloc();
         app->nfc_scanner = nfc_scanner_alloc(app->nfc);
@@ -953,7 +1037,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             usb_send(app, resp); return;
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
 
         app->ir_worker = infrared_worker_alloc();
         infrared_worker_rx_enable_signal_decoding(app->ir_worker, true);
@@ -1003,7 +1090,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             usb_send(app, resp); return;
         }
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
 
         if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
         app->ibutton_protocols = ibutton_protocols_alloc();
@@ -1026,7 +1116,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
         app->subghz_rx_count   = 0;
 
         furi_hal_subghz_reset();
@@ -1053,7 +1146,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         long long freq = json_ll(js, toks, n, "freq", 433920000LL);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
+        app->hw_start_tick = furi_get_tick();
+        app->last_progress_tick = 0;
         app->hw_deadline_tick  = furi_get_tick() + furi_ms_to_ticks(HW_TIMEOUT_MS);
+        app->progress = 15;
         app->subghz_rx_count   = 0;
         app->rx_timings_count  = 0;
         app->subghz_record_mode = true;
@@ -1239,6 +1335,8 @@ static void process_usb_rx(Pen15App* app) {
     int32_t got = furi_hal_cdc_receive(0, buf, USB_PKT_LEN);
     furi_mutex_release(app->usb_mtx);
 
+    if(got > 0) pen15_note_rx(app, (uint16_t)got);
+
     for(int32_t i = 0; i < got; i++) {
         char c = (char)buf[i];
         if(c == '\n' || c == '\r') {
@@ -1288,7 +1386,7 @@ int32_t pen15_app(void* p) {
         uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 250);
 
         if(evts & FuriFlagError) {
-            /* Timeout tick — check hw deadline */
+            /* Timeout tick — check hw deadline + emit progress */
             if(app->hw_state != HwIdle &&
                furi_get_tick() > app->hw_deadline_tick) {
                 static char tout[64];
@@ -1298,6 +1396,12 @@ int32_t pen15_app(void* p) {
                 hw_stop_all(app);
                 usb_send(app, tout);
                 strncpy(app->rx_disp, "hw timeout", sizeof(app->rx_disp) - 1);
+            } else if(app->hw_state != HwIdle && app->hw_deadline_tick > 0) {
+                uint32_t now = furi_get_tick();
+                if(now - app->last_progress_tick >= furi_ms_to_ticks(500)) {
+                    app->last_progress_tick = now;
+                    pen15_send_progress(app, app->status);
+                }
             }
             app->spin++;
             view_port_update(app->vp);
@@ -1312,8 +1416,12 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
-                    furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                if(got > 0) {
+                    pen15_note_rx(app, (uint16_t)got);
+                    if(app->uart_ready)
+                        furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                    pen15_note_tx(app, (uint16_t)got);
+                }
             } else {
                 process_usb_rx(app);
             }
@@ -1325,7 +1433,10 @@ int32_t pen15_app(void* p) {
                 size_t got;
                 do {
                     got = furi_stream_buffer_receive(app->uart_rx_buf, uart_buf, sizeof(uart_buf), 0);
-                    if(got > 0) usb_send_raw(app, uart_buf, (uint16_t)got);
+                    if(got > 0) {
+                        pen15_note_rx(app, (uint16_t)got);
+                        usb_send_raw(app, uart_buf, (uint16_t)got);
+                    }
                 } while(got > 0);
             }
         }
