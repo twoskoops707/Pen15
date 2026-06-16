@@ -58,12 +58,31 @@ typedef enum {
     HwSubghzTx,
 } HwState;
 
-typedef enum { ModeJson, ModeMenu, ModeBridge } AppMode;
+typedef enum {
+    ModeMenu,     /* Interactive menu */
+    ModeBridge,  /* UART bridge to AWOK */
+    ModeJson,    /* JSON protocol (default) */
+} AppMode;
 
-#define MENU_COUNT 9
-static const char* MENU_TITLES[MENU_COUNT] __attribute__((unused)) = { "RFID Read", "NFC Detect", "SubGHz RX", "IR Learn", "iButton Read", "SubGHz TX", "UART Bridge", "GPIO Control", "Exit" };
-static const char* MENU_HINTS[MENU_COUNT] __attribute__((unused)) = { "READ", "DETECT", "RECORD", "LEARN", "READ", "TX", "BRIDGE", "GPIO", "EXIT" };
-
+/* Menu strings for ModeMenu */
+enum { MENU_COUNT = 14 };
+static const char* SPIN_CHARS[4] = {"|", "/", "-", "\\"};
+static const char* MENU_TITLES[MENU_COUNT] = {
+    "RFID Read",
+    "RFID Emulate",
+    "NFC Detect",
+    "NFC Emulate",
+    "SubGHz RX",
+    "SubGHz Record",
+    "SubGHz TX",
+    "IR Learn",
+    "IR Transmit",
+    "iButton Read",
+    "iButton Emulate",
+    "GPIO Control",
+    "UART Bridge",
+    "Exit",
+};
 
 typedef enum { PinUnset = 0, PinInput, PinOutput } PinMode;
 
@@ -78,6 +97,10 @@ typedef struct {
     FuriStreamBuffer*    uart_rx_buf;
     bool                 uart_ready;
     volatile bool        bridge_mode;
+    AppMode         app_mode;
+    uint8_t         menu_index;
+    uint32_t        bridge_exit_tick;
+    bool            init_done;
 
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
@@ -89,11 +112,6 @@ typedef struct {
     uint8_t spin;
 
     PinMode pin_mode[8];
-
-    AppMode    app_mode;
-    uint8_t    menu_index;
-    uint32_t   bridge_exit_tick;
-    bool       init_done;
 
     Gui*      gui;
     ViewPort* vp;
@@ -142,8 +160,6 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
-static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
-
 /* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
 static const uint8_t OOK650_PRESET[] = {
     0x02, 0x0D,
@@ -181,8 +197,12 @@ static void cdc_on_tx_done(void* ctx) {
 static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
+        if(app->app_mode == ModeBridge && app->bridge_exit_tick &&
+           furi_get_tick() > app->bridge_exit_tick) {
+            app->bridge_mode = false; app->app_mode = ModeJson;
+            furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
+        }
     if(app->bridge_mode && !(s & 0x01)) {
-        app->app_mode = ModeJson;
         app->bridge_mode = false;
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtBridgeExit);
     }
@@ -233,28 +253,209 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 /* ═══════════════════════════════════════════════════════════════════
    GUI
    ═══════════════════════════════════════════════════════════════════ */
+/* ── Icon glyphs (5×5 pixel bitmaps drawn as 5 horizontal lines) ── */
+static void draw_icon_rfid(Canvas* c, uint8_t x, uint8_t y) {
+    /* RF waves: ))) */
+    canvas_draw_str(c, x, y, ")))");
+}
+static void draw_icon_nfc(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "[N]");
+}
+static void draw_icon_sub(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "~Hz");
+}
+static void draw_icon_ir(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "IR*");
+}
+static void draw_icon_ikey(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "[K]");
+}
+static void draw_icon_gpio(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "I/O");
+}
+static void draw_icon_bridge(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "<=>");
+}
+static void draw_icon_exit(Canvas* c, uint8_t x, uint8_t y) {
+    canvas_draw_str(c, x, y, "[ ]");
+}
+
+/* Map menu index to short icon string */
+static void draw_menu_icon(Canvas* c, uint8_t idx, uint8_t x, uint8_t y) {
+    switch(idx) {
+        case 0: case 1: draw_icon_rfid(c, x, y);   break;
+        case 2: case 3: draw_icon_nfc(c, x, y);    break;
+        case 4: case 5: case 6: draw_icon_sub(c, x, y); break;
+        case 7: case 8: draw_icon_ir(c, x, y);     break;
+        case 9: case 10: draw_icon_ikey(c, x, y);  break;
+        case 11: draw_icon_gpio(c, x, y);           break;
+        case 12: draw_icon_bridge(c, x, y);         break;
+        default: draw_icon_exit(c, x, y);           break;
+    }
+}
+
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
+
+    /* ── Header — full-width inverted bar ────────────────────────── */
     canvas_set_color(canvas, ColorBlack);
+    canvas_draw_box(canvas, 0, 0, 128, 12);
+    canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 2, 9, "PEN15");
+
+    /* Animated scan dots in header */
+    uint8_t dot_phase = app->spin & 3;
+    for(uint8_t d = 0; d < 4; d++) {
+        uint8_t dx = 50 + d * 6;
+        if(d < dot_phase)
+            canvas_draw_box(canvas, dx, 4, 4, 4);
+        else
+            canvas_draw_frame(canvas, dx, 4, 4, 4);
+    }
+
+    /* Mode badge top-right */
+    const char* mode_str = (app->app_mode == ModeBridge) ? "BRG"
+                         : (app->app_mode == ModeMenu)   ? "MNU"
+                                                         : "RDY";
+    canvas_draw_box(canvas, 104, 1, 23, 10);
+    canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    canvas_draw_str(canvas, 106, 9, mode_str);
+
+    canvas_set_color(canvas, ColorBlack);
+
+    /* ── MENU mode — two-column icon grid ────────────────────────── */
+    if(app->app_mode == ModeMenu) {
+        /* Thin separator below header */
+        canvas_draw_line(canvas, 0, 13, 128, 13);
+
+        uint8_t sel = app->menu_index;
+        /* Show 4 rows × 2 columns = 8 items per page */
+        uint8_t page_start = (sel / 8) * 8;
+        if(page_start + 8 > MENU_COUNT) page_start = (MENU_COUNT >= 8) ? MENU_COUNT - 8 : 0;
+
+        for(uint8_t i = 0; i < 8 && (page_start + i) < MENU_COUNT; i++) {
+            uint8_t idx = page_start + i;
+            uint8_t col = i % 2;
+            uint8_t row = i / 2;
+            uint8_t cx  = col ? 64 : 0;
+            uint8_t cy  = 14 + row * 13;
+            bool is_sel = (idx == sel);
+
+            if(is_sel) {
+                canvas_set_color(canvas, ColorBlack);
+                canvas_draw_box(canvas, cx, cy, 63, 12);
+                canvas_set_color(canvas, ColorWhite);
+            } else {
+                canvas_set_color(canvas, ColorBlack);
+            }
+
+            canvas_set_font(canvas, FontSecondary);
+            draw_menu_icon(canvas, idx, cx + 1, cy + 9);
+            canvas_draw_str(canvas, cx + 22, cy + 9, MENU_TITLES[idx]);
+            canvas_set_color(canvas, ColorBlack);
+
+            /* Grid dividers */
+            if(col == 0) canvas_draw_line(canvas, 63, cy, 63, cy + 12);
+        }
+
+        /* Page indicator dots */
+        uint8_t pages = (MENU_COUNT + 7) / 8;
+        uint8_t cur_page = page_start / 8;
+        for(uint8_t p = 0; p < pages; p++) {
+            uint8_t px = 56 + p * 5;
+            if(p == cur_page) canvas_draw_box(canvas, px, 61, 3, 3);
+            else              canvas_draw_frame(canvas, px, 61, 3, 3);
+        }
+
+        /* Nav hint */
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 0, 63, "^ v OK  BACK=quit");
+        return;
+    }
+
+    /* ── BRIDGE mode — waveform + status ─────────────────────────── */
+    if(app->app_mode == ModeBridge) {
+        /* Waveform animation using spin phase */
+        static const uint8_t WAVE_H[8] = {4,6,8,10,8,6,4,2};
+        uint8_t phase = app->spin & 7;
+        for(uint8_t i = 0; i < 16; i++) {
+            uint8_t wh = WAVE_H[(i + phase) & 7];
+            uint8_t wy = 32 - wh / 2;
+            canvas_draw_box(canvas, 6 + i * 7, wy, 5, wh);
+        }
+
+        /* Status overlay pill */
+        canvas_set_color(canvas, ColorBlack);
+        canvas_draw_box(canvas, 18, 42, 92, 11);
+        canvas_set_color(canvas, ColorWhite);
+        canvas_set_font(canvas, FontSecondary);
+        canvas_draw_str(canvas, 22, 50, "USB");
+        canvas_draw_str(canvas, 44, 50, "<=>");
+        canvas_draw_str(canvas, 66, 50, "UART");
+        canvas_set_color(canvas, ColorBlack);
+
+        /* Bottom hint */
+        canvas_draw_str(canvas, 10, 63, "Hold OK 3s to exit");
+        return;
+    }
+
+    /* ── JSON mode — terminal display ───────────────────────────── */
+    /* Left border tick */
+    canvas_draw_line(canvas, 0, 13, 0, 63);
+    canvas_draw_line(canvas, 1, 13, 1, 63);
+
+    canvas_set_font(canvas, FontSecondary);
+
+    /* CMD line with > prompt */
+    canvas_draw_str(canvas, 4, 22, ">");
+    canvas_draw_str(canvas, 11, 22, app->cmd_disp[0] ? app->cmd_disp : "waiting...");
+
+    /* Divider */
+    canvas_draw_line(canvas, 4, 24, 112, 24);
+
+    /* Status with spinner */
+    const char* sp = SPIN_CHARS[app->spin & 3];
+    canvas_draw_str(canvas, 4, 33, sp);
+    canvas_draw_str(canvas, 11, 33, app->status[0] ? app->status : "idle");
+
+    /* RX hex-style display */
+    canvas_draw_str(canvas, 4, 43, "RX");
+    canvas_draw_line(canvas, 4, 44, 18, 44);
+    canvas_draw_str(canvas, 4, 53, app->rx_disp[0] ? app->rx_disp : "---");
+
+    /* Vertical progress bar on right edge */
+    canvas_draw_frame(canvas, 118, 14, 8, 48);
+    if(app->progress > 0) {
+        uint8_t ph = (app->progress > 100) ? 46
+                   : (uint8_t)((app->progress * 46) / 100);
+        canvas_draw_box(canvas, 119, 14 + (46 - ph), 6, ph);
+    }
+    /* % label */
+    if(app->progress > 0) {
+        char pct[5];
+        snprintf(pct, sizeof(pct), "%u%%", (unsigned)(app->progress > 100 ? 100 : app->progress));
+        canvas_draw_str(canvas, 113, 63, pct);
+    }
 }
+
+
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
-    if(ev->type == InputTypeShort && ev->key == InputKeyBack)
-        furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop);
+    if(!app->init_done || ev->type != InputTypeShort) return;
+    if(ev->key == InputKeyUp) {
+        if(app->app_mode == ModeMenu) app->menu_index = (app->menu_index + MENU_COUNT - 1) % MENU_COUNT;
+    } else if(ev->key == InputKeyDown) {
+        if(app->app_mode == ModeMenu) app->menu_index = (app->menu_index + 1) % MENU_COUNT;
+    } else if(ev->key == InputKeyOk) {
+        if(app->app_mode == ModeBridge) { app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000); }
+        else if(app->app_mode == ModeMenu) { app->app_mode = ModeJson; }
+    } else if(ev->key == InputKeyBack) {
+        if(app->app_mode != ModeMenu) { app->app_mode = ModeMenu; app->menu_index = 0; }
+        else { furi_thread_flags_set(furi_thread_get_id(app->thread), EvtStop); }
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -458,12 +659,19 @@ static void nfc_scanner_cb(NfcScannerEvent event, void* ctx) {
     Pen15App* app = ctx;
     if(event.type == NfcScannerEventTypeDetected) {
         const char* proto_name = "NFC";
-        if(event.data.protocol_num > 0)
-            proto_name = nfc_device_get_protocol_name(event.data.protocols[0]);
+        NfcProtocol proto = NfcProtocolInvalid;
+        if(event.data.protocol_num > 0) {
+            proto = event.data.protocols[0];
+            proto_name = nfc_device_get_protocol_name(proto);
+        }
+
+        /* Build a UID string: protocol index as hex so uid is never empty */
+        char uid_str[16];
+        snprintf(uid_str, sizeof(uid_str), "%02X", (unsigned)proto);
 
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
-            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"\",\"id\":\"%s\"}\n",
-            proto_name, app->hw_id);
+            "{\"status\":\"ok\",\"type\":\"%s\",\"uid\":\"%s\",\"id\":\"%s\"}\n",
+            proto_name, uid_str, app->hw_id);
 
         furi_thread_flags_set(furi_thread_get_id(app->thread), EvtHwDone);
     }
@@ -649,8 +857,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
-        app->app_mode = ModeBridge;
-        app->bridge_exit_tick = 0;
+            app->bridge_mode = true;
+        app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000);
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
@@ -1036,10 +1244,8 @@ static void process_usb_rx(Pen15App* app) {
         if(c == '\n' || c == '\r') {
             if(app->json_len > 0) {
                 app->json_buf[app->json_len] = '\0';
-        if(app->app_mode == ModeJson) {
                 handle_json(app, app->json_buf, app->json_len);
-            app->json_len = 0;
-        }
+                app->json_len = 0;
             }
         } else if(app->json_len < JSON_BUF_SZ - 1) {
             app->json_buf[app->json_len++] = c;
@@ -1054,10 +1260,6 @@ int32_t pen15_app(void* p) {
     Pen15App* app = malloc(sizeof(Pen15App));
     memset(app, 0, sizeof(Pen15App));
 
-    app->app_mode = ModeMenu;
-    app->menu_index = 0;
-    app->init_done = true;
-
     app->thread      = furi_thread_get_current();
     app->usb_mtx     = furi_mutex_alloc(FuriMutexTypeNormal);
     app->tx_sem      = furi_semaphore_alloc(1, 1);
@@ -1065,6 +1267,8 @@ int32_t pen15_app(void* p) {
     app->hw_state    = HwIdle;
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
+    app->app_mode = ModeJson;
+    app->menu_index = 0;
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
 
@@ -1077,6 +1281,7 @@ int32_t pen15_app(void* p) {
     app->cli_vcp = furi_record_open(RECORD_CLI_VCP);
     cli_vcp_disable(app->cli_vcp);
     furi_hal_cdc_set_callbacks(0, (CdcCallbacks*)&CDC_CB, app);
+    app->init_done = true;
 
     /* Main event loop */
     while(true) {
@@ -1126,6 +1331,7 @@ int32_t pen15_app(void* p) {
         }
 
         if(evts & EvtBridgeExit) {
+        app->app_mode = ModeJson;
             strncpy(app->status,   "WAIT",       sizeof(app->status)   - 1);
             strncpy(app->rx_disp,  "bridge off", sizeof(app->rx_disp)  - 1);
             app->progress = 0;

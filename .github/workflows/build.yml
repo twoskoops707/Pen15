@@ -2,7 +2,7 @@ name: Android Debug Build - Creates Release
 
 on:
   push:
-    branches: [ main, master, awok-only, ux-redesign ]
+    branches: [ main, master, awok-only, ux-redesign, dolphin-rewrite, fap-rewrite ]
   workflow_dispatch:
 
 permissions:
