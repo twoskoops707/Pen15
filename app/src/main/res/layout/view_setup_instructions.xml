@@ -44,7 +44,7 @@
             android:lineSpacingExtra="8dp"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
-            android:text="1. Plug the cable in.\n   Flipper or AWOK → your phone.\n\n2. A box pops up on the phone.\n   Tap OK. Tap YES. Tap ALLOW.\n\n3. On the Flipper screen:\n   Apps → Tools → Pen15 Controller.\n   Tap it to open.\n\n4. Phone asks about Bluetooth?\n   Tap ALLOW.\n\n5. Phone asks about Location?\n   Tap ALLOW. (WiFi needs this.)\n\n6. Phone asks about Files or Photos?\n   Tap ALLOW. (Saves your stuff.)\n\n7. Want the green Recon tools?\n   Tap the button below.\n   Install Termux. Open it once.\n   Come back here.\n\n8. Ready? Tap FLIPPER or AWOK below." />
+            android:text="1. Plug the cable in.\n   Flipper → your phone.\n   AWOK wires → Flipper pins 13 &amp; 14.\n\n2. A box pops up on the phone.\n   Tap OK. Tap YES. Tap ALLOW.\n\n3. The app wakes up Pen15 Controller\n   on the Flipper for you. Wait a few seconds.\n\n4. Phone asks about Bluetooth?\n   Tap ALLOW.\n\n5. Phone asks about Location?\n   Tap ALLOW. (WiFi needs this.)\n\n6. Phone asks about Files or Photos?\n   Tap ALLOW. (Saves your stuff.)\n\n7. Want the green Recon tools?\n   Tap the button below.\n   Install Termux. Open it once.\n   Come back here.\n\n8. AWOK turns green when the app\n   sees it through the Flipper." />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOpenTermuxHelp"

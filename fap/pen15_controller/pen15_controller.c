@@ -936,7 +936,8 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
             app->bridge_mode = true;
-        app->bridge_exit_tick = furi_get_tick() + furi_ms_to_ticks(3000);
+            app->app_mode = ModeBridge;
+            app->bridge_exit_tick = 0;
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
