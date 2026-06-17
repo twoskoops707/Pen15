@@ -2,7 +2,7 @@ name: Cyber Refined Build
 
 on:
   push:
-    branches: [ cursor/cyber-refined-ui-1082 ]
+    branches: [ cursor/cyber-refined-ui-1082, cursor/auto-fap-awok-bridge-1082 ]
   workflow_dispatch:
 
 permissions:
