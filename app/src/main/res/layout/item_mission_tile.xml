@@ -14,7 +14,7 @@
     app:cardElevation="0dp"
     app:strokeColor="@color/border"
     app:strokeWidth="1dp"
-    app:rippleColor="#1ABD93F9">
+    app:rippleColor="@color/primary">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -72,7 +72,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnKeylogger"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="KEYLOGGER"
@@ -84,7 +84,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReverseShellBuilder"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="REVERSE SHELL"
@@ -96,7 +96,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDataExfil"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="DATA EXFILTRATION"
@@ -108,7 +108,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPersistence"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="PERSISTENCE/BACKDOOR"
@@ -296,7 +296,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCopyScript"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.Pen15.Button.Outlined"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"

@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -78,7 +78,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:boxBackgroundColor="#22000000">
+                        app:boxBackgroundColor="@color/overlay_scrim_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputProxyPort"
@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -116,7 +116,7 @@
                         android:layout_height="48dp"
                         android:text="LIVE CONNECTIONS (ss)"
                         app:backgroundTint="@color/success"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -127,7 +127,7 @@
                         android:layout_height="48dp"
                         android:text="INTERFACES + ARP"
                         app:backgroundTint="@color/info"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -138,7 +138,7 @@
                         android:layout_height="48dp"
                         android:text="HTTP INTERCEPT (mitmproxy)"
                         app:backgroundTint="@color/warning"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -149,7 +149,7 @@
                         android:layout_height="48dp"
                         android:text="BANDWIDTH STATS"
                         app:backgroundTint="@color/info"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -160,7 +160,7 @@
                         android:layout_height="48dp"
                         android:text="STOP"
                         app:backgroundTint="@color/danger"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:enabled="false"/>
@@ -173,7 +173,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:visibility="gone"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -206,7 +206,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#22000000"
+                app:cardBackgroundColor="@color/overlay_scrim_light"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 

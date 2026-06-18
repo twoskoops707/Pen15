@@ -104,4 +104,10 @@
     <color name="pink">#FF2D6F</color>
     <color name="terminal_text">#39FF14</color>
     <color name="surface_variant">#181828</color>
+
+    <!-- Layout scrims (replaces hardcoded hex in hardware activity layouts) -->
+    <color name="overlay_scrim">#44000000</color>
+    <color name="overlay_scrim_light">#22000000</color>
+    <color name="tab_bar_scrim">#0A000000</color>
+    <color name="badge_active_bg">#22FFFF00</color>
 </resources>

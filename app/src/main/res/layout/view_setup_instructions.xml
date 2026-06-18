@@ -48,13 +48,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOpenTermuxHelp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.Pen15.Button.Outlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Get Termux (F-Droid)"
-            android:textColor="@color/section_recon"
-            app:strokeColor="@color/section_recon" />
+            android:text="Get Termux (F-Droid)" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

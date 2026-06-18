@@ -53,7 +53,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
-                android:background="#22FFFF00"
+                android:background="@color/badge_active_bg"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingTop="4dp"
@@ -77,14 +77,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#0A000000"
+            android:background="@color/tab_bar_scrim"
             android:padding="8dp"
             android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/header">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn315"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
@@ -97,7 +97,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn390"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
@@ -117,12 +117,12 @@
                 android:textSize="10sp"
                 android:fontFamily="monospace"
                 app:backgroundTint="@color/info"
-                android:textColor="#000000"
+                android:textColor="@color/text_on_primary"
                 android:layout_marginEnd="4dp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn868"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
@@ -135,7 +135,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn915"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Pen15.Button.Outlined"
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
@@ -274,7 +274,7 @@
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     app:backgroundTint="@color/info"
-                    android:textColor="#000000"
+                    android:textColor="@color/text_on_primary"
                     android:layout_marginBottom="8dp"/>
 
                 <com.google.android.material.button.MaterialButton
@@ -285,7 +285,7 @@
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     app:backgroundTint="@color/success"
-                    android:textColor="#000000"
+                    android:textColor="@color/text_on_primary"
                     android:layout_marginBottom="8dp"/>
 
                 <com.google.android.material.button.MaterialButton
@@ -296,7 +296,7 @@
                     android:textSize="10sp"
                     android:fontFamily="monospace"
                     app:backgroundTint="@color/warning"
-                    android:textColor="#000000"/>
+                    android:textColor="@color/text_on_primary"/>
             </LinearLayout>
         </FrameLayout>
 
@@ -310,7 +310,7 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_margin="16dp"
         android:text="START SCAN"
-        android:textColor="#000000"
+        android:textColor="@color/text_on_primary"
         android:fontFamily="monospace"
         app:backgroundTint="@color/func_subghz"
         app:icon="@android:drawable/ic_media_play"

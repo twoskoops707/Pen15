@@ -92,7 +92,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp"
                 android:layout_marginBottom="16dp">
@@ -115,11 +115,11 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnMarauder"
-                        style="@style/Widget.MaterialComponents.Button"
+                        style="@style/Widget.Pen15.Button"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="WIFI MARAUDER"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:textSize="12sp"
@@ -129,7 +129,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDeauth"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Pen15.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="DEAUTH ATTACK"
@@ -144,7 +144,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEvilPortal"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Pen15.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="EVIL PORTAL"
@@ -164,7 +164,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnWifiScan"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            style="@style/Widget.Pen15.Button.Outlined"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
                             android:layout_weight="1"
@@ -180,7 +180,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnBLESpam"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            style="@style/Widget.Pen15.Button.Outlined"
                             android:layout_width="0dp"
                             android:layout_height="48dp"
                             android:layout_weight="1"
@@ -200,7 +200,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp"
                 android:layout_marginBottom="16dp">
@@ -223,7 +223,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnPinControl"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Pen15.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:text="PIN CONTROL"
@@ -240,7 +240,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp"
                 android:layout_marginBottom="16dp">
@@ -271,7 +271,7 @@
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:padding="12dp"
-                        android:background="#22000000"
+                        android:background="@color/overlay_scrim_light"
                         android:textIsSelectable="true"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -279,7 +279,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/overlay_scrim"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -301,11 +301,11 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/fabControl"
-                        style="@style/Widget.MaterialComponents.Button"
+                        style="@style/Widget.Pen15.Button"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:text="EXECUTE"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:textSize="14sp"

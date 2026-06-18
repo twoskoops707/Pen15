@@ -660,6 +660,19 @@ static bool storage_write_file(const char* path, const char* data, size_t len) {
     return ok;
 }
 
+static bool storage_append_file(const char* path, const char* data, size_t len) {
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    File*    file    = storage_file_alloc(storage);
+    bool     ok      = false;
+    if(storage_file_open(file, path, FSAM_WRITE, FSOM_OPEN_APPEND)) {
+        ok = storage_file_write(file, data, len) == len;
+        storage_file_close(file);
+    }
+    storage_file_free(file);
+    furi_record_close(RECORD_STORAGE);
+    return ok;
+}
+
 static size_t storage_read_file(const char* path, char* buf, size_t buf_sz) {
     Storage* storage = furi_record_open(RECORD_STORAGE);
     File*    file    = storage_file_alloc(storage);
@@ -1227,6 +1240,20 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             ok ? "ok" : "error", id);
         app->progress = 100; usb_send(app, resp);
         strncpy(app->rx_disp, ok ? "write ok" : "write err", sizeof(app->rx_disp) - 1);
+
+    /* ── storage_append ───────────────────────────────────────────── */
+    } else if(strcmp(action, "storage_append") == 0) {
+        static char path[128];    memset(path, 0, sizeof(path));
+        static char content[1024]; memset(content, 0, sizeof(content));
+        json_str(js, toks, n, "path",    path,    sizeof(path));
+        json_str(js, toks, n, "content", content, sizeof(content));
+        json_unescape(content);
+
+        bool ok = storage_append_file(path, content, strlen(content));
+        snprintf(resp, sizeof(resp), "{\"status\":\"%s\",\"id\":\"%s\"}\n",
+            ok ? "ok" : "error", id);
+        app->progress = 100; usb_send(app, resp);
+        strncpy(app->rx_disp, ok ? "append ok" : "append err", sizeof(app->rx_disp) - 1);
 
     /* ── storage_read ──────────────────────────────────────────────── */
     } else if(strcmp(action, "storage_read") == 0) {

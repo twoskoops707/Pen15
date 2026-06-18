@@ -55,7 +55,7 @@
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
-                android:background="#22FFFF00"
+                android:background="@color/badge_active_bg"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingTop="4dp"
@@ -86,7 +86,7 @@
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="#0A000000"
+            android:background="@color/tab_bar_scrim"
             app:tabTextColor="@color/terminal_text"
             app:tabSelectedTextColor="@color/info"
             app:tabIndicatorColor="@color/info"
@@ -375,7 +375,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="#0A000000"
+                    app:cardBackgroundColor="@color/tab_bar_scrim"
                     app:cardElevation="0dp"
                     app:cardCornerRadius="4dp">
 
@@ -458,7 +458,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="⬢ SAVE"
-                            android:textColor="#000000"
+                            android:textColor="@color/text_on_primary"
                             app:backgroundTint="@color/success"
                             android:fontFamily="monospace"
                             android:textSize="11sp"
@@ -479,7 +479,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEmulateTag"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Pen15.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="⬢ EMULATE TAG"
@@ -491,7 +491,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnSavedTags"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.Pen15.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="⬢ SAVED TAGS"
@@ -513,7 +513,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
         android:text="START READ"
-        android:textColor="#000000"
+        android:textColor="@color/text_on_primary"
         android:textStyle="bold"
         android:fontFamily="monospace"
         android:textSize="14sp"
