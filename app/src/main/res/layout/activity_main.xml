@@ -204,6 +204,20 @@
             </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/textConnectionBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:padding="10dp"
+            android:background="@drawable/bg_hardware_card_default"
+            android:text="Plug Flipper USB — app will link automatically"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium" />
+
         <include
             android:id="@+id/dashboardLink"
             layout="@layout/view_data_flow"
@@ -232,8 +246,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_hardware_card"
-                android:padding="16dp"
+                android:background="@drawable/bg_wizard_banner"
+                android:padding="18dp"
                 android:layout_marginBottom="16dp"
                 android:foreground="?attr/selectableItemBackground">
 

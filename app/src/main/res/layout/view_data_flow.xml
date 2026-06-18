@@ -84,10 +84,10 @@
         android:id="@+id/dataFlowStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="─ IDLE"
+        android:text="─ WAITING FOR FLIPPER"
         android:textColor="@color/text_hint"
-        android:textSize="8sp"
+        android:textSize="12sp"
         android:fontFamily="monospace"
-        android:paddingTop="2dp"/>
+        android:paddingTop="4dp"/>
 
 </LinearLayout>

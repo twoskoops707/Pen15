@@ -1,6 +1,7 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include <furi_hal_usb_cdc.h>
+#include <furi_hal_power.h>
 #include <furi_hal_subghz.h>
 #include <gui/gui.h>
 #include <gui/view_port.h>
@@ -917,6 +918,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "uart_init") == 0) {
         int baud = json_int(js, toks, n, "baud", 115200);
         bool uart_ok = false;
+        bool otg_ok = false;
+        if(!furi_hal_power_is_otg_enabled()) {
+            otg_ok = furi_hal_power_enable_otg();
+        } else {
+            otg_ok = true;
+        }
         if(!app->uart_ready) {
             app->serial = furi_hal_serial_control_acquire(FuriHalSerialIdUsart);
             if(app->serial) {
@@ -924,14 +931,18 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 furi_hal_serial_dma_rx_start(app->serial, uart_rx_dma_cb, app, false);
                 app->uart_ready = true;
                 uart_ok = true;
-                snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
+                snprintf(resp, sizeof(resp),
+                    "{\"status\":\"ok\",\"baud\":%d,\"otg\":%s,\"id\":\"%s\"}\n",
+                    baud, otg_ok ? "true" : "false", id);
             } else {
                 snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_BUSY\",\"id\":\"%s\"}\n", id);
             }
         } else {
             furi_hal_serial_set_br(app->serial, (uint32_t)baud);
             uart_ok = true;
-            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
+            snprintf(resp, sizeof(resp),
+                "{\"status\":\"ok\",\"baud\":%d,\"otg\":%s,\"id\":\"%s\"}\n",
+                baud, otg_ok ? "true" : "false", id);
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
