@@ -695,7 +695,7 @@ static NfcCommand nfc_poller_cb(NfcPollerEvent event, void* ctx) {
     Pen15App* app = ctx;
     if(app->hw_state != HwNfcRead) return NfcCommandStop;
 
-    Iso14443_3aPollerEvent* iso_ev = (Iso14443_3aPollerEvent*)event;
+    Iso14443_3aPollerEvent* iso_ev = (Iso14443_3aPollerEvent*)&event;
 
     if(iso_ev->type == Iso14443_3aPollerEventTypeReady) {
         const Iso14443_3aData* d = iso_ev->data;
@@ -730,7 +730,6 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
             app->rx_timings[app->rx_timings_count++] = level ? (int32_t)duration : -(int32_t)duration;
         }
         if(app->rx_timings_count >= RX_MAX_TIMES) {
-            app->hw_state = HwIdle;
             /* Format timings as comma-separated signed ints */
             char* p = app->hw_result_json;
             int remaining = (int)sizeof(app->hw_result_json);
@@ -749,7 +748,6 @@ static void subghz_rx_pair_cb(void* ctx, bool level, uint32_t duration) {
     }
 
     if(app->subghz_rx_count >= 50 && app->hw_state == HwSubghzRx) {
-        app->hw_state = HwIdle;
         snprintf(app->hw_result_json, sizeof(app->hw_result_json),
             "{\"status\":\"ok\",\"count\":%u,\"timings\":\"\",\"id\":\"%s\"}\n",
             (unsigned)app->subghz_rx_count, app->hw_id);
@@ -1230,12 +1228,49 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp); return;
         }
+        /* Build key from JSON type+data if not already set by prior ikey_read */
+        char ikey_type[32] = {0};
+        char ikey_data[64] = {0};
+        json_str(js, toks, n, "type", ikey_type, sizeof(ikey_type));
+        json_str(js, toks, n, "data", ikey_data, sizeof(ikey_data));
+
+        if(strlen(ikey_type) > 0 && strlen(ikey_data) > 0) {
+            if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
+            if(app->ibutton_protocols) { ibutton_protocols_free(app->ibutton_protocols); app->ibutton_protocols = NULL; }
+            app->ibutton_protocols = ibutton_protocols_alloc();
+
+            iButtonProtocolId pid = 0;
+            bool pid_found = false;
+            for(iButtonProtocolId i = 0; i < ibutton_protocols_get_count(app->ibutton_protocols); i++) {
+                const char* pn = ibutton_protocols_get_name(app->ibutton_protocols, i);
+                if(pn && strcmp(pn, ikey_type) == 0) { pid = i; pid_found = true; break; }
+            }
+            (void)pid_found;
+
+            app->ibutton_key = ibutton_key_alloc(64);
+            ibutton_key_set_protocol_id(app->ibutton_key, pid);
+
+            uint8_t raw[16]; size_t raw_len = 0;
+            const char* hp = ikey_data;
+            while(*hp && raw_len < sizeof(raw)) {
+                while(*hp == ' ' || *hp == ':') hp++;
+                if(!*hp) break;
+                char bs[3] = { hp[0], hp[1] ? hp[1] : '0', '\0' };
+                raw[raw_len++] = (uint8_t)strtoul(bs, NULL, 16);
+                hp += 2;
+            }
+            if(raw_len > 0) {
+                uint8_t* kd = ibutton_key_get_data_p(app->ibutton_key);
+                if(kd) memcpy(kd, raw, raw_len);
+            }
+        }
+
         if(!app->ibutton_key) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"NO_KEY\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp); return;
         }
-        app->ibutton_protocols = ibutton_protocols_alloc();
-        app->ibutton_worker    = ibutton_worker_alloc(app->ibutton_protocols);
+        if(!app->ibutton_protocols) app->ibutton_protocols = ibutton_protocols_alloc();
+        app->ibutton_worker = ibutton_worker_alloc(app->ibutton_protocols);
         strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
         ibutton_worker_emulate_start(app->ibutton_worker, app->ibutton_key);
         app->hw_state = HwIkeyEmulate;
