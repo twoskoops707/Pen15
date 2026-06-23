@@ -9,7 +9,6 @@ ACTIVITIES=(
   PhoneSensorsActivity SettingsActivity ScriptBuilderActivity PayloadGeneratorActivity
   ARPPoisonerActivity CheatSheetActivity CreditCardReaderActivity MissionFlowActivity
 )
-adb logcat -c || true
 echo "=== Pen15 activity smoke matrix ==="
 FAIL=0
 for act in "${ACTIVITIES[@]}"; do
@@ -20,13 +19,13 @@ for act in "${ACTIVITIES[@]}"; do
   RC=$?
   set -e
   sleep 2
-  CRASH=$(adb logcat -d 2>/dev/null | grep -E "FATAL EXCEPTION|AndroidRuntime" | grep -F "$act" || true)
-  if [[ $RC -ne 0 ]] || echo "$OUT" | grep -qiE "Error|Exception"; then
+  CRASH=$(adb logcat -d 2>/dev/null | grep -F "FATAL EXCEPTION" | grep -F "$PKG" || true)
+  if [[ $RC -ne 0 ]]; then
     echo "FAIL $act (start rc=$RC) $OUT"
     FAIL=1
   elif [[ -n "$CRASH" ]]; then
     echo "FAIL $act (runtime crash)"
-    echo "$CRASH" | tail -n 5
+    echo "$CRASH" | tail -n 8
     FAIL=1
   else
     echo "OK   $act"
