@@ -36,17 +36,7 @@ jobs:
           emulator-boot-timeout: 900
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: false
-          script: |
-            sleep 15
-            for attempt in 1 2 3 4 5; do
-              if adb install -r -g app/build/outputs/apk/debug/app-debug.apk; then
-                break
-              fi
-              echo "install attempt $attempt failed; retrying..."
-              sleep 15
-            done
-            chmod +x scripts/emulator-activity-smoke.sh
-            bash scripts/emulator-activity-smoke.sh | tee activity-smoke.log
+          script: bash scripts/ci-emulator-smoke.sh
 
       - name: Upload smoke log
         if: always()
@@ -54,4 +44,3 @@ jobs:
         with:
           name: activity-smoke-log
           path: activity-smoke.log
-
