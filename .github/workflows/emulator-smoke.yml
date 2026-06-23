@@ -35,7 +35,7 @@ jobs:
           disk-size: 8192M
           emulator-boot-timeout: 900
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          disable-animations: true
+          disable-animations: false
           script: |
             sleep 15
             for attempt in 1 2 3 4 5; do
@@ -54,3 +54,4 @@ jobs:
         with:
           name: activity-smoke-log
           path: activity-smoke.log
+
