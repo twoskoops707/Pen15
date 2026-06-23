@@ -1,0 +1,44 @@
+﻿name: Emulator Activity Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ cursor/pen15-comm-ui-reboot-2026 ]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4.7.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build debug APK
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Activity launch smoke (API 34 emulator)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            chmod +x scripts/emulator-activity-smoke.sh
+            bash scripts/emulator-activity-smoke.sh | tee activity-smoke.log
+
+      - name: Upload smoke log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: activity-smoke-log
+          path: activity-smoke.log
