@@ -745,14 +745,25 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         }
         app->progress = 100; usb_send(app, resp);
         if(uart_ok) {
+            strncpy(app->status, "UART", sizeof(app->status) - 1);
+            strncpy(app->rx_disp, "uart ok", sizeof(app->rx_disp) - 1);
+        }
+
+    /* ── uart_send ─────────────────────────────────────────────────── */
+    } else if(strcmp(action, "uart_bridge") == 0) {
+        if(!app->uart_ready) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
+            app->progress = 0; usb_send(app, resp);
+        } else {
             app->app_mode = ModeBridge;
             app->bridge_mode = true;
             app->bridge_exit_tick = 0;
+            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"bridge\":true,\"id\":\"%s\"}\n", id);
+            app->progress = 100; usb_send(app, resp);
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
         }
 
-    /* ── uart_send ─────────────────────────────────────────────────── */
     } else if(strcmp(action, "uart_send") == 0) {
         static char data[128]; memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
