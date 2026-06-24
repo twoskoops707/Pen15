@@ -86,11 +86,11 @@ jobs:
             ${{ steps.build-fap.outputs.fap-artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Subscribe phone ntfy app to topic pen15-builds-twoskoops707 (or set repo secret NTFY_TOPIC)
+      # Subscribe phone ntfy app to topic twoskoops (or set repo secret NTFY_TOPIC)
       - name: Notify ntfy on success
         if: success()
         env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC || 'pen15-builds-twoskoops707' }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC || 'twoskoops' }}
           NTFY_BODY: >-
             Branch: ${{ github.ref_name }} |
             Build: v3.0.${{ github.run_number }} |
