@@ -281,7 +281,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
 
     if(app->app_mode == ModeMenu) {
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str(canvas, 2, 30, "Local menu (phone optional)");
+        canvas_draw_str(canvas, 2, 30, "Phone optional - local menu");
         int start = (app->menu_index > 2) ? app->menu_index - 2 : 0;
         int end = start + 3;
         if(end > MENU_COUNT) end = MENU_COUNT;
@@ -292,7 +292,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
             row += 12;
         }
         canvas_set_font(canvas, FontSecondary);
-        canvas_draw_str(canvas, 2, 62, "OK=run  ^v=nav  [BACK]=exit");
+        canvas_draw_str(canvas, 2, 62, "OK=run  ^v=menu  [BACK]=exit");
         return;
     }
 
@@ -662,7 +662,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     if(strcmp(action, "ping") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap\":\"2.1\",\"id\":\"%s\"}\n", id);
         usb_send(app, resp);
         strncpy(app->status,  "CONN", sizeof(app->status) - 1);
         strncpy(app->rx_disp, "ping ok", sizeof(app->rx_disp) - 1);
@@ -798,7 +798,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "get_device_info") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"device\":\"flipper_zero\","
-            "\"fw\":\"mntm\",\"fap_ver\":\"2.0\",\"id\":\"%s\"}\n", id);
+            "\"fw\":\"mntm\",\"fap_ver\":\"2.1\",\"id\":\"%s\"}\n", id);
         app->progress = 100; usb_send(app, resp);
 
     /* ── hw_stop ───────────────────────────────────────────────────── */
@@ -1173,7 +1173,7 @@ int32_t pen15_app(void* p) {
     app->uart_rx_buf = furi_stream_buffer_alloc(UART_RX_BUF, 1);
     app->hw_state    = HwIdle;
 
-    strncpy(app->status,   "READY", sizeof(app->status)   - 1);
+    strncpy(app->status,   "FAP READY", sizeof(app->status)   - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
     strncpy(app->rx_disp,  "---",  sizeof(app->rx_disp)  - 1);
 

@@ -60,7 +60,7 @@
         android:paddingEnd="16dp"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
-        android:background="#1A000000"
+        android:background="@color/surface_glass"
         app:layout_constraintTop_toBottomOf="@id/header">
 
         <TextView
@@ -100,7 +100,7 @@
                 android:layout_height="48dp"
                 android:text="CONNECT"
                 app:backgroundTint="@color/success"
-                android:textColor="#000000"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
                 android:layout_marginBottom="16dp"/>
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/surface_glass"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -134,7 +134,7 @@
                         android:layout_height="48dp"
                         android:text="SCAN NETWORKS"
                         app:backgroundTint="@color/info"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -145,7 +145,7 @@
                         android:layout_height="48dp"
                         android:text="EVIL TWIN AP"
                         app:backgroundTint="@color/warning"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -156,7 +156,7 @@
                         android:layout_height="48dp"
                         android:text="DEAUTH ATTACK"
                         app:backgroundTint="@color/danger"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"
                         android:layout_marginBottom="8dp"/>
@@ -167,7 +167,7 @@
                         android:layout_height="48dp"
                         android:text="PACKET SNIFFING"
                         app:backgroundTint="@color/success"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -177,7 +177,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#44000000"
+                app:cardBackgroundColor="@color/surface_glass"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="0dp">
 
@@ -202,7 +202,7 @@
                         android:layout_height="48dp"
                         android:text="BLE SCAN &amp; SPAM"
                         app:backgroundTint="@color/info"
-                        android:textColor="#000000"
+                        android:textColor="@color/text_on_primary"
                         android:textStyle="bold"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -213,7 +213,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="STOP ALL"
-                android:textColor="#000000"
+                android:textColor="@color/text_on_primary"
                 android:textStyle="bold"
                 android:fontFamily="monospace"
                 app:backgroundTint="@color/danger"
@@ -258,7 +258,7 @@
                             android:textSize="9sp"
                             android:fontFamily="monospace"
                             app:backgroundTint="@color/success"
-                            android:textColor="#000000"
+                            android:textColor="@color/text_on_primary"
                             app:cornerRadius="4dp"
                             style="@style/Widget.MaterialComponents.Button.TextButton"/>
 

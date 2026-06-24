@@ -1,5 +1,9 @@
 # Pen15 Project - v3.0
 
+**Active branch:** `cursor/pen15-comm-ui-reboot-2026` — three-state Flipper UI (DISCONNECTED / USB ONLY / FAP READY), FAP v2.1, direct AWOK USB + GPIO bridge.
+
+See **docs/FIRMWARE.md** for Flipper OS compatibility and when users must update firmware.
+
 ## MANDATORY WORKING RULES — NEVER SKIP
 
 1. **READ BEFORE TOUCHING.** Before editing ANY file, read its current contents in full. No exceptions.
@@ -14,18 +18,8 @@ Violating these rules wastes the user's time and money. Do not do it.
 | Branch | Purpose | Status |
 |--------|---------|--------|
 | main | Stable release | v1.0.129 |
-| dolphin-rewrite | Review + rewrite with dolphin-mistral model | Active - primary dev |
-| recon-tools | OSINT, Google Dork, Phone Sensors, Termux fixes | Active |
-| awok-only | Direct AWOK/ESP32 USB serial (no Termux dependency) | Active |
-
-## Active Branch: dolphin-rewrite
-- Branch created from fap-patch for code review and rewrite
-- GitHub Actions workflow: Emergency Build & Release (APK only, no FAP due to token scope)
-- Build: GitHub Actions run 24451615544 (in progress)
-- All 47 .kt files compile clean (only deprecation warnings, zero errors)
-- btnScrollLock wired in ESP32ManagerActivity (auto-scroll toggle) — fixed in d9dcce2
-- FAP build pending: needs `workflow` scope to push workflow changes
-- APK download: https://github.com/twoskoops707/Pen15/releases/tag/build-202
+| cursor/pen15-comm-ui-reboot-2026 | Comm/UI reboot, FAP handoff, cyber theme | Active |
+| awok-only | Direct AWOK/ESP32 USB serial | Merged patterns |
 
 ## USB Serial Communication
 

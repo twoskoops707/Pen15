@@ -77,8 +77,9 @@ jobs:
             **Flipper Zero (FAP):**
             1. Download pen15_controller.fap
             2. Copy to Flipper SD card: `/apps/Tools/pen15_controller.fap`
-            3. On Flipper: Apps → Tools → Pen15 Controller
-            4. Then connect USB OTG and tap Connect in the phone app
+            3. Firmware: stock release, Momentum, or Unleashed (see docs/FIRMWARE.md)
+            4. On Flipper: Apps → Tools → Pen15 Controller (must show FAP READY)
+            5. Connect USB OTG to phone — dashboard should show FAP READY (green)
 
             🤖 Auto-built by GitHub Actions
           files: |
