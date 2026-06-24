@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug-only: allow adb am start smoke tests on internal activities (not in release). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <activity android:name=".WizardActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".RFIDActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".NFCActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".SubGHzActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".InfraredActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".BadUSBActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".IButtonActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".GPIOActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".BluetoothActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".WiFiDeauthActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".ESP32ManagerActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".WiFiCaptureActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".OSINTActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".GoogleDorkActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".NetworkScannerActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".ExploitDatabaseActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".PacketSnifferActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".HashCrackerActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".PhoneSensorsActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".SettingsActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".ScriptBuilderActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".PayloadGeneratorActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".ARPPoisonerActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".CheatSheetActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".CreditCardReaderActivity" android:exported="true" tools:replace="android:exported" />
+        <activity android:name=".MissionFlowActivity" android:exported="true" tools:replace="android:exported" />
+    </application>
+</manifest>
