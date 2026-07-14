@@ -22,8 +22,8 @@ set -gx OSINT_BIN_WRAPPERS sherlock maigret holehe theHarvester sublist3r \
     spiderfoot sf recon-ng sqlmap photon h8mail blackbird cloud_enum \
     phoneinfoga amass nikto shodan ghunt bbot socialscan
 
-set -gx OSINT_PIP_PACKAGES sherlock-project maigret holehe theHarvester sublist3r \
-    h8mail socialscan sqlmap shodan bbot ghunt
+set -gx OSINT_PIP_PACKAGES sherlock-project maigret holehe theHarvester theharvester \
+    sublist3r h8mail socialscan sqlmap shodan bbot ghunt mitmproxy hashid
 
 set -gx OSINT_REPO_DIRS \
     "$OSINT_TOOLS_DIR/sherlock" \
@@ -40,7 +40,30 @@ set -gx OSINT_REPO_DIRS \
     "$OSINT_TOOLS_DIR/nikto" \
     "$HOME/spiderfoot" \
     "$HOME/recon-ng" \
-    "$HOME/theHarvester"
+    "$HOME/theHarvester" \
+    "$HOME/nikto" \
+    "$HOME/sherlock" \
+    "$HOME/maigret" \
+    "$HOME/holehe" \
+    "$HOME/Sublist3r" \
+    "$HOME/sublist3r" \
+    "$HOME/sqlmap" \
+    "$HOME/blackbird" \
+    "$HOME/cloud_enum" \
+    "$HOME/GHunt" \
+    "$HOME/Photon" \
+    "$HOME/h8mail" \
+    "$HOME/john-src" \
+    "$HOME/hydra-src"
+
+set -gx OSINT_LEGACY_GARBAGE \
+    /tmp/sf-req-lite.txt \
+    /tmp/hashcat.7z \
+    /tmp/hashcat_extracted \
+    "$HOME/.cache/pip" \
+    "$HOME/.cache/maigret" \
+    "$HOME/.cache/sherlock" \
+    "$HOME/.local/share/pipx"
 
 function log_msg
     set -l level "INFO"
@@ -315,6 +338,45 @@ end
 # Cleanup helpers — temp files, broken clones, full reset
 # ---------------------------------------------------------------------------
 
+function cleanup_legacy_garbage
+    set -l dry_run $argv[1]
+    log_msg INFO "Removing legacy install garbage and build leftovers..."
+
+    for p in $OSINT_LEGACY_GARBAGE
+        if test -e $p
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $p"
+            else
+                rm -rf $p 2>/dev/null
+                log_msg INFO "Removed: $p"
+            end
+        end
+    end
+
+    for p in $PREFIX/tmp/pip-*
+        if test -e $p
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $p"
+            else
+                rm -rf $p 2>/dev/null
+            end
+        end
+    end
+
+    # __pycache__ under home tool dirs
+    for dir in $OSINT_REPO_DIRS $OSINT_TOOLS_DIR $HOME
+        if test -d $dir
+            find $dir -maxdepth 4 -type d -name '__pycache__' 2>/dev/null | while read -l cache
+                if test "$dry_run" = 1
+                    echo "  [dry-run] would remove: $cache"
+                else
+                    rm -rf $cache 2>/dev/null
+                end
+            end
+        end
+    end
+end
+
 function cleanup_temp_artifacts
     set -l dry_run $argv[1]
     log_msg INFO "Cleaning temp build artifacts and caches..."
@@ -487,10 +549,11 @@ end
 
 function reset_osint_install
     set -l dry_run $argv[1]
-    log_msg INFO "=== Full OSINT reset (repos + wrappers + pip) ==="
+    log_msg INFO "=== Full OSINT reset (repos + wrappers + pip + garbage) ==="
     cleanup_osint_wrappers $dry_run
     cleanup_osint_repos $dry_run
     cleanup_osint_pip $dry_run
+    cleanup_legacy_garbage $dry_run
     cleanup_broken_clones $dry_run
     cleanup_temp_artifacts $dry_run
 

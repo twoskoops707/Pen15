@@ -97,6 +97,7 @@ switch $mode
         echo ""
         echo "Done — OSINT stack wiped. API keys in ~/.pen15/ kept."
         echo "Reinstall: fish install_osint_tools.fish --skip-heavy"
+        echo "     or:   bash nuke_osint.sh --reinstall"
     case full
         if test $dry_run -eq 0
             confirm_action "FULL cleanup wipes OSINT installs AND install logs."
