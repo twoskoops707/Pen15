@@ -17,6 +17,31 @@ set -gx OSINT_FAILED_LIST "$PEN15_DIR/osint-failed.txt"
 set -gx OSINT_OK_LIST
 set -gx OSINT_FAIL_LIST
 
+# Known OSINT artifacts — used by clean/reset routines.
+set -gx OSINT_BIN_WRAPPERS sherlock maigret holehe theHarvester sublist3r \
+    spiderfoot sf recon-ng sqlmap photon h8mail blackbird cloud_enum \
+    phoneinfoga amass nikto shodan ghunt bbot socialscan
+
+set -gx OSINT_PIP_PACKAGES sherlock-project maigret holehe theHarvester sublist3r \
+    h8mail socialscan sqlmap shodan bbot ghunt
+
+set -gx OSINT_REPO_DIRS \
+    "$OSINT_TOOLS_DIR/sherlock" \
+    "$OSINT_TOOLS_DIR/maigret" \
+    "$OSINT_TOOLS_DIR/holehe" \
+    "$OSINT_TOOLS_DIR/theHarvester" \
+    "$OSINT_TOOLS_DIR/Sublist3r" \
+    "$OSINT_TOOLS_DIR/sqlmap" \
+    "$OSINT_TOOLS_DIR/Photon" \
+    "$OSINT_TOOLS_DIR/h8mail" \
+    "$OSINT_TOOLS_DIR/blackbird" \
+    "$OSINT_TOOLS_DIR/cloud_enum" \
+    "$OSINT_TOOLS_DIR/GHunt" \
+    "$OSINT_TOOLS_DIR/nikto" \
+    "$HOME/spiderfoot" \
+    "$HOME/recon-ng" \
+    "$HOME/theHarvester"
+
 function log_msg
     set -l level "INFO"
     if test (count $argv) -ge 2
@@ -228,6 +253,10 @@ function write_fish_aliases
     echo "    fish $check_script" >> $conf
     echo 'end' >> $conf
     echo '' >> $conf
+    echo 'function osint-clean' >> $conf
+    echo "    fish $OSINT_SCRIPT_DIR/clean_osint_tools.fish \$argv" >> $conf
+    echo 'end' >> $conf
+    echo '' >> $conf
     echo 'abbr -a -- sf "cd ~/spiderfoot && python3 sf.py"' >> $conf
     echo 'abbr -a -- harvest "theHarvester"' >> $conf
     echo 'abbr -a -- recon "recon-ng"' >> $conf
@@ -277,5 +306,216 @@ function show_summary
         echo "    cat $OSINT_REPORT"
     end
     echo "  Verify: fish check_osint_tools.fish"
+    echo "  Clean:  fish clean_osint_tools.fish --temp"
+    echo "  Reset:  fish clean_osint_tools.fish --reset  (wipe broken install, keep API keys)"
     echo "=============================================="
+end
+
+# ---------------------------------------------------------------------------
+# Cleanup helpers — temp files, broken clones, full reset
+# ---------------------------------------------------------------------------
+
+function cleanup_temp_artifacts
+    set -l dry_run $argv[1]
+    log_msg INFO "Cleaning temp build artifacts and caches..."
+
+    set -l temp_paths /tmp/sf-req-lite.txt "$HOME/.cache/pip"
+
+    for p in $temp_paths
+        if test -e $p
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $p"
+            else
+                rm -rf $p 2>/dev/null
+                log_msg INFO "Removed: $p"
+            end
+        end
+    end
+
+    for p in $PREFIX/tmp/pip-*
+        if test -e $p
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $p"
+            else
+                rm -rf $p 2>/dev/null
+            end
+        end
+    end
+
+    if command -v pip3 >/dev/null
+        if test "$dry_run" = 1
+            echo "  [dry-run] would run: pip3 cache purge"
+        else
+            pip3 cache purge 2>/dev/null
+            log_msg INFO "Purged pip cache"
+        end
+    end
+
+    if command -v pkg >/dev/null
+        if test "$dry_run" = 1
+            echo "  [dry-run] would run: pkg clean"
+        else
+            pkg clean -y 2>/dev/null
+            log_msg INFO "Ran pkg clean"
+        end
+    end
+end
+
+function is_broken_clone
+    set -l dir $argv[1]
+    if not test -d $dir
+        return 1
+    end
+    if not test -d "$dir/.git"
+        return 0
+    end
+    # Empty or nearly empty clone
+    set -l file_count (find $dir -mindepth 1 -maxdepth 2 2>/dev/null | wc -l | string trim)
+    if test "$file_count" -lt 2
+        return 0
+    end
+    return 1
+end
+
+function cleanup_broken_clones
+    set -l dry_run $argv[1]
+    log_msg INFO "Scanning for broken / partial git clones..."
+
+    for dir in $OSINT_REPO_DIRS
+        if is_broken_clone $dir
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove broken clone: $dir"
+            else
+                rm -rf $dir 2>/dev/null
+                log_msg INFO "Removed broken clone: $dir"
+            end
+        end
+    end
+
+    # Catch stray partial dirs under osint-tools
+    if test -d $OSINT_TOOLS_DIR
+        for dir in $OSINT_TOOLS_DIR/*
+            if test -d $dir; and is_broken_clone $dir
+                if test "$dry_run" = 1
+                    echo "  [dry-run] would remove broken clone: $dir"
+                else
+                    rm -rf $dir 2>/dev/null
+                    log_msg INFO "Removed broken clone: $dir"
+                end
+            end
+        end
+    end
+end
+
+function cleanup_osint_wrappers
+    set -l dry_run $argv[1]
+    log_msg INFO "Removing OSINT bin wrappers from $PREFIX/bin ..."
+
+    for name in $OSINT_BIN_WRAPPERS
+        set -l path "$PREFIX/bin/$name"
+        if test -e $path; or test -L $path
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $path"
+            else
+                rm -f $path 2>/dev/null
+                log_msg INFO "Removed wrapper: $path"
+            end
+        end
+    end
+end
+
+function cleanup_osint_repos
+    set -l dry_run $argv[1]
+    log_msg INFO "Removing OSINT git clone directories..."
+
+    for dir in $OSINT_REPO_DIRS
+        if test -d $dir
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $dir"
+            else
+                rm -rf $dir 2>/dev/null
+                log_msg INFO "Removed repo: $dir"
+            end
+        end
+    end
+
+    if test -d $OSINT_TOOLS_DIR
+        if test "$dry_run" = 1
+            echo "  [dry-run] would remove: $OSINT_TOOLS_DIR"
+        else
+            rm -rf $OSINT_TOOLS_DIR 2>/dev/null
+            log_msg INFO "Removed: $OSINT_TOOLS_DIR"
+        end
+    end
+end
+
+function cleanup_osint_pip
+    set -l dry_run $argv[1]
+    set -l pip_flags
+    if pip3 uninstall --help 2>/dev/null | grep -q break-system-packages
+        set pip_flags --break-system-packages
+    end
+
+    log_msg INFO "Uninstalling OSINT pip packages..."
+    for pkg in $OSINT_PIP_PACKAGES
+        if pip3 show $pkg >/dev/null 2>&1
+            if test "$dry_run" = 1
+                echo "  [dry-run] would uninstall pip: $pkg"
+            else
+                pip3 uninstall -y $pip_flags $pkg 2>/dev/null
+                log_msg INFO "Uninstalled pip: $pkg"
+            end
+        end
+    end
+end
+
+function cleanup_osint_logs
+    set -l dry_run $argv[1]
+    set -l log_files $OSINT_LOG $OSINT_REPORT $OSINT_FAILED_LIST
+
+    for f in $log_files
+        if test -f $f
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove: $f"
+            else
+                rm -f $f 2>/dev/null
+                log_msg INFO "Removed log: $f"
+            end
+        end
+    end
+end
+
+function reset_osint_install
+    set -l dry_run $argv[1]
+    log_msg INFO "=== Full OSINT reset (repos + wrappers + pip) ==="
+    cleanup_osint_wrappers $dry_run
+    cleanup_osint_repos $dry_run
+    cleanup_osint_pip $dry_run
+    cleanup_broken_clones $dry_run
+    cleanup_temp_artifacts $dry_run
+
+    set -l conf "$HOME/.config/fish/conf.d/pen15-osint.fish"
+    if test -f $conf
+        if test "$dry_run" = 1
+            echo "  [dry-run] would remove: $conf"
+        else
+            rm -f $conf 2>/dev/null
+            log_msg INFO "Removed fish aliases: $conf"
+        end
+    end
+end
+
+function run_post_install_cleanup
+    set -l had_failures $argv[1]
+    log_msg INFO "=== Post-install cleanup ==="
+    cleanup_temp_artifacts 0
+    cleanup_broken_clones 0
+
+    if test $had_failures -gt 0
+        log_msg WARN "Install had failures — broken partial clones removed"
+        echo ""
+        echo "  Tip: if installs keep failing, wipe and retry fresh:"
+        echo "    fish clean_osint_tools.fish --reset --yes"
+        echo "    fish install_osint_tools.fish --skip-heavy"
+    end
 end

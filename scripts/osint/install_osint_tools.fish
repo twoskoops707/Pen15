@@ -9,6 +9,8 @@
 #   # or, if repo is already cloned:
 #   fish ~/Pen15/scripts/osint/install_osint_tools.fish
 #   fish ~/Pen15/scripts/osint/install_osint_tools.fish --retry-failed
+#   fish ~/Pen15/scripts/osint/install_osint_tools.fish --clean-first
+#   fish ~/Pen15/scripts/osint/clean_osint_tools.fish --reset
 #   fish ~/Pen15/scripts/osint/check_osint_tools.fish
 #
 # Logs & reports:
@@ -21,16 +23,28 @@ source "$script_dir/lib_pen15_osint.fish"
 
 set -l retry_failed 0
 set -l skip_heavy 0
+set -l clean_first 0
+set -l no_cleanup 0
+set -l assume_yes 0
 for arg in $argv
     switch $arg
         case --retry-failed
             set retry_failed 1
         case --skip-heavy
             set skip_heavy 1
+        case --clean-first
+            set clean_first 1
+        case --no-cleanup
+            set no_cleanup 1
+        case -y --yes
+            set assume_yes 1
         case -h --help
-            echo "Usage: fish install_osint_tools.fish [--retry-failed] [--skip-heavy]"
+            echo "Usage: fish install_osint_tools.fish [options]"
             echo "  --retry-failed  Only re-attempt tools listed in ~/.pen15/osint-failed.txt"
             echo "  --skip-heavy    Skip SpiderFoot, BBOT, GHunt (large / ARM compile issues)"
+            echo "  --clean-first   Wipe previous OSINT install before starting (fixes broken state)"
+            echo "  --no-cleanup    Skip post-install temp/cache cleanup"
+            echo "  --yes / -y      Skip clean-first confirmation prompt"
             exit 0
     end
 end
@@ -371,6 +385,27 @@ function main
         log_msg INFO "Retry-failed mode — only re-attempting previously failed tools"
     end
 
+    if test $clean_first -eq 1
+        log_msg INFO "Clean-first mode — wiping previous OSINT install"
+        if test $assume_yes -eq 0
+            echo ""
+            echo "This will remove all OSINT repos, pip packages, and wrappers."
+            echo "API keys in ~/.pen15/ are kept."
+            echo -n "Type YES to continue: "
+            read -l answer
+            if test "$answer" != "YES"
+                echo "Aborted."
+                exit 1
+            end
+        end
+        # Clear stale failure list so we get a fresh run
+        rm -f $OSINT_FAILED_LIST 2>/dev/null
+        set -gx OSINT_OK_LIST
+        set -gx OSINT_FAIL_LIST
+        reset_osint_install 0
+        echo ""
+    end
+
     # Fresh log section
     echo "" >> $OSINT_LOG
     log_msg INFO "========== Install run started =========="
@@ -421,6 +456,14 @@ function main
     echo "#   virustotal.txt  — VirusTotal API key" >> "$HOME/.pen15/README.txt"
 
     write_fish_aliases
+
+    set -l fail_count (count $OSINT_FAIL_LIST)
+    if test $no_cleanup -eq 0
+        run_post_install_cleanup $fail_count
+    else
+        log_msg INFO "Skipping post-install cleanup (--no-cleanup)"
+    end
+
     show_summary
 end
 

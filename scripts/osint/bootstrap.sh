@@ -1,8 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Bootstrap: run this from Termux (bash is default shell on first open)
 #   curl -fsSL https://raw.githubusercontent.com/twoskoops707/Pen15/main/scripts/osint/bootstrap.sh | bash
+#   curl -fsSL .../bootstrap.sh | bash -s -- --clean-first --skip-heavy
 #
 # Clones Pen15 scripts (or uses local copy), installs fish, runs the OSINT installer.
+# Pass --clean-first to wipe a broken previous install before reinstalling.
 
 set -euo pipefail
 

@@ -93,7 +93,8 @@ set ok (math 24 - $fail)
 echo "Result: $ok OK, $fail missing/warn"
 echo ""
 if test $fail -gt 0
-    echo "Fix: fish install_osint_tools.fish --retry-failed"
+    echo "Fix: fish install_osint_tools.fish --clean-first --skip-heavy"
+    echo "     fish clean_osint_tools.fish --reset"
     echo "Log: cat $HOME/.pen15/osint-install.log"
 end
 echo ""
