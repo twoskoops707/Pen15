@@ -1,6 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/fish
 # Pen15 OSINT Cleanup — remove temp junk, broken clones, or full reset
 #
+# NEVER deletes private/user data. Protected paths:
+#   ~/.pen15/ (API keys, configs), ~/storage/, ~/.termux/,
+#   ~/Pen15/recon|scans|captures|..., recon-ng/workspaces/
+#
 # Usage:
 #   fish clean_osint_tools.fish              # temp/cache only (safe, default)
 #   fish clean_osint_tools.fish --temp       # same as default
@@ -10,7 +14,7 @@
 #   fish clean_osint_tools.fish --dry-run    # show what would be deleted
 #   fish clean_osint_tools.fish --reset --yes  # skip confirmation prompt
 #
-# API keys in ~/.pen15/*.txt are NEVER deleted unless --purge-keys is passed.
+# Your private files are NEVER deleted by this script.
 
 set -l script_dir (dirname (status -f))
 set -gx OSINT_SCRIPT_DIR $script_dir
@@ -19,7 +23,6 @@ source "$script_dir/lib_pen15_osint.fish"
 set -l mode temp
 set -l dry_run 0
 set -l assume_yes 0
-set -l purge_keys 0
 
 for arg in $argv
     switch $arg
@@ -35,8 +38,6 @@ for arg in $argv
             set dry_run 1
         case -y --yes
             set assume_yes 1
-        case --purge-keys
-            set purge_keys 1
         case -h --help
             echo "Usage: fish clean_osint_tools.fish [mode] [options]"
             echo ""
@@ -49,7 +50,9 @@ for arg in $argv
             echo "Options:"
             echo "  --dry-run     Show what would be deleted without deleting"
             echo "  --yes / -y    Skip confirmation prompts"
-            echo "  --purge-keys  Also delete ~/.pen15 API key files (use with care)"
+            echo ""
+            echo "Protected (never deleted): ~/.pen15/, ~/storage/, ~/.termux/,"
+            echo "  ~/Pen15/recon|scans|..., recon-ng/workspaces/"
             exit 0
     end
 end
@@ -95,7 +98,9 @@ switch $mode
         end
         reset_osint_install $dry_run
         echo ""
-        echo "Done — OSINT stack wiped. API keys in ~/.pen15/ kept."
+        echo "Done — OSINT stack wiped."
+        echo "  Kept: ~/.pen15/ (API keys & personal files)"
+        echo "  Kept: ~/storage/, recon-ng/workspaces/"
         echo "Reinstall: fish install_osint_tools.fish --skip-heavy"
         echo "     or:   bash nuke_osint.sh --reinstall"
     case full
@@ -108,20 +113,8 @@ switch $mode
         end
         reset_osint_install $dry_run
         cleanup_osint_logs $dry_run
-        if test $purge_keys -eq 1
-            for keyfile in "$PEN15_DIR"/*.txt
-                if test -f $keyfile
-                    if test $dry_run -eq 1
-                        echo "  [dry-run] would remove: $keyfile"
-                    else
-                        rm -f $keyfile
-                        log_msg INFO "Removed key file: $keyfile"
-                    end
-                end
-            end
-        end
         echo ""
-        echo "Done — full cleanup complete."
+        echo "Done — full cleanup complete. Your private files in ~/.pen15/ were kept."
         echo "Reinstall: fish install_osint_tools.fish"
 end
 

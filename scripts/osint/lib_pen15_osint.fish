@@ -62,8 +62,96 @@ set -gx OSINT_LEGACY_GARBAGE \
     /tmp/hashcat_extracted \
     "$HOME/.cache/pip" \
     "$HOME/.cache/maigret" \
-    "$HOME/.cache/sherlock" \
-    "$HOME/.local/share/pipx"
+    "$HOME/.cache/sherlock"
+
+# NEVER delete these paths or anything inside them (user data / private config).
+set -gx OSINT_PROTECTED_PREFIXES \
+    "$HOME/.pen15" \
+    "$HOME/.termux" \
+    "$HOME/storage" \
+    "$HOME/Pen15/recon" \
+    "$HOME/Pen15/scans" \
+    "$HOME/Pen15/captures" \
+    "$HOME/Pen15/hashes" \
+    "$HOME/Pen15/reports" \
+    "$HOME/Pen15/dorks" \
+    "$HOME/Pen15/payloads" \
+    "$HOME/recon-ng/workspaces" \
+    "$HOME/.spiderfoot"
+
+# Only these files inside ~/.pen15 may ever be removed (install diagnostics only).
+set -gx OSINT_PEN15_REMOVABLE_LOGS \
+    "$PEN15_DIR/osint-install.log" \
+    "$PEN15_DIR/osint-install-report.txt" \
+    "$PEN15_DIR/osint-failed.txt"
+
+function is_protected_path
+    set -l target $argv[1]
+    if test -z "$target"
+        return 1
+    end
+    # Normalize: reject home itself or any protected prefix.
+    if test "$target" = "$HOME"; or test "$target" = "/"
+        return 0
+    end
+    for prefix in $OSINT_PROTECTED_PREFIXES
+        if test "$target" = "$prefix"; or string match -q "$prefix/*" "$target"
+            return 0
+        end
+    end
+    return 1
+end
+
+function safe_rm_path
+    set -l target $argv[1]
+    set -l dry_run $argv[2]
+    if test -z "$target"
+        return 1
+    end
+    if is_protected_path $target
+        log_msg WARN "SKIP protected (user data): $target"
+        return 1
+    end
+    if not test -e $target
+        return 1
+    end
+    if test "$dry_run" = 1
+        echo "  [dry-run] would remove: $target"
+    else
+        rm -rf $target 2>/dev/null
+        log_msg INFO "Removed: $target"
+    end
+    return 0
+end
+
+function safe_rm_install_logs
+    set -l dry_run $argv[1]
+    log_msg INFO "Clearing install diagnostic logs only (not API keys or personal files)..."
+    for f in $OSINT_PEN15_REMOVABLE_LOGS
+        if test -f $f
+            if test "$dry_run" = 1
+                echo "  [dry-run] would remove log: $f"
+            else
+                rm -f $f 2>/dev/null
+                log_msg INFO "Removed log: $f"
+            end
+        end
+    end
+end
+
+function cleanup_pycache_in_tool_dirs
+    set -l dry_run $argv[1]
+    log_msg INFO "Clearing __pycache__ inside OSINT tool dirs only..."
+    for dir in $OSINT_REPO_DIRS $OSINT_TOOLS_DIR
+        if test -d $dir; and not is_protected_path $dir
+            find $dir -maxdepth 6 -type d -name '__pycache__' 2>/dev/null | while read -l cache
+                if not is_protected_path $cache
+                    safe_rm_path $cache $dry_run
+                end
+            end
+        end
+    end
+end
 
 function log_msg
     set -l level "INFO"
@@ -343,38 +431,16 @@ function cleanup_legacy_garbage
     log_msg INFO "Removing legacy install garbage and build leftovers..."
 
     for p in $OSINT_LEGACY_GARBAGE
-        if test -e $p
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $p"
-            else
-                rm -rf $p 2>/dev/null
-                log_msg INFO "Removed: $p"
-            end
-        end
+        safe_rm_path $p $dry_run
     end
 
     for p in $PREFIX/tmp/pip-*
         if test -e $p
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $p"
-            else
-                rm -rf $p 2>/dev/null
-            end
+            safe_rm_path $p $dry_run
         end
     end
 
-    # __pycache__ under home tool dirs
-    for dir in $OSINT_REPO_DIRS $OSINT_TOOLS_DIR $HOME
-        if test -d $dir
-            find $dir -maxdepth 4 -type d -name '__pycache__' 2>/dev/null | while read -l cache
-                if test "$dry_run" = 1
-                    echo "  [dry-run] would remove: $cache"
-                else
-                    rm -rf $cache 2>/dev/null
-                end
-            end
-        end
-    end
+    cleanup_pycache_in_tool_dirs $dry_run
 end
 
 function cleanup_temp_artifacts
@@ -384,23 +450,12 @@ function cleanup_temp_artifacts
     set -l temp_paths /tmp/sf-req-lite.txt "$HOME/.cache/pip"
 
     for p in $temp_paths
-        if test -e $p
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $p"
-            else
-                rm -rf $p 2>/dev/null
-                log_msg INFO "Removed: $p"
-            end
-        end
+        safe_rm_path $p $dry_run
     end
 
     for p in $PREFIX/tmp/pip-*
         if test -e $p
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $p"
-            else
-                rm -rf $p 2>/dev/null
-            end
+            safe_rm_path $p $dry_run
         end
     end
 
@@ -445,12 +500,7 @@ function cleanup_broken_clones
 
     for dir in $OSINT_REPO_DIRS
         if is_broken_clone $dir
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove broken clone: $dir"
-            else
-                rm -rf $dir 2>/dev/null
-                log_msg INFO "Removed broken clone: $dir"
-            end
+            safe_rm_path $dir $dry_run
         end
     end
 
@@ -458,12 +508,7 @@ function cleanup_broken_clones
     if test -d $OSINT_TOOLS_DIR
         for dir in $OSINT_TOOLS_DIR/*
             if test -d $dir; and is_broken_clone $dir
-                if test "$dry_run" = 1
-                    echo "  [dry-run] would remove broken clone: $dir"
-                else
-                    rm -rf $dir 2>/dev/null
-                    log_msg INFO "Removed broken clone: $dir"
-                end
+                safe_rm_path $dir $dry_run
             end
         end
     end
@@ -488,26 +533,26 @@ end
 
 function cleanup_osint_repos
     set -l dry_run $argv[1]
-    log_msg INFO "Removing OSINT git clone directories..."
+    log_msg INFO "Removing OSINT git clone directories (preserving user workspaces)..."
 
     for dir in $OSINT_REPO_DIRS
         if test -d $dir
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $dir"
-            else
-                rm -rf $dir 2>/dev/null
-                log_msg INFO "Removed repo: $dir"
+            # recon-ng: keep investigation workspaces
+            if test "$dir" = "$HOME/recon-ng"
+                if test "$dry_run" = 1
+                    echo "  [dry-run] would remove recon-ng tool files (keep workspaces/)"
+                else
+                    find "$dir" -mindepth 1 -maxdepth 1 ! -name workspaces -exec rm -rf {} + 2>/dev/null
+                    log_msg INFO "Removed recon-ng tool files; kept workspaces/"
+                end
+                continue
             end
+            safe_rm_path $dir $dry_run
         end
     end
 
     if test -d $OSINT_TOOLS_DIR
-        if test "$dry_run" = 1
-            echo "  [dry-run] would remove: $OSINT_TOOLS_DIR"
-        else
-            rm -rf $OSINT_TOOLS_DIR 2>/dev/null
-            log_msg INFO "Removed: $OSINT_TOOLS_DIR"
-        end
+        safe_rm_path $OSINT_TOOLS_DIR $dry_run
     end
 end
 
@@ -533,18 +578,7 @@ end
 
 function cleanup_osint_logs
     set -l dry_run $argv[1]
-    set -l log_files $OSINT_LOG $OSINT_REPORT $OSINT_FAILED_LIST
-
-    for f in $log_files
-        if test -f $f
-            if test "$dry_run" = 1
-                echo "  [dry-run] would remove: $f"
-            else
-                rm -f $f 2>/dev/null
-                log_msg INFO "Removed log: $f"
-            end
-        end
-    end
+    safe_rm_install_logs $dry_run
 end
 
 function reset_osint_install

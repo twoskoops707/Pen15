@@ -390,7 +390,7 @@ function main
         if test $assume_yes -eq 0
             echo ""
             echo "This will remove all OSINT repos, pip packages, and wrappers."
-            echo "API keys in ~/.pen15/ are kept."
+            echo "API keys and personal files in ~/.pen15/ are kept."
             echo -n "Type YES to continue: "
             read -l answer
             if test "$answer" != "YES"
