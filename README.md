@@ -133,6 +133,70 @@ Sources:
 
 ---
 
+## 🕵️ OSINT Toolkit Installer (Termux + fish)
+
+For OSINT work you can install everything at once with the standalone script
+[`scripts/install_osint_termux.sh`](scripts/install_osint_termux.sh). It is
+built for an **ARM Samsung phone running Termux with the fish shell**, clones
+the tools straight from **GitHub** (most are not in the `pkg`/`apt` repos),
+installs every dependency, and **self-heals or reports back** on any failure.
+
+### Run it
+
+```bash
+# In Termux (bash is fine even if your login shell is fish):
+pkg install -y git
+git clone https://github.com/twoskoops707/Pen15.git
+bash Pen15/scripts/install_osint_termux.sh
+```
+
+Useful flags:
+
+```bash
+bash install_osint_termux.sh            # full install
+bash install_osint_termux.sh --check    # only show what's installed
+bash install_osint_termux.sh --report   # (re)generate the diagnostic report
+bash install_osint_termux.sh --minimal  # core tools only
+bash install_osint_termux.sh --no-go    # skip the heavy Go tools
+bash install_osint_termux.sh --help
+```
+
+After it finishes, start fish and run `osint-tools` to see the status of every
+tool. If anything failed, it writes a report to
+`~/.pen15/osint_report_*.txt` — send that file back to the AI and the installer
+can be patched for your exact device.
+
+### What it installs
+
+| Category | Tools |
+|----------|-------|
+| **Usernames** | Sherlock, Maigret, blackbird, socialscan |
+| **Email** | theHarvester, holehe, h8mail, checkdmarc |
+| **Domains / subdomains** | Sublist3r, subfinder, assetfinder, dnsrecon, dnsx, dnstwist |
+| **Web recon** | SpiderFoot (+ web UI), Recon-ng, Photon, FinalRecon, httpx, nuclei, waymore, gau, waybackurls, wafw00f |
+| **SQL / injection** | sqlmap |
+| **Phone** | phoneinfoga |
+| **Google / socials** | ghunt, xeuledoc, toutatis |
+| **Multi-purpose** | Mr.Holmes |
+| **Base CLI (from pkg)** | nmap, whois, dig, exiftool, proxychains-ng, tor, jq, ripgrep |
+
+**How it handles hiccups**
+
+- Retries with exponential backoff on network/`pkg`/`git`/`go` failures.
+- Fixes the common Termux build problems automatically (installs `rust`,
+  `clang`, `libxml2`, `libxslt`, `libjpeg-turbo`, `libffi`, and the pre-built
+  `python-cryptography` / `python-lxml` / `python-numpy` / `python-pillow`
+  packages so pip doesn't have to compile them).
+- Falls back `pipx → pip --user`, and for GitHub-only tools clones the repo and
+  drops a wrapper into `$PREFIX/bin` so the command works from **any** shell.
+- Any tool that still can't be installed is recorded and written into the
+  diagnostic report instead of crashing the run.
+
+> ⚠️ Some tools (SpiderFoot correlation, nuclei, amass-style Go builds) are RAM
+> hungry. Run on a charger with other apps closed for best results.
+
+---
+
 ## 📡 Device Integration
 
 ### Flipper Zero
