@@ -88,6 +88,24 @@ When you first open the app, it will request:
 3. **Tap "Install Pentest Tools"** (wait 3-5 minutes)
 4. **Done!** You now have: nmap, git, python, wget, curl
 
+### Install the OSINT Toolkit (Termux + fish)
+
+To install the main OSINT tools (Sherlock, theHarvester, sqlmap, SpiderFoot,
+Sublist3r, Recon-ng, and many more) into Termux with all dependencies — most of
+which are cloned from GitHub because they are no longer in `pkg`/`apt` — use the
+self-healing installer:
+
+```bash
+bash scripts/termux_osint_installer.sh          # install everything
+bash scripts/termux_osint_installer.sh --minimal # just the headline tools
+bash scripts/termux_osint_installer.sh --check    # report what's installed
+```
+
+It automatically fixes common ARM64/Termux build failures and, if something
+still can't be installed, writes a copy-paste bug report you can send back for a
+fix. It also configures your **fish** shell PATH. See
+[`docs/OSINT_INSTALLER.md`](docs/OSINT_INSTALLER.md) for full details.
+
 ### Optional: Build Advanced Tools (30-60 minutes each)
 
 These tools were **removed from Termux repositories** and must be built from source:
