@@ -1,17 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/fish
 # Pen15 OSINT Toolkit Installer for Termux (ARM Samsung / Fish shell)
 #
-# Installs the main OSINT stack from GitHub + pip with self-healing retries.
-# Most tools are NOT in pkg/apt — this script clones repos and wires up PATH.
+# PRIVATE REPO: clone Pen15 first — curl from raw.githubusercontent.com will 404.
+#   gh repo clone twoskoops707/Pen15 ~/Pen15
+#   cd ~/Pen15 && bash scripts/osint/bootstrap.sh --skip-heavy
 #
-# Usage (in Termux Fish):
-#   curl -fsSL https://raw.githubusercontent.com/twoskoops707/Pen15/main/scripts/osint/bootstrap.sh | bash
-#   # or, if repo is already cloned:
-#   fish ~/Pen15/scripts/osint/install_osint_tools.fish
-#   fish ~/Pen15/scripts/osint/install_osint_tools.fish --retry-failed
-#   fish ~/Pen15/scripts/osint/install_osint_tools.fish --clean-first
-#   fish ~/Pen15/scripts/osint/clean_osint_tools.fish --reset
-#   fish ~/Pen15/scripts/osint/check_osint_tools.fish
+# Or run directly in Fish (after clone):
+#   fish ~/Pen15/scripts/osint/install_osint_tools.fish --clean-first --skip-heavy
 #
 # Logs & reports:
 #   ~/.pen15/osint-install.log

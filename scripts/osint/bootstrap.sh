@@ -1,10 +1,16 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Bootstrap: run this from Termux (bash is default shell on first open)
-#   curl -fsSL https://raw.githubusercontent.com/twoskoops707/Pen15/main/scripts/osint/bootstrap.sh | bash
-#   curl -fsSL .../bootstrap.sh | bash -s -- --clean-first --skip-heavy
+# Pen15 OSINT Bootstrap for Termux
 #
-# Clones Pen15 scripts (or uses local copy), installs fish, runs the OSINT installer.
-# Pass --clean-first to wipe a broken previous install before reinstalling.
+# NOTE: Pen15 is a PRIVATE repo — curl|bash from GitHub raw URLs returns 404.
+# Clone first, then run locally:
+#
+#   pkg install git gh
+#   gh auth login
+#   gh repo clone twoskoops707/Pen15 ~/Pen15
+#   cd ~/Pen15 && bash scripts/osint/bootstrap.sh --skip-heavy
+#
+# Options passed through to install_osint_tools.fish:
+#   --clean-first  --skip-heavy  --retry-failed  --yes
 
 set -euo pipefail
 
@@ -30,8 +36,13 @@ if [ -d "${INSTALL_DIR}/.git" ]; then
     git -C "${INSTALL_DIR}" pull --ff-only 2>/dev/null || true
 else
     git clone --depth 1 "${PEN15_REPO}" "${INSTALL_DIR}" 2>/dev/null || {
-        echo "[!!] Clone failed — if you have scripts locally, copy to ${OSINT_DIR}"
-        mkdir -p "${OSINT_DIR}"
+        echo "[!!] Clone failed — Pen15 is a private repo."
+        echo "     Authenticate first:"
+        echo "       pkg install gh && gh auth login"
+        echo "       gh repo clone twoskoops707/Pen15 ~/Pen15"
+        echo "     Then run:"
+        echo "       cd ~/Pen15 && bash scripts/osint/bootstrap.sh"
+        exit 1
     }
 fi
 

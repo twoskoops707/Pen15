@@ -1,10 +1,18 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Pen15 OSINT NUKE — wipe OSINT tool installs only (NOT your private data)
-# Works from default Termux bash (no fish required).
 #
-# Usage:
-#   curl -fsSL .../nuke_osint.sh | bash -s -- --yes --reinstall
-#   bash nuke_osint.sh --dry-run
+# NOTE: Pen15 is a PRIVATE GitHub repo — curl|bash from raw.githubusercontent.com
+# will 404. Clone the repo first, then run locally:
+#
+#   pkg install git gh
+#   gh auth login
+#   gh repo clone twoskoops707/Pen15 ~/Pen15
+#   cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --dry-run
+#   cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall
+#
+# Usage (from local clone):
+#   bash scripts/osint/nuke_osint.sh --dry-run
+#   bash scripts/osint/nuke_osint.sh --yes --reinstall
 #
 # REMOVES: OSINT git clones, pip packages, bin wrappers, build caches
 # NEVER TOUCHES: ~/.pen15 API keys, ~/storage, ~/.termux, Pen15 recon/scans,
@@ -227,10 +235,25 @@ echo ""
 
 if [ "$REINSTALL" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
     echo "Starting fresh install..."
-    SCRIPT_URL="https://raw.githubusercontent.com/twoskoops707/Pen15/cursor/osint-termux-fish-installer-cff4/scripts/osint/bootstrap.sh"
-    curl -fsSL "$SCRIPT_URL" | bash -s -- --skip-heavy --yes
+    BOOTSTRAP="${HOME}/Pen15/scripts/osint/bootstrap.sh"
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+    if [ -f "$BOOTSTRAP" ]; then
+        bash "$BOOTSTRAP" --skip-heavy --yes
+    elif [ -f "${SCRIPT_DIR}/bootstrap.sh" ]; then
+        bash "${SCRIPT_DIR}/bootstrap.sh" --skip-heavy --yes
+    else
+        echo "[!!] bootstrap.sh not found. Clone the repo first:"
+        echo "     pkg install git gh && gh auth login"
+        echo "     gh repo clone twoskoops707/Pen15 ~/Pen15"
+        echo "     cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall"
+        exit 1
+    fi
 else
-    echo "Reinstall now:"
-    echo "  curl -fsSL https://raw.githubusercontent.com/twoskoops707/Pen15/cursor/osint-termux-fish-installer-cff4/scripts/osint/nuke_osint.sh | bash -s -- --yes --reinstall"
+    echo "Reinstall (from local clone):"
+    echo "  cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall"
+    echo ""
+    echo "First time? Clone the private repo:"
+    echo "  pkg install git gh && gh auth login"
+    echo "  gh repo clone twoskoops707/Pen15 ~/Pen15"
 fi
 echo ""
