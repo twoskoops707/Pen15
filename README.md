@@ -102,6 +102,50 @@ These tools were **removed from Termux repositories** and must be built from sou
 
 ---
 
+## 🕵️ One-Shot OSINT Toolkit Installer (Termux + fish)
+
+For terminal-only workflows on your Samsung / ARM64 phone, `scripts/osint_install.sh`
+installs the entire modern OSINT stack in one pass. It is idempotent, self-healing,
+and emits a paste-back-ready failure report if anything goes wrong.
+
+```bash
+pkg install -y git fish
+git clone https://github.com/twoskoops707/Pen15.git ~/Pen15
+bash ~/Pen15/scripts/osint_install.sh
+```
+
+**Modes:**
+
+| Command                                          | What it does                              |
+|--------------------------------------------------|-------------------------------------------|
+| `bash ~/Pen15/scripts/osint_install.sh`          | Full install                              |
+| `bash ~/Pen15/scripts/osint_install.sh --check`  | Verify what is on PATH                    |
+| `bash ~/Pen15/scripts/osint_install.sh --update` | `git pull` every cloned tool + pipx upgrade |
+| `bash ~/Pen15/scripts/osint_install.sh --repair` | Retry only tools that failed last run     |
+
+**Included tools** (each wired up as a normal command in fish):
+
+- **Username OSINT:** Sherlock, Maigret, Nexfil, Blackbird, socialscan
+- **Email OSINT:** holehe, h8mail
+- **Phone OSINT:** PhoneInfoga, ignorant
+- **Domain / Subdomain:** theHarvester, Sublist3r, subfinder, amass, assetfinder, dnsrecon
+- **Recon frameworks:** SpiderFoot, Recon-ng, FinalRecon
+- **Web crawl / vuln:** Photon, XSStrike, sqlmap, httpx, nuclei, katana, ffuf, gobuster, wafw00f
+- **URL / Wayback:** gau, waybackurls
+- **Google / Cloud OSINT:** GHunt
+- **Instagram / Social:** instaloader, Osintgram, toutatis
+- **Search APIs:** shodan, censys
+- **Hash / misc:** hashid, john (source build)
+
+After it finishes, open a fresh fish shell and run `osint-help` for the full cheat sheet.
+
+**If something fails**, the script writes a machine-readable report to
+`~/.pen15/osint_install_failures.txt` and (when `termux-api` is installed)
+copies it to the clipboard. Paste that file back to the Cursor agent and
+it will patch the installer with a targeted fix.
+
+---
+
 ## 🛠️ What's Included
 
 ### ✅ Tools Available via Termux PKG (Install in 5 min)
