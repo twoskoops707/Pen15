@@ -100,6 +100,22 @@ These tools were **removed from Termux repositories** and must be built from sou
 - ✅ At least 2GB free storage
 - ✅ Stable internet connection
 
+### Optional: One-shot OSINT toolkit (fish shell)
+
+To install the main OSINT tools (Sherlock, theHarvester, sqlmap, SpiderFoot,
+Recon-ng, Maigret, holehe, subfinder, amass, PhoneInfoga, and more) with all of
+their dependencies and fish-shell `PATH` wiring, run the self-healing installer
+from Termux:
+
+```bash
+bash scripts/install_osint_termux.sh          # full install
+bash scripts/install_osint_termux.sh --doctor # verify what's installed
+```
+
+It clones tools from GitHub (most are not in the pkg/apt repos), auto-fixes
+common build failures, and writes a report to `~/.pen15/osint/last_report.txt`
+for anything it can't fix. See [docs/OSINT_TERMUX_INSTALL.md](docs/OSINT_TERMUX_INSTALL.md).
+
 ---
 
 ## 🛠️ What's Included
