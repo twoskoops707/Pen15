@@ -88,6 +88,16 @@ When you first open the app, it will request:
 3. **Tap "Install Pentest Tools"** (wait 3-5 minutes)
 4. **Done!** You now have: nmap, git, python, wget, curl
 
+### Fish shell OSINT installer for ARM Termux
+
+For a fuller Samsung/ARM64 Termux setup with Sherlock, theHarvester, sqlmap, SpiderFoot, Maigret, GHunt, PhoneInfoga, ProjectDiscovery tools, Amass, SecLists, and diagnostics:
+
+```sh
+fish scripts/install_termux_osint.fish
+```
+
+See [`docs/TERMUX_OSINT_INSTALLER.md`](docs/TERMUX_OSINT_INSTALLER.md) for the tool list, usage examples, and what logs to send back if installation hiccups happen.
+
 ### Optional: Build Advanced Tools (30-60 minutes each)
 
 These tools were **removed from Termux repositories** and must be built from source:
