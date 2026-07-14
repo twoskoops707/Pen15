@@ -1,12 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/fish
-# Pen15 OSINT Toolkit — verify installed tools
+# Termux OSINT Toolkit — verify installed tools
 # Usage: fish check_osint_tools.fish
 
 set -l script_dir (dirname (status -f))
 set -gx OSINT_SCRIPT_DIR $script_dir
-source "$script_dir/lib_pen15_osint.fish"
+source "$script_dir/lib_osint.fish"
 
-set -gx PEN15_DIR "$HOME/.pen15"
+set -gx OSINT_CONFIG_DIR "$HOME/.termux-osint"
 
 function check_cmd
     set -l name $argv[1]
@@ -37,7 +37,7 @@ set -l ok 0
 set -l fail 0
 
 echo ""
-echo "=== Pen15 OSINT Tool Check ==="
+echo "=== Termux OSINT Tool Check ==="
 echo "Arch: "(uname -m)" | Prefix: $PREFIX"
 echo ""
 
@@ -79,23 +79,16 @@ check_cmd shodan "pip install shodan"; or set fail (math $fail + 1)
 check_cmd ghunt "git clone GHunt"; or set fail (math $fail + 1)
 
 echo ""
-echo "--- Pen15 Integration ---"
-if test -f "$HOME/.termux/termux.properties"; and grep -q allow-external-apps "$HOME/.termux/termux.properties"
-    echo "  [OK]   allow-external-apps (Pen15 can run commands)"
-else
-    echo "  [WARN] allow-external-apps not set — Pen15 auto-run won't work"
-    set fail (math $fail + 1)
-end
-check_path pen15-config "$HOME/.pen15"; or set fail (math $fail + 1)
+echo "--- Config ---"
+check_path termux-osint-config "$OSINT_CONFIG_DIR"; or set fail (math $fail + 1)
 
 echo ""
-set ok (math 24 - $fail)
+set ok (math 22 - $fail)
 echo "Result: $ok OK, $fail missing/warn"
 echo ""
 if test $fail -gt 0
-    echo "Fix: fish install_osint_tools.fish --clean-first --skip-heavy"
-    echo "     fish clean_osint_tools.fish --reset"
-    echo "Log: cat $HOME/.pen15/osint-install.log"
+    echo "Fix: cd ~/termux-osint && bash nuke_osint.sh --yes --reinstall"
+    echo "Log: cat $OSINT_CONFIG_DIR/osint-install.log"
 end
 echo ""
 

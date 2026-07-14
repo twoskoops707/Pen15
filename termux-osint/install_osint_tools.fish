@@ -1,20 +1,15 @@
 #!/data/data/com.termux/files/usr/bin/fish
-# Pen15 OSINT Toolkit Installer for Termux (ARM Samsung / Fish shell)
+# Standalone Termux OSINT Toolkit Installer (Fish shell)
+# NOT tied to any Android app — local Termux only.
 #
-# PRIVATE REPO: clone Pen15 first — curl from raw.githubusercontent.com will 404.
-#   gh repo clone twoskoops707/Pen15 ~/Pen15
-#   cd ~/Pen15 && bash scripts/osint/bootstrap.sh --skip-heavy
+#   cd ~/termux-osint && bash bootstrap.sh --skip-heavy
+#   fish ~/termux-osint/install_osint_tools.fish --clean-first --skip-heavy
 #
-# Or run directly in Fish (after clone):
-#   fish ~/Pen15/scripts/osint/install_osint_tools.fish --clean-first --skip-heavy
-#
-# Logs & reports:
-#   ~/.pen15/osint-install.log
-#   ~/.pen15/osint-install-report.txt
+# Logs: ~/.termux-osint/osint-install.log
 
 set -l script_dir (dirname (status -f))
 set -gx OSINT_SCRIPT_DIR $script_dir
-source "$script_dir/lib_pen15_osint.fish"
+source "$script_dir/lib_osint.fish"
 
 set -l retry_failed 0
 set -l skip_heavy 0
@@ -35,7 +30,7 @@ for arg in $argv
             set assume_yes 1
         case -h --help
             echo "Usage: fish install_osint_tools.fish [options]"
-            echo "  --retry-failed  Only re-attempt tools listed in ~/.pen15/osint-failed.txt"
+            echo "  --retry-failed  Only re-attempt tools listed in ~/.termux-osint/osint-failed.txt"
             echo "  --skip-heavy    Skip SpiderFoot, BBOT, GHunt (large / ARM compile issues)"
             echo "  --clean-first   Wipe previous OSINT install before starting (fixes broken state)"
             echo "  --no-cleanup    Skip post-install temp/cache cleanup"
@@ -348,7 +343,7 @@ function install_pkg_osint_base
 end
 
 # ---------------------------------------------------------------------------
-# Retry-failed mode: read ~/.pen15/osint-failed.txt and map to installers
+# Retry-failed mode: read ~/.termux-osint/osint-failed.txt and map to installers
 # ---------------------------------------------------------------------------
 
 function should_install
@@ -371,7 +366,7 @@ end
 function main
     echo ""
     echo "╔══════════════════════════════════════════════════╗"
-    echo "║  Pen15 OSINT Toolkit Installer (Termux / ARM64)  ║"
+    echo "║  Termux OSINT Toolkit Installer (Termux / ARM64)  ║"
     echo "║  Fish shell • GitHub clones • Self-healing       ║"
     echo "╚══════════════════════════════════════════════════╝"
     echo ""
@@ -385,7 +380,7 @@ function main
         if test $assume_yes -eq 0
             echo ""
             echo "This will remove all OSINT repos, pip packages, and wrappers."
-            echo "API keys and personal files in ~/.pen15/ are kept."
+            echo "API keys and personal files in ~/.termux-osint/ are kept."
             echo -n "Type YES to continue: "
             read -l answer
             if test "$answer" != "YES"
@@ -442,14 +437,13 @@ function main
     should_install nikto; and install_nikto
     should_install shodan; and install_shodan_cli
 
-    # Pen15 integration dirs
-    mkdir -p "$HOME/Pen15/scripts/osint"
-    mkdir -p "$HOME/.pen15"
-    if not test -f "$HOME/.pen15/README.txt"
-        echo "# Store API keys here (one per file):" > "$HOME/.pen15/README.txt"
-        echo "#   hibp_key.txt    — Have I Been Pwned API key" >> "$HOME/.pen15/README.txt"
-        echo "#   shodan_key.txt  — Shodan API key" >> "$HOME/.pen15/README.txt"
-        echo "#   virustotal.txt  — VirusTotal API key" >> "$HOME/.pen15/README.txt"
+    # Config dir for optional API keys
+    mkdir -p "$OSINT_CONFIG_DIR"
+    if not test -f "$OSINT_CONFIG_DIR/README.txt"
+        echo "# Optional API keys (one per file):" > "$OSINT_CONFIG_DIR/README.txt"
+        echo "#   shodan_key.txt  — Shodan API key" >> "$OSINT_CONFIG_DIR/README.txt"
+        echo "#   virustotal.txt  — VirusTotal API key" >> "$OSINT_CONFIG_DIR/README.txt"
+        echo "#   hibp_key.txt    — Have I Been Pwned API key" >> "$OSINT_CONFIG_DIR/README.txt"
     end
 
     write_fish_aliases

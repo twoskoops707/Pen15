@@ -1,0 +1,28 @@
+Termux OSINT Toolkit — standalone, NOT part of Pen15 app
+============================================================
+
+Copy this entire folder to your phone:
+
+  ~/termux-osint
+
+Then in Termux:
+
+  cd ~/termux-osint
+  bash nuke_osint.sh --dry-run          # preview cleanup
+  bash nuke_osint.sh --yes --reinstall  # wipe + fresh install
+
+Or step by step:
+
+  bash bootstrap.sh --skip-heavy
+  fish check_osint_tools.fish
+
+Config and API keys (optional): ~/.termux-osint/
+Tool clones: ~/osint-tools/
+
+Your private data is NEVER deleted:
+  ~/.termux-osint/  ~/storage/  ~/.termux/  recon-ng/workspaces/
+
+Getting this folder onto your phone:
+  - USB: adb push termux-osint /data/data/com.termux/files/home/termux-osint
+  - Or zip and send to yourself, unzip in Termux home
+  - No GitHub curl needed — this folder is self-contained

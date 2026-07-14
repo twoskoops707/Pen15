@@ -1,9 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/fish
-# Pen15 OSINT Cleanup — remove temp junk, broken clones, or full reset
+# Termux OSINT Cleanup — remove temp junk, broken clones, or full reset
 #
-# NEVER deletes private/user data. Protected paths:
-#   ~/.pen15/ (API keys, configs), ~/storage/, ~/.termux/,
-#   ~/Pen15/recon|scans|captures|..., recon-ng/workspaces/
+# NEVER deletes private/user data. Protected: ~/.termux-osint/, ~/storage/,
+# ~/.termux/, recon-ng/workspaces/
 #
 # Usage:
 #   fish clean_osint_tools.fish              # temp/cache only (safe, default)
@@ -18,7 +17,7 @@
 
 set -l script_dir (dirname (status -f))
 set -gx OSINT_SCRIPT_DIR $script_dir
-source "$script_dir/lib_pen15_osint.fish"
+source "$script_dir/lib_osint.fish"
 
 set -l mode temp
 set -l dry_run 0
@@ -51,8 +50,7 @@ for arg in $argv
             echo "  --dry-run     Show what would be deleted without deleting"
             echo "  --yes / -y    Skip confirmation prompts"
             echo ""
-            echo "Protected (never deleted): ~/.pen15/, ~/storage/, ~/.termux/,"
-            echo "  ~/Pen15/recon|scans|..., recon-ng/workspaces/"
+            echo "Protected (never deleted): ~/.termux-osint/, ~/storage/, ~/.termux/"
             exit 0
     end
 end
@@ -71,7 +69,7 @@ end
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
-echo "║  Pen15 OSINT Cleanup (Termux / ARM64)            ║"
+echo "║  Termux OSINT Cleanup (Termux / ARM64)            ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
 echo "Mode: $mode"(test $dry_run -eq 1; and echo " (dry-run)")
@@ -99,7 +97,7 @@ switch $mode
         reset_osint_install $dry_run
         echo ""
         echo "Done — OSINT stack wiped."
-        echo "  Kept: ~/.pen15/ (API keys & personal files)"
+        echo "  Kept: ~/.termux-osint/ (API keys & personal files)"
         echo "  Kept: ~/storage/, recon-ng/workspaces/"
         echo "Reinstall: fish install_osint_tools.fish --skip-heavy"
         echo "     or:   bash nuke_osint.sh --reinstall"
@@ -114,7 +112,7 @@ switch $mode
         reset_osint_install $dry_run
         cleanup_osint_logs $dry_run
         echo ""
-        echo "Done — full cleanup complete. Your private files in ~/.pen15/ were kept."
+        echo "Done — full cleanup complete. Your private files in ~/.termux-osint/ were kept."
         echo "Reinstall: fish install_osint_tools.fish"
 end
 

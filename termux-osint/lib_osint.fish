@@ -1,17 +1,17 @@
-# Pen15 OSINT installer helpers for Termux (Fish shell)
+# Termux OSINT installer helpers for Termux (Fish shell)
 # Source from install_osint_tools.fish — do not run directly.
 
-if not set -q PEN15_OSINT_LIB_LOADED
-    set -gx PEN15_OSINT_LIB_LOADED 1
+if not set -q OSINT_LIB_LOADED
+    set -gx OSINT_LIB_LOADED 1
 else
     return
 end
 
-set -gx PEN15_DIR "$HOME/.pen15"
+set -gx OSINT_CONFIG_DIR "$HOME/.termux-osint"
 set -gx OSINT_TOOLS_DIR "$HOME/osint-tools"
-set -gx OSINT_LOG "$PEN15_DIR/osint-install.log"
-set -gx OSINT_REPORT "$PEN15_DIR/osint-install-report.txt"
-set -gx OSINT_FAILED_LIST "$PEN15_DIR/osint-failed.txt"
+set -gx OSINT_LOG "$OSINT_CONFIG_DIR/osint-install.log"
+set -gx OSINT_REPORT "$OSINT_CONFIG_DIR/osint-install-report.txt"
+set -gx OSINT_FAILED_LIST "$OSINT_CONFIG_DIR/osint-failed.txt"
 
 # Track install results for the final report.
 set -gx OSINT_OK_LIST
@@ -66,24 +66,17 @@ set -gx OSINT_LEGACY_GARBAGE \
 
 # NEVER delete these paths or anything inside them (user data / private config).
 set -gx OSINT_PROTECTED_PREFIXES \
-    "$HOME/.pen15" \
+    "$HOME/.termux-osint" \
     "$HOME/.termux" \
     "$HOME/storage" \
-    "$HOME/Pen15/recon" \
-    "$HOME/Pen15/scans" \
-    "$HOME/Pen15/captures" \
-    "$HOME/Pen15/hashes" \
-    "$HOME/Pen15/reports" \
-    "$HOME/Pen15/dorks" \
-    "$HOME/Pen15/payloads" \
     "$HOME/recon-ng/workspaces" \
     "$HOME/.spiderfoot"
 
-# Only these files inside ~/.pen15 may ever be removed (install diagnostics only).
-set -gx OSINT_PEN15_REMOVABLE_LOGS \
-    "$PEN15_DIR/osint-install.log" \
-    "$PEN15_DIR/osint-install-report.txt" \
-    "$PEN15_DIR/osint-failed.txt"
+# Only these install diagnostic logs may be removed (not API keys or other files).
+set -gx OSINT_REMOVABLE_LOGS \
+    "$OSINT_CONFIG_DIR/osint-install.log" \
+    "$OSINT_CONFIG_DIR/osint-install-report.txt" \
+    "$OSINT_CONFIG_DIR/osint-failed.txt"
 
 function is_protected_path
     set -l target $argv[1]
@@ -127,7 +120,7 @@ end
 function safe_rm_install_logs
     set -l dry_run $argv[1]
     log_msg INFO "Clearing install diagnostic logs only (not API keys or personal files)..."
-    for f in $OSINT_PEN15_REMOVABLE_LOGS
+    for f in $OSINT_REMOVABLE_LOGS
         if test -f $f
             if test "$dry_run" = 1
                 echo "  [dry-run] would remove log: $f"
@@ -163,7 +156,7 @@ function log_msg
     set -l ts (date '+%Y-%m-%d %H:%M:%S')
     set -l line "[$ts] [$level] $msg"
     echo $line
-    mkdir -p $PEN15_DIR
+    mkdir -p $OSINT_CONFIG_DIR
     echo $line >> $OSINT_LOG
 end
 
@@ -327,38 +320,24 @@ end
 
 function fix_termux_basics
     log_msg INFO "Running Termux baseline setup..."
-    ensure_dir $PEN15_DIR
+    ensure_dir $OSINT_CONFIG_DIR
     ensure_dir $OSINT_TOOLS_DIR
     ensure_dir "$HOME/.config/fish/conf.d"
-
-    if not test -f "$HOME/.termux/termux.properties"
-        mkdir -p "$HOME/.termux"
-    end
-    if not grep -q 'allow-external-apps=true' "$HOME/.termux/termux.properties" 2>/dev/null
-        echo 'allow-external-apps=true' >> "$HOME/.termux/termux.properties"
-        log_msg INFO "Added allow-external-apps=true for Pen15 integration"
-    end
-
-    if not command -v termux-setup-storage >/dev/null
-        log_msg WARN "termux-setup-storage not found — run manually if you need shared storage"
-    else if not test -d "$HOME/storage"
-        log_msg INFO "Grant storage: run 'termux-setup-storage' when prompted"
-    end
 
     retry_cmd pkg update -y
     retry_cmd pkg upgrade -y
 end
 
 function write_fish_aliases
-    set -l conf "$HOME/.config/fish/conf.d/pen15-osint.fish"
+    set -l conf "$HOME/.config/fish/conf.d/termux-osint.fish"
     set -l check_script "$OSINT_SCRIPT_DIR/check_osint_tools.fish"
     if test -z "$OSINT_SCRIPT_DIR"
-        set check_script "$HOME/Pen15/scripts/osint/check_osint_tools.fish"
+        set check_script "$HOME/termux-osint/check_osint_tools.fish"
     end
     log_msg INFO "Writing Fish aliases to $conf"
-    echo '# Pen15 OSINT tool shortcuts — auto-generated' > $conf
+    echo '# Termux OSINT tool shortcuts — auto-generated' > $conf
     echo 'set -gx OSINT_TOOLS_DIR "$HOME/osint-tools"' >> $conf
-    echo 'set -gx PEN15_DIR "$HOME/.pen15"' >> $conf
+    echo 'set -gx OSINT_CONFIG_DIR "$HOME/.termux-osint"' >> $conf
     echo '' >> $conf
     echo 'function osint-check' >> $conf
     echo "    fish $check_script" >> $conf
@@ -375,7 +354,7 @@ end
 
 function write_install_report
     log_msg INFO "Writing install report to $OSINT_REPORT"
-    echo "=== Pen15 OSINT Install Report ===" > $OSINT_REPORT
+    echo "=== Termux OSINT Install Report ===" > $OSINT_REPORT
     echo "Date: "(date) >> $OSINT_REPORT
     echo "Device arch: "(uname -m) >> $OSINT_REPORT
     echo "Termux prefix: $PREFIX" >> $OSINT_REPORT
@@ -401,7 +380,7 @@ function show_summary
     write_install_report
     echo ""
     echo "=============================================="
-    echo "  Pen15 OSINT Install Complete"
+    echo "  Termux OSINT Install Complete"
     echo "=============================================="
     echo "  OK:   "(count $OSINT_OK_LIST)
     echo "  FAIL: "(count $OSINT_FAIL_LIST)
@@ -591,7 +570,7 @@ function reset_osint_install
     cleanup_broken_clones $dry_run
     cleanup_temp_artifacts $dry_run
 
-    set -l conf "$HOME/.config/fish/conf.d/pen15-osint.fish"
+    set -l conf "$HOME/.config/fish/conf.d/termux-osint.fish"
     if test -f $conf
         if test "$dry_run" = 1
             echo "  [dry-run] would remove: $conf"

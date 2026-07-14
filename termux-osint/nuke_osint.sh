@@ -1,28 +1,20 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Pen15 OSINT NUKE — wipe OSINT tool installs only (NOT your private data)
+# Standalone Termux OSINT cleanup — NOT tied to any Android app.
 #
-# NOTE: Pen15 is a PRIVATE GitHub repo — curl|bash from raw.githubusercontent.com
-# will 404. Clone the repo first, then run locally:
+# Run from the folder on your phone:
+#   cd ~/termux-osint && bash nuke_osint.sh --dry-run
+#   cd ~/termux-osint && bash nuke_osint.sh --yes --reinstall
 #
-#   pkg install git gh
-#   gh auth login
-#   gh repo clone twoskoops707/Pen15 ~/Pen15
-#   cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --dry-run
-#   cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall
-#
-# Usage (from local clone):
-#   bash scripts/osint/nuke_osint.sh --dry-run
-#   bash scripts/osint/nuke_osint.sh --yes --reinstall
-#
-# REMOVES: OSINT git clones, pip packages, bin wrappers, build caches
-# NEVER TOUCHES: ~/.pen15 API keys, ~/storage, ~/.termux, Pen15 recon/scans,
-#                recon-ng workspaces, spiderfoot databases
+# REMOVES: OSINT tool installs, pip packages, wrappers, build caches
+# NEVER TOUCHES: ~/.termux-osint API keys, ~/storage, ~/.termux,
+#                recon-ng/workspaces, ~/.spiderfoot
 
 set -euo pipefail
 
 DRY_RUN=0
 REINSTALL=0
 YES=0
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 for arg in "$@"; do
     case "$arg" in
@@ -38,20 +30,12 @@ done
 
 PREFIX="${PREFIX:-/data/data/com.termux/files/usr/bin}"
 HOME="${HOME:-/data/data/com.termux/files/home}"
-PEN15_DIR="${HOME}/.pen15"
+CONFIG_DIR="${HOME}/.termux-osint"
 
-# Protected prefixes — never delete these or anything inside them.
 PROTECTED=(
-    "${HOME}/.pen15"
+    "${HOME}/.termux-osint"
     "${HOME}/.termux"
     "${HOME}/storage"
-    "${HOME}/Pen15/recon"
-    "${HOME}/Pen15/scans"
-    "${HOME}/Pen15/captures"
-    "${HOME}/Pen15/hashes"
-    "${HOME}/Pen15/reports"
-    "${HOME}/Pen15/dorks"
-    "${HOME}/Pen15/payloads"
     "${HOME}/recon-ng/workspaces"
     "${HOME}/.spiderfoot"
 )
@@ -86,9 +70,9 @@ rm_path() {
 
 rm_install_logs_only() {
     local logs=(
-        "${PEN15_DIR}/osint-install.log"
-        "${PEN15_DIR}/osint-install-report.txt"
-        "${PEN15_DIR}/osint-failed.txt"
+        "${CONFIG_DIR}/osint-install.log"
+        "${CONFIG_DIR}/osint-install-report.txt"
+        "${CONFIG_DIR}/osint-failed.txt"
     )
     for f in "${logs[@]}"; do
         if [ -f "$f" ]; then
@@ -103,7 +87,7 @@ rm_install_logs_only() {
 
 echo ""
 echo "╔══════════════════════════════════════════════════╗"
-echo "║  Pen15 OSINT NUKE — tools only, NOT your data    ║"
+echo "║  Termux OSINT NUKE — tools only, NOT your data   ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
 
@@ -111,11 +95,10 @@ if [ "$DRY_RUN" -eq 0 ] && [ "$YES" -eq 0 ]; then
     echo "Removes OSINT tool installs only."
     echo ""
     echo "PROTECTED (never deleted):"
-    echo "  ~/.pen15/          API keys, configs, personal files"
-    echo "  ~/storage/         Termux shared storage"
+    echo "  ~/.termux-osint/   API keys and personal config"
+    echo "  ~/storage/         shared storage"
     echo "  ~/.termux/         Termux settings"
-    echo "  ~/Pen15/recon/     your recon output"
-    echo "  ~/recon-ng/workspaces/  investigation databases"
+    echo "  recon-ng/workspaces/"
     echo ""
     read -r -p "Type YES to continue: " answer
     if [ "$answer" != "YES" ]; then
@@ -124,8 +107,8 @@ if [ "$DRY_RUN" -eq 0 ] && [ "$YES" -eq 0 ]; then
     fi
 fi
 
-mkdir -p "$PEN15_DIR"
-echo "[1/5] Removing OSINT git clones (allowlist only)..."
+mkdir -p "$CONFIG_DIR"
+echo "[1/5] Removing OSINT git clones..."
 REPO_DIRS=(
     "${HOME}/osint-tools"
     "${HOME}/spiderfoot"
@@ -149,7 +132,6 @@ for d in "${REPO_DIRS[@]}"; do
     rm_path "$d"
 done
 
-# recon-ng: remove tool code but keep workspaces/
 if [ -d "${HOME}/recon-ng" ] && ! is_protected "${HOME}/recon-ng"; then
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "  [dry-run] would remove recon-ng tool files (keep workspaces/)"
@@ -160,7 +142,7 @@ if [ -d "${HOME}/recon-ng" ] && ! is_protected "${HOME}/recon-ng"; then
 fi
 
 echo ""
-echo "[2/5] Removing OSINT bin wrappers only..."
+echo "[2/5] Removing OSINT bin wrappers..."
 BIN_WRAPPERS=(
     sherlock maigret holehe theHarvester sublist3r
     spiderfoot sf recon-ng sqlmap photon h8mail
@@ -172,7 +154,7 @@ for name in "${BIN_WRAPPERS[@]}"; do
 done
 
 echo ""
-echo "[3/5] Uninstalling OSINT pip packages only..."
+echo "[3/5] Uninstalling OSINT pip packages..."
 PIP_PKGS=(
     sherlock-project maigret holehe theHarvester theharvester
     sublist3r h8mail socialscan sqlmap shodan bbot ghunt
@@ -191,14 +173,14 @@ for pkg in "${PIP_PKGS[@]}"; do
 done
 
 echo ""
-echo "[4/5] Clearing build caches (not personal files)..."
+echo "[4/5] Clearing build caches..."
 rm_path /tmp/sf-req-lite.txt
 rm_path /tmp/hashcat.7z
 rm_path /tmp/hashcat_extracted
 rm_path "${HOME}/.cache/pip"
 rm_path "${HOME}/.cache/maigret"
 rm_path "${HOME}/.cache/sherlock"
-rm_path "${HOME}/.config/fish/conf.d/pen15-osint.fish"
+rm_path "${HOME}/.config/fish/conf.d/termux-osint.fish"
 for p in "${PREFIX}"/tmp/pip-*; do
     [ -e "$p" ] && rm_path "$p"
 done
@@ -206,11 +188,10 @@ if [ "$DRY_RUN" -eq 0 ]; then
     pip3 cache purge 2>/dev/null || true
     pkg clean -y 2>/dev/null || true
 fi
-
 rm_install_logs_only
 
 echo ""
-echo "[5/5] Clearing __pycache__ inside tool dirs only..."
+echo "[5/5] Clearing __pycache__ in tool dirs only..."
 PYCACHE_DIRS=(
     "${HOME}/osint-tools" "${HOME}/spiderfoot" "${HOME}/recon-ng"
     "${HOME}/theHarvester" "${HOME}/nikto" "${HOME}/sherlock"
@@ -222,38 +203,18 @@ for dir in "${PYCACHE_DIRS[@]}"; do
         done
     fi
 done
-echo "  done"
 
 echo ""
 echo "=============================================="
-echo "  NUKE complete — OSINT tools cleared"
+echo "  Done — OSINT tools cleared"
+echo "  Your ~/.termux-osint/ and ~/storage/ untouched"
 echo "=============================================="
-echo "  Your private data was NOT touched:"
-echo "    ~/.pen15/  ~/storage/  ~/.termux/"
-echo "    ~/Pen15/recon/  recon-ng/workspaces/"
 echo ""
 
 if [ "$REINSTALL" -eq 1 ] && [ "$DRY_RUN" -eq 0 ]; then
     echo "Starting fresh install..."
-    BOOTSTRAP="${HOME}/Pen15/scripts/osint/bootstrap.sh"
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-    if [ -f "$BOOTSTRAP" ]; then
-        bash "$BOOTSTRAP" --skip-heavy --yes
-    elif [ -f "${SCRIPT_DIR}/bootstrap.sh" ]; then
-        bash "${SCRIPT_DIR}/bootstrap.sh" --skip-heavy --yes
-    else
-        echo "[!!] bootstrap.sh not found. Clone the repo first:"
-        echo "     pkg install git gh && gh auth login"
-        echo "     gh repo clone twoskoops707/Pen15 ~/Pen15"
-        echo "     cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall"
-        exit 1
-    fi
+    bash "${SCRIPT_DIR}/bootstrap.sh" --skip-heavy --yes
 else
-    echo "Reinstall (from local clone):"
-    echo "  cd ~/Pen15 && bash scripts/osint/nuke_osint.sh --yes --reinstall"
-    echo ""
-    echo "First time? Clone the private repo:"
-    echo "  pkg install git gh && gh auth login"
-    echo "  gh repo clone twoskoops707/Pen15 ~/Pen15"
+    echo "Reinstall: cd ~/termux-osint && bash nuke_osint.sh --yes --reinstall"
 fi
 echo ""
