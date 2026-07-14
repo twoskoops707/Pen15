@@ -102,6 +102,47 @@ These tools were **removed from Termux repositories** and must be built from sou
 
 ---
 
+### Full OSINT Tool Installer for Termux + Fish
+
+For a broader OSINT setup on an ARM64 Samsung/Android phone, copy this repo's installer into Termux and run it from fish:
+
+```fish
+cd ~/storage/downloads  # or wherever you copied the repo/script
+bash scripts/install_termux_osint_fish.sh
+```
+
+The script installs into `~/.pen15`, creates a Python virtual environment, clones maintained GitHub sources, and writes fish shell integration to:
+
+```text
+~/.config/fish/conf.d/pen15-osint.fish
+```
+
+Included GitHub-based tools:
+- Sherlock, Maigret, Holehe, GHunt
+- theHarvester, SpiderFoot, Recon-ng, Photon, FinalRecon
+- sqlmap, Nikto
+- SecLists sparse checkout
+- ProjectDiscovery tools (`subfinder`, `httpx`, `nuclei`, `naabu`, `dnsx`), Amass, and go-dork
+
+Useful options:
+
+```fish
+bash scripts/install_termux_osint_fish.sh --skip-go       # smaller install
+bash scripts/install_termux_osint_fish.sh --with-darkweb  # add optional dark-web tooling
+bash scripts/install_termux_osint_fish.sh --report-only   # print latest failure report
+```
+
+If anything fails, the installer keeps going where safe and writes:
+
+```text
+~/.pen15/logs/osint-install-report.txt
+~/.pen15/logs/osint-install-latest.log
+```
+
+Paste the report back into Cursor for diagnosis.
+
+---
+
 ## 🛠️ What's Included
 
 ### ✅ Tools Available via Termux PKG (Install in 5 min)
