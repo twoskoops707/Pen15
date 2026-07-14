@@ -16,9 +16,17 @@ pkg install -y python python-pip git
 echo "[3/4] Installing pyflipper..."
 pip install --upgrade pyflipper pyserial
 
-# Create scripts directory
+# Create scripts directory and deploy Flipper helper scripts
 echo "[4/4] Creating scripts directory..."
-mkdir -p /data/data/com.termux/files/home/Pen15/scripts
+PEN15_SCRIPTS="/data/data/com.termux/files/home/Pen15/scripts"
+mkdir -p "$PEN15_SCRIPTS"
+SCRIPT_SRC="$(cd "$(dirname "$0")" && pwd)"
+for script in ibutton_read.py infrared_learn.py nfc_read.py rfid_read.py; do
+    if [ -f "$SCRIPT_SRC/$script" ]; then
+        cp "$SCRIPT_SRC/$script" "$PEN15_SCRIPTS/"
+        chmod +x "$PEN15_SCRIPTS/$script"
+    fi
+done
 
 echo ""
 echo "=== Setup Complete ==="

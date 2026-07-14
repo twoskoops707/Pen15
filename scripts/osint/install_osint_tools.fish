@@ -450,10 +450,12 @@ function main
     # Pen15 integration dirs
     mkdir -p "$HOME/Pen15/scripts/osint"
     mkdir -p "$HOME/.pen15"
-    echo "# Store API keys here (one per file):" > "$HOME/.pen15/README.txt"
-    echo "#   hibp_key.txt    — Have I Been Pwned API key" >> "$HOME/.pen15/README.txt"
-    echo "#   shodan_key.txt  — Shodan API key" >> "$HOME/.pen15/README.txt"
-    echo "#   virustotal.txt  — VirusTotal API key" >> "$HOME/.pen15/README.txt"
+    if not test -f "$HOME/.pen15/README.txt"
+        echo "# Store API keys here (one per file):" > "$HOME/.pen15/README.txt"
+        echo "#   hibp_key.txt    — Have I Been Pwned API key" >> "$HOME/.pen15/README.txt"
+        echo "#   shodan_key.txt  — Shodan API key" >> "$HOME/.pen15/README.txt"
+        echo "#   virustotal.txt  — VirusTotal API key" >> "$HOME/.pen15/README.txt"
+    end
 
     write_fish_aliases
 
