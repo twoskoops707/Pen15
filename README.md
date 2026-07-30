@@ -292,6 +292,26 @@ pkg install build-essential clang make autoconf automake libtool pkg-config
 
 ---
 
+## 🧹 Termux Storage Cleanup
+
+Termux storage fills up fast with duplicate git clones and stray copies of
+files that are already committed and pushed to GitHub. `scripts/storage_dedupe.sh`
+finds and removes those redundant local copies — it never touches uncommitted
+work, unpushed commits, or anything that looks like a secret (keys, tokens,
+`.env` files, credentials), regardless of where it lives.
+
+```bash
+# From a local clone, inside Termux:
+cd ~/Pen15
+bash scripts/storage_dedupe.sh --dry-run     # preview only, deletes nothing
+bash scripts/storage_dedupe.sh               # apply (asks you to type YES)
+bash scripts/storage_dedupe.sh --list-repos  # just show repo push status
+```
+
+Always run with `--dry-run` first and review the output before applying.
+
+---
+
 ## 📚 Learning Resources
 
 ### Termux Basics
