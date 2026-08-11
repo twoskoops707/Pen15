@@ -47,6 +47,7 @@ jobs:
       - name: Build Pen15 FAP (Flipper App Package)
         uses: flipperdevices/flipperzero-ufbt-action@v0.1
         id: build-fap
+        continue-on-error: true
         with:
           sdk-channel: release
           app-dir: fap/pen15_controller
@@ -63,10 +64,13 @@ jobs:
             **Branch:** `${{ github.ref_name }}`
             **Commit:** `${{ github.sha }}`
             **Build:** `#${{ github.run_number }}`
+            **FAP build:** `${{ steps.build-fap.outcome }}`
 
             ### Downloads
             - **pen15-v3.0.${{ github.run_number }}-*.apk** — Install on phone
             - **pen15_controller.fap** — Install on Flipper SD card
+              (only present when the FAP step succeeded — check the FAP
+              build status above; on failure see workflow logs for SDK drift)
 
             ### Installation
             **Phone (APK):**
@@ -80,9 +84,10 @@ jobs:
             3. On Flipper: Apps → Tools → Pen15 Controller
             4. Then connect USB OTG and tap Connect in the phone app
 
-            🤖 Auto-built by GitHub Actions
+            Auto-built by GitHub Actions.
           files: |
             app/build/outputs/apk/debug/pen15-v3.0.${{ github.run_number }}-*.apk
             ${{ steps.build-fap.outputs.fap-artifacts }}
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
