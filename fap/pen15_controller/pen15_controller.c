@@ -1286,8 +1286,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"HW_BUSY\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp); return;
         }
-        char uid_hex[32] = {0};
-        json_str(js, toks, n, "uid", uid_hex, sizeof(uid_hex));
+        char uid_hex[32]  = {0};
+        char atqa_hex[8]  = {0};
+        char sak_hex[4]   = {0};
+        json_str(js, toks, n, "uid",  uid_hex,  sizeof(uid_hex));
+        json_str(js, toks, n, "atqa", atqa_hex, sizeof(atqa_hex));
+        json_str(js, toks, n, "sak",  sak_hex,  sizeof(sak_hex));
 
         Iso14443_3aData iso_data;
         memset(&iso_data, 0, sizeof(iso_data));
@@ -1301,9 +1305,10 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
                 "{\"status\":\"error\",\"code\":\"BAD_UID\",\"id\":\"%s\"}\n", id);
             app->progress = 0; usb_send(app, resp);
         } else {
-            /* Default ATQA/SAK for ISO14443-3A (NTAG-compatible) */
-            iso_data.atqa = 0x4400;
-            iso_data.sak  = 0x00;
+            /* ATQA/SAK: use JSON-supplied values if present (Theory 17),
+             * otherwise fall back to ISO14443-3A NTAG-compatible defaults. */
+            iso_data.atqa = atqa_hex[0] ? (uint16_t)strtol(atqa_hex, NULL, 16) : 0x4400;
+            iso_data.sak  = sak_hex[0]  ? (uint8_t)strtol(sak_hex,  NULL, 16) : 0x00;
             strncpy(app->hw_id, id, sizeof(app->hw_id) - 1);
             app->nfc = nfc_alloc();
             app->nfc_listener = nfc_listener_alloc(app->nfc, NfcProtocolIso14443_3a, &iso_data);

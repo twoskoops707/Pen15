@@ -1,42 +1,59 @@
-PEN15 UNFIXED / DEFERRED BUGS — as of 2026-06-14
+PEN15 UNFIXED / DEFERRED BUGS — as of 2026-08-11
 ================================================
 All critical-path bugs (ERR-01 through ERR-34) were fixed in commit 54a7524.
-The items below are remaining lower-priority or architectural issues.
+Remaining lower-priority items are tracked below.
 
-ERR-06: pen15_controller.c — nfc_emulate and nfc_write actions always return
-        {"status":"not_supported"}. NFC write/emulate over CDC requires loading
-        the full NFC subsystem stack which is not yet implemented in the FAP.
-        IMPACT: NFCActivity write and emulate tabs silently fail.
-        FIX NEEDED: Implement nfc_device_save + nfc_emulate in pen15_controller.c
-        using the Flipper NFC worker API.
+ERR-06 (partial): pen15_controller.c — nfc_write still returns NOT_SUPPORTED.
+        FIX NEEDED (Theory 15): Implement NTAG write via
+        iso14443_3a_poller_send_standard_frame(). Currently deferred — writing
+        to arbitrary NFC tags is protocol-specific and most access-control
+        cards are read-only anyway.
 
-ERR-07 (partial): pen15_controller.c NFC scanner — uid field now contains the
-        protocol index as hex (e.g. "04" for ISO14443-3A) rather than the actual
-        tag UID bytes. NFCActivity shows a tag was detected but the UID is not the
-        real card UID.
-        IMPACT: Cannot clone/save specific NFC tags by UID.
-        FIX NEEDED: Use nfc_device_alloc() + nfc_worker to do a full read that
-        returns actual UID bytes from the ATQA/SAK/UID response.
+ERR-07 (partial): Non-ISO14443-3A cards still get protocol-index as UID.
+        ISO14443-3A cards return real UID + ATQA + SAK (fixed on 54a7524).
+        FIX NEEDED: Protocol-specific pollers for ISO14443-4A, ISO15693,
+        FeliCa, EM4x. Currently deferred.
 
 ================================================
-FIXED THIS SESSION:
-- ERR-38/39/40/41: Removed TermuxIntegration.WiFi attack methods (root-requiring
+FIXED THIS SESSION (2026-08-11):
+- Theory 17 (recommended in bugs journal): nfc_emulate now accepts optional
+  "atqa" (16-bit hex) and "sak" (8-bit hex) JSON fields. Defaults to
+  0x4400/0x00 (NTAG-compatible) when absent. Enables perfect clone of a
+  detected card's ATQA/SAK. FILE: fap/pen15_controller/pen15_controller.c
+- FapProtocol.nfcDetect callback now returns (type, uid, atqa, sak).
+  FapProtocol.nfcEmulate accepts optional atqa/sak parameters and forwards
+  them to the FAP. FILE: FapProtocol.kt
+- NFCActivity.SavedTag now persists atqa/sak per tag, so re-emulating a
+  saved card uses that card's exact ATQA/SAK response. Detection callback
+  captures the two new fields. FILE: NFCActivity.kt
+- ERR-43: Deleted FlipperDevice.kt and Esp32Device.kt — both were dead code
+  (no other .kt file referenced them). FlipperDevice used CLI-prompt
+  protocol incompatible with FAP JSON mode. Esp32Device duplicated
+  ESP32SerialManager, which is the wired implementation.
+
+================================================
+FIXED PRIOR SESSIONS (2026-06-14):
+- ERR-38/39/40/41: Removed TermuxIntegration.WiFi attack methods (root-required
   dead code). Kept WiFi.Wordlists object since Hash object references it.
-- ERR-43: FlipperDevice.kt and Esp32Device.kt remain untracked (decision deferred).
 - ERR-44: FlipperDevice.kt line 214 — fixed "\x03\r\n" → "\u0003\r\n"
-- ERR-45: FlipperDevice.kt readUntilPrompt() — made suspend, replaced Thread.sleep with delay()
-- ERR-46: FlipperBluetoothManager.kt — added BLUETOOTH_CONNECT permission check before connectGatt()
-- ERR-47: HardwareGuide.kt — updated WIFI_DEAUTH and MARAUDER guides to describe direct USB to AWOK
-- ERR-48: TermuxIntegration HASHCAT_LATEST — verified ${'$'} escaping is already correct (no fix needed)
-- ERR-49: DataFlowIndicator destroy() — added dataFlow.destroy() to onDestroy() in
-  SubGHzActivity, RFIDActivity, InfraredActivity, IButtonActivity
+- ERR-45: FlipperDevice.kt readUntilPrompt() — made suspend, replaced
+  Thread.sleep with delay(). (Since deleted with the rest of FlipperDevice.kt.)
+- ERR-46: FlipperBluetoothManager.kt — added BLUETOOTH_CONNECT permission
+  check before connectGatt().
+- ERR-47: HardwareGuide.kt — updated WIFI_DEAUTH and MARAUDER guides to
+  describe direct USB to AWOK.
+- ERR-48: TermuxIntegration HASHCAT_LATEST — verified ${'$'} escaping is
+  already correct (no fix needed).
+- ERR-49: DataFlowIndicator destroy() — added dataFlow.destroy() to
+  onDestroy() in SubGHzActivity, RFIDActivity, InfraredActivity,
+  IButtonActivity.
 - ERR-50: StorageManager.ensureDirs() race — confirmed already handled in
-  storagePermissionsLauncher callback in MainActivity (no fix needed)
+  storagePermissionsLauncher callback in MainActivity (no fix needed).
 
 ================================================
 NOTES:
-- ERR-01 through ERR-34 were fixed and committed on 2026-06-14 (commit 54a7524)
-- FAP GUI was completely redesigned (commit 3a9a397)
-- Build triggered via GitHub Actions (dolphin-rewrite branch)
-- ERR-06 and ERR-07 remain as FAP C code changes requiring ufbt build pipeline
+- ERR-01 through ERR-34 fixed and committed on 2026-06-14 (commit 54a7524).
+- FAP GUI redesigned (commit 3a9a397).
+- APK builds via GitHub Actions (workflow: build.yml). FAP builds require
+  ufbt and are not part of the APK build workflow due to token scope.
 ================================================
