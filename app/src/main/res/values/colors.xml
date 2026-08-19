@@ -1,107 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- ═══════════════════════════════════════════════════════════════
-         PEN15 MODERN CYBER PALETTE
-         Base: near-black, Accent: electric cyan, Warning: neon pink
+         PEN15 CYBERPUNK PALETTE v2
+         Refined contrast, better visual hierarchy, consistent naming
     ═══════════════════════════════════════════════════════════════════ -->
 
     <!-- Base -->
-    <color name="background">#0A0A12</color>
-    <color name="surface">#111120</color>
-    <color name="surface_raised">#181828</color>
-    <color name="surface_glass">#1A1A2E</color>
-    <color name="border">#252540</color>
-    <color name="border_bright">#3D3D6B</color>
+    <color name="background">#080810</color>
+    <color name="surface">#0E0E1C</color>
+    <color name="surface_raised">#151528</color>
+    <color name="surface_glass">#1A1A30</color>
+    <color name="border">#1E1E38</color>
+    <color name="border_bright">#3A3A60</color>
 
     <!-- Primary: Electric Cyan -->
     <color name="primary">#00E5FF</color>
     <color name="primary_dim">#00A8C6</color>
     <color name="primary_glow">#4DFFFB</color>
+    <color name="primary_surface">#001A22</color>
 
     <!-- Accent: Neon Pink (danger/alert) -->
     <color name="accent">#FF2D6F</color>
     <color name="accent_dim">#CC2457</color>
+    <color name="accent_surface">#1A0A14</color>
 
     <!-- Status -->
-    <color name="success">#39FF14</color>
-    <color name="success_dim">#2ECC0F</color>
-    <color name="warning">#FF6B35</color>
+    <color name="success">#00FF88</color>
+    <color name="success_dim">#00CC6A</color>
+    <color name="success_surface">#001A10</color>
+    <color name="warning">#FFB800</color>
     <color name="danger">#FF2D6F</color>
-    <color name="info">#00E5FF</color>
+    <color name="info">#00B4D8</color>
 
     <!-- Section Colors (hardware categories) -->
     <color name="section_flipper">#00E5FF</color>
     <color name="section_awok">#FF2D6F</color>
-    <color name="section_recon">#39FF14</color>
+    <color name="section_recon">#00FF88</color>
 
     <!-- Text -->
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#8888AA</color>
-    <color name="text_hint">#444466</color>
-    <color name="text_on_primary">#0A0A12</color>
+    <color name="text_primary">#EAEAF0</color>
+    <color name="text_secondary">#7878A0</color>
+    <color name="text_hint">#3A3A58</color>
+    <color name="text_on_primary">#080810</color>
 
     <!-- Glow colors (for drawable tints) -->
     <color name="glow_cyan">#00E5FF</color>
     <color name="glow_pink">#FF2D6F</color>
-    <color name="glow_green">#39FF14</color>
-    <color name="glow_orange">#FF6B35</color>
+    <color name="glow_green">#00FF88</color>
+    <color name="glow_orange">#FFB800</color>
 
     <!-- Status dots -->
-    <color name="status_connected">#39FF14</color>
-    <color name="status_connecting">#FF6B35</color>
+    <color name="status_connected">#00FF88</color>
+    <color name="status_connecting">#FFB800</color>
     <color name="status_disconnected">#FF2D6F</color>
-    <color name="status_idle">#444466</color>
+    <color name="status_idle">#3A3A58</color>
 
     <!-- Module card backgrounds by category -->
-    <color name="card_flipper_bg">#0D1520</color>
-    <color name="card_flipper_border">#00E5FF</color>
-    <color name="card_awok_bg">#1A0D15</color>
-    <color name="card_awok_border">#FF2D6F</color>
-    <color name="card_recon_bg">#0D1A0D</color>
-    <color name="card_recon_border">#39FF14</color>
-    <color name="card_default_bg">#111120</color>
+    <color name="card_flipper_bg">#0A1420</color>
+    <color name="card_flipper_border">#003848</color>
+    <color name="card_awok_bg">#1A0A14</color>
+    <color name="card_awok_border">#3A1028</color>
+    <color name="card_recon_bg">#0A1A10</color>
+    <color name="card_recon_border">#103820</color>
+    <color name="card_default_bg">#0E0E1C</color>
 
     <!-- Function tints (FAB, icons per module) -->
     <color name="func_wifi">#FF2D6F</color>
     <color name="func_subghz">#00E5FF</color>
-    <color name="func_nfc">#00E5FF</color>
-    <color name="func_bluetooth">#00E5FF</color>
+    <color name="func_nfc">#00B4D8</color>
+    <color name="func_bluetooth">#00B4D8</color>
     <color name="func_badusb">#FF2D6F</color>
     <color name="func_rfid">#00E5FF</color>
-    <color name="func_ir">#FF6B35</color>
-    <color name="func_gpio">#FF6B35</color>
-    <color name="func_ibutton">#FF6B35</color>
+    <color name="func_ir">#FFB800</color>
+    <color name="func_gpio">#FFB800</color>
+    <color name="func_ibutton">#FFB800</color>
 
     <!-- Legacy / compat aliases -->
     <color name="primary_variant">#00A8C6</color>
     <color name="colorPrimary">#00E5FF</color>
-    <color name="colorPrimaryDark">#0A0A12</color>
+    <color name="colorPrimaryDark">#080810</color>
     <color name="colorAccent">#00E5FF</color>
     <color name="electric_blue">#00E5FF</color>
     <color name="neon_cyan">#00E5FF</color>
-    <color name="neon_green">#39FF14</color>
+    <color name="neon_green">#00FF88</color>
     <color name="neon_red">#FF2D6F</color>
-    <color name="text_dim">#8888AA</color>
-    <color name="text_gray">#8888AA</color>
-    <color name="text_muted">#444466</color>
-    <color name="text_white">#FFFFFF</color>
-    <color name="status_scanning">#FF6B35</color>
-    <color name="ic_launcher_background">#0A0A12</color>
-    <color name="black_bg">#0A0A12</color>
-    <color name="dark_bg">#0A0A12</color>
-    <color name="dark_grey">#252540</color>
-    <color name="surface_bg">#111120</color>
-    <color name="terminal_black">#0A0A12</color>
-    <color name="terminal_green">#39FF14</color>
+    <color name="text_dim">#7878A0</color>
+    <color name="text_gray">#7878A0</color>
+    <color name="text_muted">#3A3A58</color>
+    <color name="text_white">#EAEAF0</color>
+    <color name="status_scanning">#FFB800</color>
+    <color name="ic_launcher_background">#080810</color>
+    <color name="black_bg">#080810</color>
+    <color name="dark_bg">#080810</color>
+    <color name="dark_grey">#1E1E38</color>
+    <color name="surface_bg">#0E0E1C</color>
+    <color name="terminal_black">#080810</color>
+    <color name="terminal_green">#00FF88</color>
     <color name="terminal_cyan">#00E5FF</color>
     <color name="terminal_red">#FF2D6F</color>
-    <color name="terminal_yellow">#FF6B35</color>
-    <color name="terminal_gray">#8888AA</color>
-    <color name="terminal_dark_gray">#444466</color>
-    <color name="black">#0A0A12</color>
-    <color name="white">#FFFFFF</color>
-    <color name="orange">#FF6B35</color>
+    <color name="terminal_yellow">#FFB800</color>
+    <color name="terminal_gray">#7878A0</color>
+    <color name="terminal_dark_gray">#3A3A58</color>
+    <color name="black">#080810</color>
+    <color name="white">#EAEAF0</color>
+    <color name="orange">#FFB800</color>
     <color name="pink">#FF2D6F</color>
-    <color name="terminal_text">#39FF14</color>
-    <color name="surface_variant">#181828</color>
+    <color name="terminal_text">#00FF88</color>
+    <color name="surface_variant">#151528</color>
 </resources>

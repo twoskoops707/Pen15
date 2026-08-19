@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="DORK TEMPLATE LIBRARY"
-        android:textColor="#BD93F9"
+        android:textColor="#00E5FF"
         android:textSize="12sp"
         android:textStyle="bold"
         android:fontFamily="monospace"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="50+ ready-made searches. Tap USE THIS to load one into the Builder tab."
-        android:textColor="#6272A4"
+        android:textColor="#7878A0"
         android:textSize="12sp"
         android:layout_marginBottom="16dp"/>
 

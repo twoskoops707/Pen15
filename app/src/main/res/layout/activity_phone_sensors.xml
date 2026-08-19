@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="IDLE"
-            android:textColor="#808080"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:textStyle="bold"
             android:fontFamily="monospace"/>
@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:background="#44000000"
-        app:tabTextColor="#808080"
+        app:tabTextColor="@color/text_secondary"
         app:tabSelectedTextColor="@color/info"
         app:tabIndicatorColor="@color/info"
         app:tabIndicatorHeight="2dp"
@@ -138,7 +138,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="FOUND"
-                            android:textColor="#808080"
+                            android:textColor="@color/text_secondary"
                             android:textSize="10sp"
                             android:fontFamily="monospace"/>
                     </LinearLayout>
@@ -164,7 +164,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="OPEN"
-                            android:textColor="#808080"
+                            android:textColor="@color/text_secondary"
                             android:textSize="10sp"
                             android:fontFamily="monospace"/>
                     </LinearLayout>
@@ -190,7 +190,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="SECURED"
-                            android:textColor="#808080"
+                            android:textColor="@color/text_secondary"
                             android:textSize="10sp"
                             android:fontFamily="monospace"/>
                     </LinearLayout>

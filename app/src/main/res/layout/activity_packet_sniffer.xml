@@ -87,7 +87,7 @@
                             android:hint="Proxy port (default: 8080)"
                             android:inputType="number"
                             android:textColor="@color/success"
-                            android:textColorHint="#808080"
+                            android:textColorHint="@color/text_secondary"
                             android:fontFamily="monospace"
                             android:singleLine="true"
                             android:scrollHorizontally="true"

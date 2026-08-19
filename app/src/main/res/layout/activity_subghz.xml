@@ -185,7 +185,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Select frequency and press the button below"
-                    android:textColor="#808080"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:fontFamily="monospace"
                     android:layout_marginTop="8dp"/>
