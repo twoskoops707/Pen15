@@ -107,4 +107,9 @@
     <color name="pink">#FF2D6F</color>
     <color name="terminal_text">#00FF88</color>
     <color name="surface_variant">#151528</color>
+
+    <!-- Aliases for activity_garage_door.xml compatibility -->
+    <color name="textPrimary">#EAEAF0</color>
+    <color name="textSecondary">#7878A0</color>
+    <color name="textHint">#3A3A58</color>
 </resources>
