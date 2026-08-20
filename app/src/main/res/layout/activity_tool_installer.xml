@@ -77,19 +77,39 @@
             android:textColor="@android:color/white"/>
     </LinearLayout>
 
-    <!-- Copy install log / summary to clipboard -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCopyLog"
-        style="@style/Widget.Pen15.Button.Outlined"
+    <!-- Copy summary / full log to clipboard -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="12dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="4dp"
-        android:minHeight="36dp"
-        android:text="📋 COPY INSTALL LOG — paste back to the assistant"
-        android:textAllCaps="false"
-        android:textSize="11sp"/>
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCopySummary"
+            style="@style/Widget.Pen15.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:minHeight="36dp"
+            android:text="📋 COPY SUMMARY"
+            android:textAllCaps="false"
+            android:textSize="11sp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCopyLog"
+            style="@style/Widget.Pen15.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:minHeight="36dp"
+            android:text="📋 COPY FULL LOG"
+            android:textAllCaps="false"
+            android:textSize="11sp"/>
+    </LinearLayout>
 
     <!-- Tool List -->
     <ScrollView
