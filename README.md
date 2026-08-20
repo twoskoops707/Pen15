@@ -40,7 +40,7 @@ A Kotlin Android app that controls your Flipper Zero and ESP32 hardware via USB,
 - ESP32 connects to Flipper's GPIO header (pins 13/14) at 115200 baud
 - The FAP enters **bridge mode**: transparently forwards bytes between USB and UART
 - Phone sends Marauder CLI commands through the bridge:
-  - `scanap` → scan WiFi networks
+  - `scanall` → scan WiFi networks
   - `attack -t deauth` → deauthentication attack
   - `sniffpmkid -d -l` → targeted PMKID capture
   - `evilportal -c start` → captive portal attack
@@ -115,8 +115,7 @@ These commands are sent from the app to the ESP32 through the Flipper bridge:
 ### WiFi Attacks
 | Command | Description |
 |---------|-------------|
-| `scanap` | Scan for WiFi access points |
-| `scansta` | Scan for connected stations (clients) |
+| `scanall` | Scan for WiFi access points and stations |
 | `list -a` | List discovered APs |
 | `list -c` | List discovered stations |
 | `select -a <index>` | Select target AP(s) — comma-separated for multiple |
@@ -132,7 +131,7 @@ These commands are sent from the app to the ESP32 through the Flipper bridge:
 |---------|-------------|
 | `ssid -a -n <name>` | Add an SSID to the AP name list |
 | `evilportal -c start` | Start captive portal with selected AP config |
-| `evilportal -c stop` | Stop the portal |
+| `stopscan` | Stop the portal (any running scan/attack) |
 | `evilportal -c sethtml <file>` | Select HTML template from SD card |
 
 **Note:** Evil Portal requires an SD card on the ESP32 (since Marauder v0.11.0). Credentials are saved to `evil_portal_x.log` on the SD card root.
@@ -141,13 +140,14 @@ These commands are sent from the app to the ESP32 through the Flipper bridge:
 | Command | Description |
 |---------|-------------|
 | `sniffbt` | Bluetooth sniffer |
-| `sourapple` | Apple BLE spam |
-| `swiftpair` | Microsoft Swift Pair spam |
+| `blespam -t all` | All BLE spam attacks |
+| `blespam -t sourapple` | Apple BLE spam |
+| `blespam -t windows` | Microsoft Swift Pair spam |
 
 ### Signal Monitoring
 | Command | Description |
 |---------|-------------|
-| `sigmon` | Signal strength monitor for selected AP |
+| `foxhunt -w <ap>` | Signal strength monitor (fox hunt) for selected AP |
 
 ## Termux Setup
 

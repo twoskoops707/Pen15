@@ -65,17 +65,17 @@ FTDI:       VID 0x0403
 
 ### ESP32 Marauder CLI Commands (AWOK Dual Mini v3)
 ```
-scanap              - Scan WiFi access points
+scanall             - Scan WiFi APs and stations
 stopscan            - Stop current scan
 select -a <idx>     - Select AP by index
 attack -t deauth    - Deauth attack on selected AP
-sniffpmkid          - Capture PMKID hashes
+sniffpmkid -d -l    - Targeted PMKID capture (deauth + list)
 sniffbt             - Bluetooth sniffing
-blespam             - BLE spam attack
-evilportal          - Evil twin portal
-channel <n>         - Set WiFi channel
-list                - List scan results
-clearlist           - Clear results
+blespam -t all      - BLE spam attack
+evilportal -c start - Evil twin portal
+channel -s <n>      - Set WiFi channel
+list -a             - List scan results (APs)
+clearlist -a        - Clear results
 gps                 - GPS info (if module present)
 help                - List commands
 reboot              - Reboot ESP32
