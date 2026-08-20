@@ -26,6 +26,10 @@
     <!-- Termux RUN_COMMAND Permission - Required for automatic command execution -->
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
 
+    <!-- Foreground service permission for background tool execution -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
     <!-- Queries declaration for Termux package visibility -->
     <queries>
         <package android:name="com.termux" />
