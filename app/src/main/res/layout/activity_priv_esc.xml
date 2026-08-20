@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="@color/surface">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:padding="8dp"
+            android:background="@drawable/bg_quick_action"
+            android:contentDescription="Back"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PRIV ESCALATION"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/textPrimary"
+            android:layout_marginStart="12dp"/>
+
+        <TextView
+            android:id="@+id/statusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="READY"
+            android:textSize="10sp"
+            android:textColor="@color/success"
+            android:background="@drawable/bg_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"/>
+    </LinearLayout>
+
+    <!-- Target Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:hint="SSH target (user@host) or 'local'"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputTarget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="@color/textPrimary"
+            android:textColorHint="@color/textSecondary"
+            android:text="local"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Tool Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLinpeas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="🐧 LINPEAS"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/success"
+            android:textColor="@android:color/white"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnWinpeas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="🪟 WINPEAS"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/info"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSuid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="🔑 SUID"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/warning"
+            android:textColor="@android:color/white"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnKernel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="🐧 KERNEL"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/danger"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCron"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="⏰ CRON"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/primary"
+            android:textColor="@android:color/white"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCapabilities"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="🔒 CAPS"
+            android:textAllCaps="false"
+            android:textSize="11sp"
+            android:backgroundTint="@color/info"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <!-- Stop Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:text="⏹ STOP"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/danger"
+        android:textColor="@android:color/white"/>
+
+    <!-- Output -->
+    <ScrollView
+        android:id="@+id/logScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:background="@drawable/bg_output">
+
+        <TextView
+            android:id="@+id/logOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/success"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:text="[Ready] Privilege Escalation Scanner
+
+🐧 LINPEAS — Full Linux privesc enumeration (100+ checks)
+🪟 WINPEAS — Windows privesc scanner (runs on target)
+🔑 SUID — Find exploitable SUID/SGID binaries (GTFOBins)
+🐧 KERNEL — Check kernel version for known exploits
+⏰ CRON — Enumerate cron jobs for writable scripts
+🔒 CAPS — Check Linux capabilities
+
+Use 'local' to scan this device, or enter
+user@host for SSH-based scanning."/>
+    </ScrollView>
+</LinearLayout>
