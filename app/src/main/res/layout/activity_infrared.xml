@@ -81,7 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:background="#44000000"
-        app:tabTextColor="#808080"
+        app:tabTextColor="@color/text_secondary"
         app:tabSelectedTextColor="@color/info"
         app:tabIndicatorColor="@color/info"
         app:tabIndicatorHeight="2dp"
@@ -190,7 +190,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Enter signal details and press TRANSMIT"
-            android:textColor="#808080"
+            android:textColor="@color/text_secondary"
             android:fontFamily="monospace"
             android:textSize="11sp"
             android:layout_marginTop="12dp"/>
@@ -222,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="No saved signals.\nCapture a signal in LEARN tab first."
-            android:textColor="#808080"
+            android:textColor="@color/text_secondary"
             android:fontFamily="monospace"
             android:textSize="12sp"
             android:gravity="center"
@@ -288,7 +288,7 @@
                         android:text="Point remote at Flipper Zero IR receiver"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -378,7 +378,7 @@
                         android:text="Awaiting input..."
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:textIsSelectable="true"/>

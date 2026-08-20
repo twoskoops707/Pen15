@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SEARCH AN ORGANIZATION"
-        android:textColor="#BD93F9"
+        android:textColor="#00E5FF"
         android:textSize="12sp"
         android:textStyle="bold"
         android:fontFamily="monospace"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Find exposed files, login pages, and sensitive data belonging to a company or website."
-        android:textColor="#6272A4"
+        android:textColor="#7878A0"
         android:textSize="12sp"
         android:layout_marginBottom="16dp"/>
 
@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#1A1826"
+        android:background="#0E0E1C"
         android:padding="16dp"
         android:layout_marginBottom="12dp">
 
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Domain  (required — the website address)"
-            android:textColor="#F8F8F2"
+            android:textColor="#EAEAF0"
             android:textSize="12sp"
             android:layout_marginBottom="4dp"/>
 
@@ -50,9 +50,9 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="example.com"
-            android:textColor="#F8F8F2"
-            android:textColorHint="#44475A"
-            android:background="#13111C"
+            android:textColor="#EAEAF0"
+            android:textColorHint="#3A3A58"
+            android:background="#0A0A14"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:textSize="14sp"
@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Company Name  (optional — the organization&#8217;s full name)"
-            android:textColor="#F8F8F2"
+            android:textColor="#EAEAF0"
             android:textSize="12sp"
             android:layout_marginBottom="4dp"/>
 
@@ -73,9 +73,9 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Example Inc"
-            android:textColor="#F8F8F2"
-            android:textColorHint="#44475A"
-            android:background="#13111C"
+            android:textColor="#EAEAF0"
+            android:textColorHint="#3A3A58"
+            android:background="#0A0A14"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
             android:textSize="14sp"
@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Search Depth"
-            android:textColor="#F8F8F2"
+            android:textColor="#EAEAF0"
             android:textSize="12sp"
             android:layout_marginBottom="8dp"/>
 
@@ -95,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Quick = 4 queries  |  Standard = 8 queries  |  Deep = 13+ queries"
-            android:textColor="#6272A4"
+            android:textColor="#7878A0"
             android:textSize="11sp"
             android:layout_marginBottom="8dp"/>
 
@@ -111,9 +111,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Quick"
-                android:textColor="#F8F8F2"
+                android:textColor="#EAEAF0"
                 android:textSize="13sp"
-                android:buttonTint="#BD93F9"/>
+                android:buttonTint="#00E5FF"/>
 
             <RadioButton
                 android:id="@+id/orgDepthStandard"
@@ -121,9 +121,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Standard"
-                android:textColor="#F8F8F2"
+                android:textColor="#EAEAF0"
                 android:textSize="13sp"
-                android:buttonTint="#BD93F9"
+                android:buttonTint="#00E5FF"
                 android:checked="true"/>
 
             <RadioButton
@@ -132,9 +132,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Deep"
-                android:textColor="#F8F8F2"
+                android:textColor="#EAEAF0"
                 android:textSize="13sp"
-                android:buttonTint="#BD93F9"/>
+                android:buttonTint="#00E5FF"/>
 
         </RadioGroup>
 
@@ -146,11 +146,11 @@
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:text="GENERATE DORKS"
-        android:textColor="#13111C"
+        android:textColor="#0A0A14"
         android:textStyle="bold"
         android:fontFamily="monospace"
         android:textSize="13sp"
-        app:backgroundTint="#BD93F9"
+        app:backgroundTint="#00E5FF"
         app:cornerRadius="4dp"
         android:layout_marginBottom="16dp"/>
 
@@ -160,7 +160,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#1A1826"
+        android:background="#0E0E1C"
         android:padding="16dp"
         android:layout_marginBottom="12dp"
         android:visibility="gone">
@@ -169,7 +169,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="GENERATED QUERIES"
-            android:textColor="#6272A4"
+            android:textColor="#7878A0"
             android:textSize="11sp"
             android:fontFamily="monospace"
             android:letterSpacing="0.1"
@@ -194,11 +194,11 @@
                 android:layout_height="44dp"
                 android:layout_weight="1"
                 android:text="SAVE ALL"
-                android:textColor="#50FA7B"
+                android:textColor="#00FF88"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:strokeColor="#50FA7B"
+                app:strokeColor="#00FF88"
                 app:strokeWidth="1dp"
                 app:cornerRadius="4dp"
                 android:layout_marginEnd="6dp"/>
@@ -209,11 +209,11 @@
                 android:layout_height="44dp"
                 android:layout_weight="1"
                 android:text="COPY ALL"
-                android:textColor="#8BE9FD"
+                android:textColor="#00B4D8"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:strokeColor="#8BE9FD"
+                app:strokeColor="#00B4D8"
                 app:strokeWidth="1dp"
                 app:cornerRadius="4dp"
                 android:layout_marginStart="6dp"/>

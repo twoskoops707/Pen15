@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#0D0C18"
+    android:background="@color/surface"
     android:paddingStart="14dp"
     android:paddingEnd="14dp"
     android:paddingTop="5dp"
@@ -21,26 +21,26 @@
             android:layout_width="24dp"
             android:layout_height="wrap_content"
             android:text="TX"
-            android:textColor="#6272A4"
+            android:textColor="@color/text_hint"
             android:textSize="8sp"
             android:fontFamily="monospace"
             android:textStyle="bold"/>
 
-        <TextView android:id="@+id/txA1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/txA8" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="#50FA7B" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/txA8" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="▸" android:textColor="@color/success" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
 
         <TextView
             android:id="@+id/txByteCount"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
             android:text="   0 B"
-            android:textColor="#44475A"
+            android:textColor="@color/text_hint"
             android:textSize="8sp"
             android:fontFamily="monospace"
             android:gravity="end"/>
@@ -57,26 +57,26 @@
             android:layout_width="24dp"
             android:layout_height="wrap_content"
             android:text="RX"
-            android:textColor="#6272A4"
+            android:textColor="@color/text_hint"
             android:textSize="8sp"
             android:fontFamily="monospace"
             android:textStyle="bold"/>
 
-        <TextView android:id="@+id/rxA1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
-        <TextView android:id="@+id/rxA8" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="#8BE9FD" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA1" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA2" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA3" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA4" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA5" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA6" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA7" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
+        <TextView android:id="@+id/rxA8" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="◂" android:textColor="@color/info" android:textSize="9sp" android:fontFamily="monospace" android:gravity="center" android:alpha="0.08"/>
 
         <TextView
             android:id="@+id/rxByteCount"
             android:layout_width="56dp"
             android:layout_height="wrap_content"
             android:text="   0 B"
-            android:textColor="#44475A"
+            android:textColor="@color/text_hint"
             android:textSize="8sp"
             android:fontFamily="monospace"
             android:gravity="end"/>
@@ -88,7 +88,7 @@
         android:layout_width="match_parent"
         android:layout_height="12dp"
         android:text="─ IDLE"
-        android:textColor="#2A2840"
+        android:textColor="@color/text_hint"
         android:textSize="8sp"
         android:fontFamily="monospace"
         android:paddingTop="1dp"/>

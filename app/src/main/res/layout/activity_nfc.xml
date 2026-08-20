@@ -173,7 +173,7 @@
                     android:layout_height="56dp"
                     android:text="WRITE TO TAG"
                     app:backgroundTint="@color/danger"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/text_primary"
                     android:fontFamily="monospace"
                     android:textStyle="bold"/>
 
@@ -182,7 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Hold tag near Flipper then press WRITE"
-                    android:textColor="#808080"
+                    android:textColor="@color/text_secondary"
                     android:fontFamily="monospace"
                     android:textSize="11sp"
                     android:layout_marginTop="12dp"/>
@@ -213,7 +213,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="No saved tags.\nGo to READ tab and scan a tag first."
-                    android:textColor="#808080"
+                    android:textColor="@color/text_secondary"
                     android:fontFamily="monospace"
                     android:textSize="12sp"
                     android:gravity="center"
@@ -470,7 +470,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="⬢ WRITE"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/text_primary"
                             app:backgroundTint="@color/danger"
                             android:fontFamily="monospace"
                             android:textSize="11sp"

@@ -3,9 +3,9 @@
     <style name="Theme.PentestDashboard" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_variant</item>
-        <item name="colorOnPrimary">@color/background</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
         <item name="colorSecondary">@color/info</item>
-        <item name="colorOnSecondary">@color/background</item>
+        <item name="colorOnSecondary">@color/text_on_primary</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
@@ -21,33 +21,43 @@
     <!-- Buttons -->
     <style name="Widget.Pen15.Button" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/primary</item>
-        <item name="android:textColor">@color/background</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="android:textColor">@color/text_on_primary</item>
+        <item name="cornerRadius">10dp</item>
         <item name="android:minHeight">44dp</item>
-        <item name="android:letterSpacing">0.05</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="Widget.Pen15.Button.Danger" parent="Widget.Pen15.Button">
         <item name="backgroundTint">@color/danger</item>
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColor">@color/text_on_primary</item>
     </style>
 
     <style name="Widget.Pen15.Button.Success" parent="Widget.Pen15.Button">
         <item name="backgroundTint">@color/success</item>
-        <item name="android:textColor">@color/background</item>
+        <item name="android:textColor">@color/text_on_primary</item>
     </style>
 
     <style name="Widget.Pen15.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/primary</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="cornerRadius">8dp</item>
+        <item name="strokeColor">@color/border_bright</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">10dp</item>
         <item name="android:minHeight">44dp</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.Pen15.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/primary</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:letterSpacing">0.04</item>
     </style>
 
     <!-- Cards -->
     <style name="Widget.Pen15.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">@color/surface</item>
-        <item name="cardCornerRadius">12dp</item>
+        <item name="cardCornerRadius">14dp</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeColor">@color/border</item>
         <item name="strokeWidth">1dp</item>
@@ -55,15 +65,27 @@
     </style>
 
     <style name="Widget.Pen15.CardView.Danger" parent="Widget.Pen15.CardView">
-        <item name="strokeColor">@color/danger</item>
+        <item name="strokeColor">@color/card_awok_border</item>
+        <item name="cardBackgroundColor">@color/card_awok_bg</item>
+    </style>
+
+    <style name="Widget.Pen15.CardView.Cyan" parent="Widget.Pen15.CardView">
+        <item name="strokeColor">@color/card_flipper_border</item>
+        <item name="cardBackgroundColor">@color/card_flipper_bg</item>
+    </style>
+
+    <style name="Widget.Pen15.CardView.Green" parent="Widget.Pen15.CardView">
+        <item name="strokeColor">@color/card_recon_border</item>
+        <item name="cardBackgroundColor">@color/card_recon_bg</item>
     </style>
 
     <!-- Text styles -->
     <style name="TextAppearance.Pen15.SectionHeader" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textColor">@color/primary</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.12</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="TextAppearance.Pen15.Terminal" parent="TextAppearance.MaterialComponents.Body2">
@@ -75,8 +97,9 @@
     <style name="TextAppearance.Pen15.StatusBadge" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">11sp</item>
-        <item name="android:letterSpacing">0.05</item>
+        <item name="android:letterSpacing">0.06</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <!-- Module card title -->
@@ -93,6 +116,7 @@
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.Pen15.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Pen15.Button.Outlined</item>
     </style>
 
     <!-- Status dot -->
@@ -100,5 +124,12 @@
         <item name="android:layout_width">8dp</item>
         <item name="android:layout_height">8dp</item>
         <item name="android:background">@drawable/shape_status_dot</item>
+    </style>
+
+    <!-- Connection chip -->
+    <style name="Widget.Pen15.Chip.Connection" parent="android:Widget">
+        <item name="android:layout_height">60dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
     </style>
 </resources>

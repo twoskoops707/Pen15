@@ -81,7 +81,7 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:background="#44000000"
-        app:tabTextColor="#808080"
+        app:tabTextColor="@color/text_secondary"
         app:tabSelectedTextColor="@color/info"
         app:tabIndicatorColor="@color/info"
         app:tabIndicatorHeight="2dp"
@@ -124,7 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="No saved keys.\nGo to READ tab and read a key first."
-            android:textColor="#808080"
+            android:textColor="@color/text_secondary"
             android:fontFamily="monospace"
             android:textSize="12sp"
             android:gravity="center"
@@ -190,7 +190,7 @@
                         android:text="Touch iButton key to Flipper Zero"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:fontFamily="monospace"/>
                 </LinearLayout>
@@ -280,7 +280,7 @@
                         android:text="Awaiting key..."
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#808080"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         android:fontFamily="monospace"
                         android:textIsSelectable="true"/>

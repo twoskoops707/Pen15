@@ -4,222 +4,317 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"
-        app:elevation="0dp">
+        android:orientation="vertical"
+        android:background="@color/background">
 
-        <!-- HEADER -->
+        <!-- Top glow line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/primary" />
+
+        <!-- App Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="4dp">
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="6dp">
 
+            <!-- Logo -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <TextView
+                <!-- Glowing logo mark -->
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/glow_dot">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="P"
+                        android:textColor="@color/primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+                </FrameLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PEN15"
-                    android:textColor="@color/primary"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.08" />
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pentest Dashboard"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PEN15"
+                        android:textColor="@color/text_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.12"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="v3.0 Pentest Suite"
+                        android:textColor="@color/text_hint"
+                        android:textSize="10sp"
+                        android:letterSpacing="0.06"
+                        android:layout_marginTop="1dp" />
+                </LinearLayout>
             </LinearLayout>
 
+            <!-- Settings icon -->
             <ImageView
                 android:id="@+id/btnSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_hardware_card_default"
-                android:padding="10dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_quick_action"
+                android:padding="9dp"
                 android:contentDescription="Settings"
                 android:src="@drawable/ic_settings"
                 app:tint="@color/text_secondary" />
         </LinearLayout>
 
-        <!-- STATUS CHIPS -->
+        <!-- ═══ Connection Chips ═══ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="16dp"
-            android:gravity="center_vertical">
+            android:paddingBottom="12dp">
 
-            <!-- FLIPPER -->
+            <!-- Flipper Chip -->
             <LinearLayout
                 android:id="@+id/chipFlipper"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_flipper"
+                android:background="@drawable/bg_quick_action"
                 android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:paddingEnd="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
-                <FrameLayout
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/glow_dot">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_flipper"
-                        app:tint="@color/primary" />
-                </FrameLayout>
+                <View
+                    android:id="@+id/dotFlipper"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/glow_dot_red" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp">
 
                     <TextView
-                        android:id="@+id/textFlipper"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="FLIPPER"
                         android:textColor="@color/text_primary"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:letterSpacing="0.08" />
 
                     <TextView
                         android:id="@+id/textFlipperHint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TAP TO CONNECT"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp"
+                        android:textColor="@color/text_hint"
+                        android:textSize="9sp"
                         android:layout_marginTop="1dp" />
                 </LinearLayout>
-
-                <View
-                    android:id="@+id/dotFlipper"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:background="@drawable/glow_dot_red" />
             </LinearLayout>
 
-            <!-- AWOK -->
+            <!-- AWOK Chip -->
             <LinearLayout
                 android:id="@+id/chipAwok"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_chip_awok"
+                android:background="@drawable/bg_quick_action"
                 android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:paddingEnd="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
-                <FrameLayout
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/glow_dot">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_awok"
-                        app:tint="@color/danger" />
-                </FrameLayout>
+                <View
+                    android:id="@+id/dotAwok"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/glow_dot_red" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp">
 
                     <TextView
-                        android:id="@+id/textAwok"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="AWOK"
                         android:textColor="@color/text_primary"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:letterSpacing="0.08" />
 
                     <TextView
                         android:id="@+id/textAwokHint"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TAP TO CONNECT"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="10sp"
+                        android:textColor="@color/text_hint"
+                        android:textSize="9sp"
                         android:layout_marginTop="1dp" />
                 </LinearLayout>
-
-                <View
-                    android:id="@+id/dotAwok"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:background="@drawable/glow_dot_red" />
             </LinearLayout>
         </LinearLayout>
-    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- MAIN CONTENT -->
+        <!-- ═══ Category Tabs ═══ -->
+        <LinearLayout
+            android:id="@+id/categoryTabs"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tabAll"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="ALL"
+                android:textColor="@color/primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:background="@drawable/bg_category_tab_active"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabFlipper"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="FLIPPER"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:background="@drawable/bg_category_tab"
+                android:layout_marginStart="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabWifi"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="WIFI"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:background="@drawable/bg_category_tab"
+                android:layout_marginStart="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabRecon"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="RECON"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:background="@drawable/bg_category_tab"
+                android:layout_marginStart="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border" />
+    </LinearLayout>
+
+    <!-- ═══════════════ SCROLLABLE CONTENT ═══════════════ -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="260dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
+        android:fadeScrollbars="true"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
+            android:id="@+id/contentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="14dp"
             android:paddingBottom="100dp">
 
-            <!-- MISSION WIZARD -->
+            <!-- ═══════ HERO: WiFi Password ═══════ -->
             <LinearLayout
-                android:id="@+id/cardWizard"
+                android:id="@+id/cardWifiPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_hardware_card"
-                android:padding="16dp"
+                android:background="@drawable/bg_hero_card"
+                android:padding="20dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
                 android:foreground="?attr/selectableItemBackground">
 
@@ -232,804 +327,1261 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="MISSION WIZARD"
+                        android:text="ONE-TAP WIFI CRACK"
                         android:textColor="@color/primary"
-                        android:textSize="14sp"
+                        android:textSize="10sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.06" />
+                        android:letterSpacing="0.12" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Guided attack workflow"
+                        android:text="WiFi Password Recovery"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan → Capture → Crack → Done"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_arrow_right"
-                    app:tint="@color/primary" />
+                <!-- Arrow -->
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_quick_action">
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/primary" />
+                </FrameLayout>
             </LinearLayout>
 
-
-            <!-- SECTION: FLIPPER ZERO -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ═══════ HERO: Evil Portal ═══════ -->
+            <LinearLayout
+                android:id="@+id/cardEvilPortal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="FLIPPER ZERO"
-                android:textColor="@color/primary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.12"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp" />
-            
-            <!-- FLIPPER ZERO ROW -->
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_hero_card_pink"
+                android:padding="20dp"
+                android:layout_marginBottom="20dp"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CAPTIVE PORTAL"
+                        android:textColor="@color/danger"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.12" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Evil Portal"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fake AP → Capture credentials"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_quick_action">
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="@color/danger" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- ═══ Section: FLIPPER ZERO ═══ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="4dp"
+                android:id="@+id/sectionFlipper">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="14dp"
+                    android:background="@color/primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FLIPPER ZERO"
+                    android:textColor="@color/primary"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.14"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Flipper Row 1: RFID + NFC -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardRFID"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_rfid"
-                        app:tint="@color/primary" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_rfid"
+                            app:tint="@color/primary" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="RFID"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="125kHz / 13.56MHz"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RFID"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Read / Emulate / Clone"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardNFC"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_nfc"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_nfc"
+                            app:tint="@color/info" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="NFC"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Read / Emulate"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NFC"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Scan / Emulate"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <!-- FLIPPER ZERO ROW -->
+
+            <!-- Flipper Row 2: SubGHz + Infrared -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardSubGHz"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_subghz"
-                        app:tint="@color/pink" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_subghz"
+                            app:tint="@color/accent" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Sub-GHz"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="433 / 868 / 915 MHz"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sub-GHz"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Record / Replay / TX"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
-                <LinearLayout
-                    android:id="@+id/cardBadUSB"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
-                    android:gravity="center_vertical"
-                    android:padding="14dp"
-                    android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_badusb"
-                        app:tint="@color/danger" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Bad USB"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Keystroke Injection"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
-                </LinearLayout>
-            </LinearLayout>
-            <!-- FLIPPER ZERO ROW -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
-                
                 <LinearLayout
                     android:id="@+id/cardIR"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_ir"
-                        app:tint="@color/orange" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_ir"
+                            app:tint="@color/warning" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Infrared"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TX / RX"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Infrared"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Learn / Transmit / TV"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+            </LinearLayout>
+
+            <!-- Flipper Row 3: iButton + BadUSB -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
                 <LinearLayout
                     android:id="@+id/cardIButton"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_ibutton"
-                        app:tint="@color/warning" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_ibutton"
+                            app:tint="@color/warning" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="iButton"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="iButton"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1-Wire Keys"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cardBadUSB"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_badusb"
+                            app:tint="@color/danger" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="1-Wire Keys"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bad USB"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Keystroke Injection"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <!-- FLIPPER ZERO ROW -->
+
+            <!-- Flipper Row 4: Bluetooth + GPIO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
-                
+                android:layout_marginBottom="18dp">
+
                 <LinearLayout
                     android:id="@+id/cardBluetooth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_bluetooth_custom"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bluetooth_custom"
+                            app:tint="@color/info" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Bluetooth"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BLE Scanner"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bluetooth"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BLE Scanner"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardGPIO"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_flipper"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_gpio"
-                        app:tint="@color/primary" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_gpio"
+                            app:tint="@color/primary" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="GPIO"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="UART Bridge"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GPIO"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UART Bridge"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-
-            <!-- SECTION: AWOK / MARAUDER -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ═══ Section: WIFI / MARAUDER ═══ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="AWOK / MARAUDER"
-                android:textColor="@color/danger"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.12"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp" />
-            
-            <!-- AWOK / MARAUDER ROW -->
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="4dp"
+                android:id="@+id/sectionWifi">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="14dp"
+                    android:background="@color/danger" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WIFI / MARAUDER"
+                    android:textColor="@color/danger"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.14"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- WiFi Row 1: Deauth + Capture -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardWifiDeauth"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_awok"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_wifi"
-                        app:tint="@color/danger" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_wifi"
+                            app:tint="@color/danger" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="WiFi Deauth"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="ESP32 Marauder"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WiFi Deauth"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Deauth Attack"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
+                <LinearLayout
+                    android:id="@+id/cardWifiCapture"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_wifi"
+                            app:tint="@color/warning" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WiFi Capture"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PMKID / Handshake"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- WiFi Row 2: Marauder + Garage Door -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="18dp">
+
                 <LinearLayout
                     android:id="@+id/cardMarauder"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_awok"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_marauder"
-                        app:tint="@color/danger" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_marauder"
+                            app:tint="@color/danger" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Marauder"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Marauder"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ESP32 Control"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cardGarageDoor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="14dp"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_subghz"
+                            app:tint="@color/accent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Scan / Attack"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Garage Door"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rolling Code"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-
-            <!-- SECTION: RECON / TOOLS -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ═══ Section: RECON / TOOLS ═══ -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="RECON / TOOLS"
-                android:textColor="@color/info"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.12"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp" />
-            
-            <!-- RECON / TOOLS ROW -->
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="4dp"
+                android:id="@+id/sectionRecon">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="14dp"
+                    android:background="@color/success" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RECON / TOOLS"
+                    android:textColor="@color/success"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.14"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Recon Row 1: OSINT + Google Dork -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardOSINT"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_osint"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_osint"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="OSINT"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Reconnaissance"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="OSINT"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reconnaissance"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardDork"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_dork"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_dork"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Google Dork"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Search Engine"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Google Dork"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Search Engine"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <!-- RECON / TOOLS ROW -->
+
+            <!-- Recon Row 2: NetScan + Exploits -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardNetScan"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_netscan"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_netscan"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Network Scan"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="nmap / LAN"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Network Scan"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="nmap / LAN"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardExploit"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_exploit"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_exploit"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Exploits"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="CVE Lookup"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Exploits"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CVE Lookup"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <!-- RECON / TOOLS ROW -->
+
+            <!-- Recon Row 3: Packet + Hash -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardPacket"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_packet"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_packet"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Packet Sniff"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="mitmproxy / ss"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Packet Sniff"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="mitmproxy / tshark"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardHash"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_hash_crack"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_hash_crack"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Hash Crack"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MD5/SHA/bcrypt"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hash Crack"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="hashcat / john"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <!-- RECON / TOOLS ROW -->
+
+            <!-- Recon Row 4: Phone Sensors + Settings -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
-                
+
                 <LinearLayout
                     android:id="@+id/cardPhone"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_recon"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_phone_sensors"
-                        app:tint="@color/info" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_phone_sensors"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Phone Sensors"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="WiFi / BLE / NFC"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phone Sensors"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="WiFi / BLE / NFC"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:id="@+id/cardSettings"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_margin="4dp"
-                    android:background="@drawable/bg_hardware_card_default"
-                    android:orientation="vertical"
+                    android:minHeight="96dp"
+                    android:background="@drawable/bg_tool_card"
+                    android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:padding="14dp"
                     android:foreground="?attr/selectableItemBackground">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_settings"
-                        app:tint="@color/text_secondary" />
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_quick_action">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_settings"
+                            app:tint="@color/text_secondary" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Settings"
-                        android:textColor="@color/text_primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Config"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="9sp"
-                        android:layout_marginTop="2dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Settings"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Theme / Config"
+                            android:textColor="@color/text_hint"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- BOTTOM SPACER for nav bar -->
+            <!-- Bottom spacer -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="80dp" />
@@ -1037,16 +1589,18 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BOTTOM NAV BAR -->
+    <!-- ═══════════════ BOTTOM NAV ═══════════════ -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="58dp"
         android:layout_gravity="bottom"
         android:background="@color/surface"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav" />
+        app:menu="@menu/bottom_nav"
+        app:elevation="0dp"
+        app:itemRippleColor="@color/primary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

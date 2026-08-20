@@ -1,0 +1,158 @@
+[
+  {
+    "id": "keylogger_tor",
+    "name": "Keylogger + Tor Email",
+    "icon": "📧",
+    "description": "Stealthy keylogger that logs keystrokes and emails them encrypted through Tor every night.",
+    "category": "SURVEILLANCE",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "email", "label": "Your email address", "hint": "you@email.com", "help": "Where the encrypted logs will be sent", "required": true},
+      {"key": "time", "label": "Send time (24hr)", "hint": "04:00", "help": "Logs sent at this time daily through Tor", "required": true, "default": "04:00"},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label to identify which machine", "required": true, "default": "TARGET-01"},
+      {"key": "smtp_server", "label": "SMTP server", "hint": "smtp.gmail.com", "help": "smtp.gmail.com for Gmail, smtp2go.com for Tor relay", "required": true, "default": "smtp.gmail.com"},
+      {"key": "smtp_port", "label": "SMTP port", "hint": "587", "help": "587 for TLS, 465 for SSL", "required": true, "default": "587"},
+      {"key": "smtp_user", "label": "SMTP username", "hint": "your_email@gmail.com", "help": "Leave blank to use email field", "required": false},
+      {"key": "smtp_pass", "label": "SMTP password / app password", "hint": "xxxx-xxxx-xxxx-xxxx", "help": "For Gmail: generate App Password at myaccount.google.com/apppasswords", "required": true}
+    ]
+  },
+  {
+    "id": "wifi_dump",
+    "name": "WiFi Password Dump",
+    "icon": "📶",
+    "description": "Exports ALL saved WiFi passwords from the target and opens them in Notepad.",
+    "category": "CREDENTIALS",
+    "risk": "HIGH",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label to identify this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "reverse_shell",
+    "name": "Reverse Shell",
+    "icon": "🐚",
+    "description": "Opens a reverse shell from target to your machine. Requires netcat listener running.",
+    "category": "EXPLOITATION",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "attacker_ip", "label": "Your IP address", "hint": "192.168.1.100", "help": "IP of your machine that receives the connection", "required": true},
+      {"key": "port", "label": "Listener port", "hint": "4444", "help": "Port to listen on (run: nc -lvnp 4444)", "required": true, "default": "4444"},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "screenshot_exfil",
+    "name": "Screenshot Stealer",
+    "icon": "📸",
+    "description": "Takes a screenshot and saves it to a shared location.",
+    "category": "SURVEILLANCE",
+    "risk": "HIGH",
+    "fields": [
+      {"key": "output_path", "label": "Save location", "hint": "\\\\YOUR_IP\\share", "help": "Network share or local path", "required": true},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "clipboard_monitor",
+    "name": "Clipboard Logger",
+    "icon": "📋",
+    "description": "Monitors clipboard for changes and logs everything copied.",
+    "category": "SURVEILLANCE",
+    "risk": "HIGH",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "usb_killer",
+    "name": "USB Kill Switch",
+    "icon": "⚡",
+    "description": "Immediately shuts down the target machine.",
+    "category": "DESTRUCTION",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "cred_harvester",
+    "name": "Credential Harvester",
+    "icon": "🔐",
+    "description": "Dumps browser passwords, WiFi keys, and Windows credentials.",
+    "category": "CREDENTIALS",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "persistence",
+    "name": "Persistence Backdoor",
+    "icon": "🔄",
+    "description": "Installs persistent backdoor that runs on startup and connects back to your server.",
+    "category": "PERSISTENCE",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "attacker_ip", "label": "Your C2 server IP", "hint": "192.168.1.100", "help": "Your Command & Control server IP", "required": true},
+      {"key": "port", "label": "C2 port", "hint": "4444", "help": "Port your C2 server listens on", "required": true, "default": "4444"},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "office_macro",
+    "name": "Office Macro Injector",
+    "icon": "📄",
+    "description": "Injects a macro into a Word doc that downloads and runs a payload.",
+    "category": "EXPLOITATION",
+    "risk": "CRITICAL",
+    "fields": [
+      {"key": "download_url", "label": "Payload URL", "hint": "https://yourserver.com/payload.ps1", "help": "URL of PowerShell script to download and execute", "required": true},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "browser_history",
+    "name": "Browser History Dumper",
+    "icon": "🌐",
+    "description": "Exports Chrome, Firefox, and Edge browsing history.",
+    "category": "RECONNAISSANCE",
+    "risk": "MEDIUM",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "sys_recon",
+    "name": "System Recon",
+    "icon": "🔍",
+    "description": "Gathers OS, users, software, network, and security info.",
+    "category": "RECONNAISSANCE",
+    "risk": "LOW",
+    "fields": [
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "lock_screen",
+    "name": "Lock Screen Prank",
+    "icon": "🔒",
+    "description": "Changes wallpaper to a custom message and locks screen. Harmless prank.",
+    "category": "PRANK",
+    "risk": "LOW",
+    "fields": [
+      {"key": "message", "label": "Wallpaper text", "hint": "I've been PWNED by PEN15", "help": "Message on the desktop wallpaper", "required": true, "default": "I've been PWNED by PEN15"},
+      {"key": "computer_name", "label": "Computer identifier", "hint": "TARGET-01", "help": "Label for this target", "required": true, "default": "TARGET-01"}
+    ]
+  },
+  {
+    "id": "custom_ducky",
+    "name": "Custom DuckyScript",
+    "icon": "⌨️",
+    "description": "Write your own DuckyScript from scratch.",
+    "category": "CUSTOM",
+    "risk": "VARIES",
+    "fields": [
+      {"key": "script", "label": "Your DuckyScript", "hint": "DELAY 500\nGUI r\nDELAY 500\nSTRING notepad\nENTER", "help": "Enter your complete DuckyScript payload", "required": true}
+    ]
+  }
+]
