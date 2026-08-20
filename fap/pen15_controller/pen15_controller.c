@@ -1,10 +1,10 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include <furi_hal_usb_cdc.h>
+#include <furi_hal_usb.h>
 #include <furi_hal_subghz.h>
 #include <gui/gui.h>
 #include <gui/view_port.h>
-#include <cli/cli_vcp.h>
 #include <storage/storage.h>
 #include <lfrfid/lfrfid_worker.h>
 #include <lfrfid/protocols/lfrfid_protocols.h>
@@ -72,7 +72,6 @@ typedef struct {
     FuriThread*          thread;
     FuriMutex*           usb_mtx;
     FuriSemaphore*       tx_sem;
-    CliVcp*              cli_vcp;
 
     FuriHalSerialHandle* serial;
     FuriStreamBuffer*    uart_rx_buf;
@@ -86,7 +85,10 @@ typedef struct {
     char   cmd_disp[DISP_STR_LEN];
     char   rx_disp[DISP_STR_LEN];
     uint8_t progress;
+    uint8_t progress_disp;   /* animated display value that eases toward progress */
     uint8_t spin;
+    uint8_t rx_pulse;        /* >0 shortly after data arrives — drives RX indicator */
+    bool    usb_connected;   /* USB host link state from the CDC state callback */
 
     PinMode pin_mode[8];
 
@@ -142,8 +144,6 @@ static const GpioPin* const EXT_PINS[8] = {
     &gpio_ext_pb2, &gpio_ext_pc3, &gpio_ext_pc1, &gpio_ext_pc0,
 };
 
-static const char* SPIN_CHARS[] = {"|", "/", "-", "\\"};
-
 /* ── OOK 650kHz CC1101 preset (FuriHalSubGhzPresetOok650Async) ────── */
 static const uint8_t OOK650_PRESET[] = {
     0x02, 0x0D,
@@ -178,7 +178,10 @@ static void cdc_on_tx_done(void* ctx) {
     Pen15App* app = ctx;
     furi_semaphore_release(app->tx_sem);
 }
-static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
+static void cdc_state_cb(void* ctx, uint8_t s) {
+    Pen15App* app = ctx;
+    app->usb_connected = (s != 0);
+}
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
     if(app->bridge_mode && !(s & 0x01)) {
@@ -213,12 +216,15 @@ static void uart_rx_dma_cb(FuriHalSerialHandle* h, FuriHalSerialRxEvent ev,
 /* ═══════════════════════════════════════════════════════════════════
    USB send
    ═══════════════════════════════════════════════════════════════════ */
+/* CDC1 is the FAP's serial port; CDC0 stays owned by the CLI. */
+#define FAP_CDC_IF 1
+
 static void usb_send(Pen15App* app, const char* str) {
     uint16_t len = (uint16_t)strlen(str);
     if(len == 0) return;
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
-    furi_hal_cdc_send(0, (uint8_t*)str, len);
+    furi_hal_cdc_send(FAP_CDC_IF, (uint8_t*)str, len);
     furi_mutex_release(app->usb_mtx);
 }
 
@@ -226,30 +232,125 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
     if(len == 0) return;
     furi_semaphore_acquire(app->tx_sem, 300);
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
-    furi_hal_cdc_send(0, (uint8_t*)data, len);
+    furi_hal_cdc_send(FAP_CDC_IF, (uint8_t*)data, len);
     furi_mutex_release(app->usb_mtx);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    GUI
    ═══════════════════════════════════════════════════════════════════ */
+/* ── GUI helpers ─────────────────────────────────────────────────── */
+
+/* Friendlier names for the internal status codes */
+static const char* pretty_mode(const char* s) {
+    if(strcmp(s, "WAIT") == 0)    return "AWAITING HOST";
+    if(strcmp(s, "CONN") == 0)    return "PEN15 LINK";
+    if(strcmp(s, "UART") == 0)    return "UART READY";
+    if(strcmp(s, "BRIDGE") == 0)  return "UART BRIDGE";
+    if(strcmp(s, "RFID") == 0)    return "RFID READ";
+    if(strcmp(s, "RFID EM") == 0) return "RFID EMULATE";
+    if(strcmp(s, "NFC") == 0)     return "NFC SCAN";
+    if(strcmp(s, "IR") == 0)      return "IR LEARN";
+    if(strcmp(s, "KEY") == 0)     return "IBUTTON READ";
+    if(strcmp(s, "KEY EM") == 0)  return "IBUTTON EMU";
+    if(strcmp(s, "RF RX") == 0)   return "SUBGHZ RX";
+    if(strcmp(s, "RF REC") == 0)  return "SUBGHZ REC";
+    if(strcmp(s, "RF TX") == 0)   return "SUBGHZ TX";
+    return s;
+}
+
+/* Five-pointed star (pentagram) drawn from line primitives */
+static void draw_pentagram(Canvas* canvas, int cx, int cy, int r) {
+    /* unit star vertices at radius 5 */
+    static const int8_t UX[5] = {0, 5, 3, -3, -5};
+    static const int8_t UY[5] = {-5, -2, 4, 4, -2};
+    for(int i = 0; i < 5; i++) {
+        int j = (i + 2) % 5;
+        canvas_draw_line(
+            canvas,
+            cx + (UX[i] * r) / 5, cy + (UY[i] * r) / 5,
+            cx + (UX[j] * r) / 5, cy + (UY[j] * r) / 5);
+    }
+}
+
+/* Rotating radar sweep: circle + sweeping spoke with a bright tip */
+static void draw_radar(Canvas* canvas, uint8_t s, int x, int y) {
+    static const int8_t DX[8] = {4, 3, 0, -3, -4, -3, 0, 3};
+    static const int8_t DY[8] = {0, 3, 4, 3, 0, -3, -4, -3};
+    uint8_t i = s % 8;
+    canvas_draw_circle(canvas, x, y, 4);
+    canvas_draw_line(canvas, x, y, x + DX[i], y + DY[i]);
+    canvas_draw_disc(canvas, x + DX[i], y + DY[i], 1);
+}
+
+/* ── Main render ─────────────────────────────────────────────────── */
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
+
+    uint8_t s = app->spin;
+    bool linked = app->usb_connected;
+
+    /* ── Header: inverted command bar ─────────────────────────── */
+    canvas_draw_box(canvas, 0, 0, 128, 13);
+    canvas_set_color(canvas, ColorWhite);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
-    canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
-    canvas_draw_str(canvas, 74, 10, app->status);
+    canvas_draw_str(canvas, 4, 10, "PEN15");
+    draw_pentagram(canvas, 40, 6, 5);
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
-    canvas_draw_str(canvas, 30, 22, app->cmd_disp);
-    canvas_draw_frame(canvas, 2, 27, 124, 5);
-    uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
-    if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
-    canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    canvas_draw_str(canvas, 50, 10, "v2.0");
+    /* link dot — solid when a host is connected, blinking otherwise */
+    if(linked) {
+        canvas_draw_disc(canvas, 121, 6, 2);
+    } else if((s / 2) % 2 == 0) {
+        canvas_draw_circle(canvas, 121, 6, 2);
+    }
+
+    /* ── Mode line — big, centered, with blinking cursor ──────── */
+    canvas_set_color(canvas, ColorBlack);
+    canvas_set_font(canvas, FontPrimary);
+    const char* mode = pretty_mode(app->status);
+    canvas_draw_str_aligned(canvas, 64, 21, AlignCenter, AlignTop, mode);
+    if((s / 2) % 2 == 0) {
+        uint16_t w = canvas_string_width(canvas, mode);
+        canvas_draw_box(canvas, 64 + (int)w / 2 + 3, 21, 5, 8);
+    }
+
+    /* ── Command line ─────────────────────────────────────────── */
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 4, 37, "CMD");
+    canvas_draw_str(canvas, 28, 37, app->cmd_disp);
+
+    /* ── Progress bar + percent ───────────────────────────────── */
+    canvas_draw_frame(canvas, 8, 41, 88, 7);
+    uint8_t pct = app->progress_disp > 100 ? 100 : app->progress_disp;
+    if(pct > 0) {
+        uint8_t w = (uint8_t)((pct * 84) / 100);
+        canvas_draw_box(canvas, 10, 43, w, 3);
+        /* pulsing leading edge while a job is running */
+        if((s / 2) % 2 == 0 && pct < 100) {
+            canvas_draw_box(canvas, 10 + w, 43, 2, 3);
+        }
+    } else {
+        /* idle sweep across the track */
+        uint8_t sweep = (s * 3) % 78;
+        canvas_draw_box(canvas, 10 + sweep, 43, 6, 3);
+    }
+    char pbuf[8];
+    snprintf(pbuf, sizeof(pbuf), "%u%%", (unsigned)pct);
+    canvas_draw_str(canvas, 100, 48, pbuf);
+
+    /* ── RX line with activity pulse ──────────────────────────── */
+    if(app->rx_pulse) {
+        canvas_draw_triangle(canvas, 4, 48, 6, 7, CanvasDirectionLeftToRight);
+    }
+    canvas_draw_str(canvas, 13, 56, "RX:");
+    canvas_draw_str(canvas, 30, 56, app->rx_disp);
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    canvas_draw_str(canvas, 4, 63, "[BACK] exit");
+    draw_radar(canvas, s, 120, 59);
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -1040,8 +1141,9 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
 static void process_usb_rx(Pen15App* app) {
     uint8_t buf[USB_PKT_LEN];
     furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
-    int32_t got = furi_hal_cdc_receive(0, buf, USB_PKT_LEN);
+    int32_t got = furi_hal_cdc_receive(FAP_CDC_IF, buf, USB_PKT_LEN);
     furi_mutex_release(app->usb_mtx);
+    if(got > 0) app->rx_pulse = 6;
 
     for(int32_t i = 0; i < got; i++) {
         char c = (char)buf[i];
@@ -1086,13 +1188,23 @@ int32_t pen15_app(void* p) {
     view_port_input_callback_set(app->vp, input_cb, app);
     gui_add_view_port(app->gui, app->vp, GuiLayerFullscreen);
 
-    app->cli_vcp = furi_record_open(RECORD_CLI_VCP);
-    cli_vcp_disable(app->cli_vcp);
-    furi_hal_cdc_set_callbacks(0, (CdcCallbacks*)&CDC_CB, app);
+    /* Claim the SECOND CDC port so the Flipper's built-in CLI stays alive on
+       the first one (CDC0). This switches the USB device single->dual once,
+       which re-enumerates it on the host — the phone app reconnects to CDC1
+       automatically after that. Do NOT call cli_vcp_disable() here: on current
+       firmware it calls furi_hal_usb_set_config(NULL), which takes the USB
+       device off the bus entirely. */
+    furi_hal_usb_set_config(&usb_cdc_dual, NULL);
+    furi_hal_cdc_set_callbacks(FAP_CDC_IF, (CdcCallbacks*)&CDC_CB, app);
 
-    /* Main event loop */
+    /* Main event loop — 100ms tick gives ~10fps for smooth animations */
     while(true) {
-        uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 250);
+        uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 100);
+
+        /* Animation state */
+        if(app->rx_pulse > 0) app->rx_pulse--;
+        if(app->progress_disp < app->progress) app->progress_disp += 4;
+        else if(app->progress_disp > app->progress) app->progress_disp -= 4;
 
         if(evts & FuriFlagError) {
             /* Timeout tick — check hw deadline */
@@ -1117,8 +1229,9 @@ int32_t pen15_app(void* p) {
             if(app->bridge_mode) {
                 uint8_t usb_buf[USB_PKT_LEN];
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
-                int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
+                int32_t got = furi_hal_cdc_receive(FAP_CDC_IF, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
+                if(got > 0) app->rx_pulse = 6;
                 if(got > 0 && app->uart_ready)
                     furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
             } else {
@@ -1132,7 +1245,10 @@ int32_t pen15_app(void* p) {
                 size_t got;
                 do {
                     got = furi_stream_buffer_receive(app->uart_rx_buf, uart_buf, sizeof(uart_buf), 0);
-                    if(got > 0) usb_send_raw(app, uart_buf, (uint16_t)got);
+                    if(got > 0) {
+                        app->rx_pulse = 6;
+                        usb_send_raw(app, uart_buf, (uint16_t)got);
+                    }
                 } while(got > 0);
             }
         }
@@ -1173,9 +1289,8 @@ int32_t pen15_app(void* p) {
     hw_stop_all(app);
     if(app->ibutton_key) { ibutton_key_free(app->ibutton_key); app->ibutton_key = NULL; }
 
-    furi_hal_cdc_set_callbacks(0, NULL, NULL);
-    cli_vcp_enable(app->cli_vcp);
-    furi_record_close(RECORD_CLI_VCP);
+    furi_hal_cdc_set_callbacks(FAP_CDC_IF, NULL, NULL);
+    furi_hal_usb_set_config(&usb_cdc_single, NULL);
 
     if(app->uart_ready && app->serial) {
         furi_hal_serial_deinit(app->serial);

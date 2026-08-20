@@ -16,6 +16,9 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="materialButtonStyle">@style/Widget.Pen15.Button</item>
         <item name="cardViewStyle">@style/Widget.Pen15.CardView</item>
+        <!-- Debug mode: every TextView is selectable/copyable (long-press to select).
+             Buttons override this below so their taps/long-presses stay normal. -->
+        <item name="android:textIsSelectable">true</item>
     </style>
 
     <!-- Buttons -->
@@ -27,6 +30,7 @@
         <item name="android:letterSpacing">0.06</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textIsSelectable">false</item>
     </style>
 
     <style name="Widget.Pen15.Button.Danger" parent="Widget.Pen15.Button">
@@ -46,12 +50,14 @@
         <item name="android:minHeight">44dp</item>
         <item name="android:letterSpacing">0.04</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:textIsSelectable">false</item>
     </style>
 
     <style name="Widget.Pen15.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/primary</item>
         <item name="cornerRadius">10dp</item>
         <item name="android:letterSpacing">0.04</item>
+        <item name="android:textIsSelectable">false</item>
     </style>
 
     <!-- Cards -->

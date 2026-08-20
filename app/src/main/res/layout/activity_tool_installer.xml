@@ -77,6 +77,20 @@
             android:textColor="@android:color/white"/>
     </LinearLayout>
 
+    <!-- Copy install log / summary to clipboard -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCopyLog"
+        style="@style/Widget.Pen15.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
+        android:minHeight="36dp"
+        android:text="📋 COPY INSTALL LOG — paste back to the assistant"
+        android:textAllCaps="false"
+        android:textSize="11sp"/>
+
     <!-- Tool List -->
     <ScrollView
         android:layout_width="match_parent"
@@ -107,7 +121,9 @@
             android:textColor="@color/success"
             android:textSize="10sp"
             android:fontFamily="monospace"
-            android:text="[Ready] Select tools to install. All tools run in Termux.
-Tools auto-detect if already installed."/>
+            android:textIsSelectable="true"
+            android:text="[Ready] Select tools to install. Installs run in the background —
+output and a parsed summary appear here.
+Long-press to select text, or tap COPY INSTALL LOG to copy everything."/>
     </ScrollView>
 </LinearLayout>
