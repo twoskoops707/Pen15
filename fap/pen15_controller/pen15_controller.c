@@ -32,6 +32,8 @@
 #define HW_TIMEOUT_MS 30000
 #define TX_MAX_TIMES  512
 #define RX_MAX_TIMES  64
+#define BRIDGE_MAX_BAUD 2000000
+#define BRIDGE_MIN_BAUD 1200
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -77,7 +79,8 @@ typedef struct {
     FuriHalSerialHandle* serial;
     FuriStreamBuffer*    uart_rx_buf;
     bool                 uart_ready;
-    volatile bool        bridge_mode;
+    uint32_t              uart_baud;
+    volatile bool         bridge_mode;
 
     char   json_buf[JSON_BUF_SZ];
     size_t json_len;
@@ -181,6 +184,7 @@ static void cdc_on_tx_done(void* ctx) {
 static void cdc_state_cb(void* ctx, uint8_t s)                   { UNUSED(ctx); UNUSED(s); }
 static void cdc_ctrl_cb(void* ctx, uint8_t s) {
     Pen15App* app = ctx;
+    /* DTR falling edge is the explicit bridge-exit signal from Android. */
     if(app->bridge_mode && !(s & 0x01)) {
         app->app_mode = ModeJson;
         app->bridge_mode = false;
@@ -631,11 +635,17 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "uart_init") == 0) {
         int baud = json_int(js, toks, n, "baud", 115200);
         bool uart_ok = false;
+        if(baud < BRIDGE_MIN_BAUD || baud > BRIDGE_MAX_BAUD) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_BAUD\",\"id\":\"%s\"}\n", id);
+            app->progress = 0; usb_send(app, resp);
+            return;
+        }
         if(!app->uart_ready) {
             app->serial = furi_hal_serial_control_acquire(FuriHalSerialIdUsart);
             if(app->serial) {
                 furi_hal_serial_init(app->serial, (uint32_t)baud);
                 furi_hal_serial_dma_rx_start(app->serial, uart_rx_dma_cb, app, false);
+                app->uart_baud = (uint32_t)baud;
                 app->uart_ready = true;
                 uart_ok = true;
                 snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
@@ -644,6 +654,7 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
             }
         } else {
             furi_hal_serial_set_br(app->serial, (uint32_t)baud);
+            app->uart_baud = (uint32_t)baud;
             uart_ok = true;
             snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"baud\":%d,\"id\":\"%s\"}\n", baud, id);
         }
@@ -657,6 +668,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
     } else if(strcmp(action, "uart_send") == 0) {
         static char data[128]; memset(data, 0, sizeof(data));
         json_str(js, toks, n, "data", data, sizeof(data));
+        size_t data_len = strlen(data);
+        if(data_len == 0 || data_len >= sizeof(data)) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_UART_DATA\",\"id\":\"%s\"}\n", id);
+            app->progress = 0; usb_send(app, resp);
+            return;
+        }
         if(!app->uart_ready) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp);
@@ -689,9 +706,12 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         if(!app->uart_ready) {
             snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"UART_NOT_INIT\",\"id\":\"%s\"}\n", id);
             usb_send(app, resp);
+        } else if(app->bridge_mode) {
+            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"mode\":\"bridge\",\"baud\":%lu,\"id\":\"%s\"}\n", (unsigned long)app->uart_baud, id);
+            app->progress = 100; usb_send(app, resp);
         } else {
             app->bridge_mode = true;
-            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"mode\":\"bridge\",\"id\":\"%s\"}\n", id);
+            snprintf(resp, sizeof(resp), "{\"status\":\"ok\",\"mode\":\"bridge\",\"baud\":%lu,\"id\":\"%s\"}\n", (unsigned long)app->uart_baud, id);
             usb_send(app, resp);
             strncpy(app->status, "BRIDGE", sizeof(app->status) - 1);
             strncpy(app->rx_disp, "awok bridge", sizeof(app->rx_disp) - 1);
@@ -1025,6 +1045,14 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->progress = 0; usb_send(app, resp);
 
     /* ── unknown ───────────────────────────────────────────────────── */
+    } else if(strcmp(action, "bridge_status") == 0) {
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"mode\":\"%s\",\"uart_ready\":%s,\"baud\":%lu,\"id\":\"%s\"}\n",
+            app->bridge_mode ? "bridge" : "json",
+            app->uart_ready ? "true" : "false",
+            (unsigned long)app->uart_baud,
+            id);
+        app->progress = 100; usb_send(app, resp);
     } else {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"error\",\"code\":\"UNKNOWN\","
@@ -1119,8 +1147,10 @@ int32_t pen15_app(void* p) {
                 furi_mutex_acquire(app->usb_mtx, FuriWaitForever);
                 int32_t got = furi_hal_cdc_receive(0, usb_buf, USB_PKT_LEN);
                 furi_mutex_release(app->usb_mtx);
-                if(got > 0 && app->uart_ready)
+                if(got > 0 && app->uart_ready) {
                     furi_hal_serial_tx(app->serial, usb_buf, (size_t)got);
+                    furi_hal_serial_tx_wait_complete(app->serial);
+                }
             } else {
                 process_usb_rx(app);
             }

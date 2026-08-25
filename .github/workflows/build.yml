@@ -46,9 +46,16 @@ jobs:
 
       - name: Build Pen15 FAP (Flipper App Package)
         uses: flipperdevices/flipperzero-ufbt-action@v0.1
-        id: build-fap
+        id: build-fap-release
         with:
           sdk-channel: release
+          app-dir: fap/pen15_controller
+
+      - name: Build Pen15 FAP (dev SDK compatibility)
+        uses: flipperdevices/flipperzero-ufbt-action@v0.1
+        id: build-fap-dev
+        with:
+          sdk-channel: dev
           app-dir: fap/pen15_controller
 
       - name: Create GitHub Release
@@ -83,6 +90,7 @@ jobs:
             🤖 Auto-built by GitHub Actions
           files: |
             app/build/outputs/apk/debug/pen15-v3.0.${{ github.run_number }}-*.apk
-            ${{ steps.build-fap.outputs.fap-artifacts }}
+            ${{ steps.build-fap-release.outputs.fap-artifacts }}
+            ${{ steps.build-fap-dev.outputs.fap-artifacts }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
