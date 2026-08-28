@@ -1117,6 +1117,10 @@ int32_t pen15_app(void* p) {
     app->cli_vcp = furi_record_open(RECORD_CLI_VCP);
     cli_vcp_disable(app->cli_vcp);
     furi_hal_cdc_set_callbacks(0, (CdcCallbacks*)&CDC_CB, app);
+    /* Allow the host to finish CDC enumeration and signal that the FAP owns
+       the port before the first JSON request. */
+    furi_delay_ms(100);
+    usb_send(app, "{\"status\":\"ready\",\"device\":\"flipper_zero\",\"fap\":\"2.0\"}\r\n");
 
     /* Main event loop */
     while(true) {
