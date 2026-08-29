@@ -36,6 +36,7 @@
 #define BRIDGE_MIN_BAUD 1200
 #define UI_FRAME_MS 125
 #define UI_PULSE_MAX 4
+#define UI_SETTINGS_ACTION "ui_settings"
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -245,7 +246,7 @@ static void usb_send_raw(Pen15App* app, const uint8_t* data, uint16_t len) {
 static void draw_cb(Canvas* canvas, void* ctx) {
     Pen15App* app = ctx;
     canvas_clear(canvas);
-    canvas_set_color(canvas, ColorBlack);
+    canvas_set_color(canvas, app->ui_invert ? ColorWhite : ColorBlack);
     canvas_set_font(canvas, FontPrimary);
     canvas_draw_str(canvas, 2, 10, "PEN15 v2");
     canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
@@ -264,7 +265,7 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_draw_str(canvas, 2, 42, "RX:");
     canvas_draw_str(canvas, 22, 42, app->rx_disp);
     canvas_draw_line(canvas, 2, 47, 125, 47);
-    canvas_draw_str(canvas, 2, 62, app->bridge_mode ? "USB BRIDGE  [BACK]" : "USB JSON     [BACK]");
+    if(!app->ui_compact) canvas_draw_str(canvas, 2, 62, app->bridge_mode ? "USB BRIDGE  [BACK]" : "USB JSON     [BACK]");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -1056,6 +1057,24 @@ static void handle_json(Pen15App* app, const char* js, size_t len) {
         app->progress = 0; usb_send(app, resp);
 
     /* ── unknown ───────────────────────────────────────────────────── */
+    } else if(strcmp(action, UI_SETTINGS_ACTION) == 0) {
+        char theme[16] = {0};
+        json_str(js, toks, n, "theme", theme, sizeof(theme));
+        if(strcmp(theme, "invert") == 0) app->ui_invert = !app->ui_invert;
+        else if(strcmp(theme, "compact") == 0) app->ui_compact = !app->ui_compact;
+        else if(strcmp(theme, "reset") == 0) {
+            app->ui_invert = false;
+            app->ui_compact = false;
+        } else {
+            snprintf(resp, sizeof(resp), "{\"status\":\"error\",\"code\":\"BAD_UI_SETTING\",\"id\":\"%s\"}\n", id);
+            usb_send(app, resp);
+            return;
+        }
+        snprintf(resp, sizeof(resp),
+            "{\"status\":\"ok\",\"ui_invert\":%s,\"ui_compact\":%s,\"id\":\"%s\"}\n",
+            app->ui_invert ? "true" : "false", app->ui_compact ? "true" : "false", id);
+        app->progress = 100;
+        usb_send(app, resp);
     } else if(strcmp(action, "bridge_status") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"status\":\"ok\",\"mode\":\"%s\",\"uart_ready\":%s,\"baud\":%lu,\"id\":\"%s\"}\n",
