@@ -34,6 +34,8 @@
 #define RX_MAX_TIMES  64
 #define BRIDGE_MAX_BAUD 2000000
 #define BRIDGE_MIN_BAUD 1200
+#define UI_FRAME_MS 125
+#define UI_PULSE_MAX 4
 
 /* ── Events ───────────────────────────────────────────────────────── */
 typedef enum {
@@ -90,6 +92,9 @@ typedef struct {
     char   rx_disp[DISP_STR_LEN];
     uint8_t progress;
     uint8_t spin;
+    uint8_t ui_pulse;
+    bool ui_invert;
+    bool ui_compact;
 
     PinMode pin_mode[8];
 
@@ -242,18 +247,24 @@ static void draw_cb(Canvas* canvas, void* ctx) {
     canvas_clear(canvas);
     canvas_set_color(canvas, ColorBlack);
     canvas_set_font(canvas, FontPrimary);
-    canvas_draw_str(canvas, 2,  10, "PEN15 v2");
+    canvas_draw_str(canvas, 2, 10, "PEN15 v2");
     canvas_draw_str(canvas, 60, 10, SPIN_CHARS[app->spin & 3]);
     canvas_draw_str(canvas, 74, 10, app->status);
+
+    /* Animated activity meter: the pulse expands only while work is active. */
+    uint8_t pulse = (app->hw_state != HwIdle || app->bridge_mode) ? app->ui_pulse : 0;
+    for(uint8_t i = 0; i < pulse; i++) canvas_draw_box(canvas, (uint8_t)(114 + i * 3), 5, 2, 2);
+
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 2,  22, "CMD:");
+    canvas_draw_str(canvas, 2, 22, "CMD:");
     canvas_draw_str(canvas, 30, 22, app->cmd_disp);
     canvas_draw_frame(canvas, 2, 27, 124, 5);
     uint8_t fill = (app->progress > 100) ? 124 : (uint8_t)((app->progress * 124) / 100);
     if(fill > 0) canvas_draw_box(canvas, 2, 27, fill, 5);
-    canvas_draw_str(canvas, 2,  42, "RX:");
+    canvas_draw_str(canvas, 2, 42, "RX:");
     canvas_draw_str(canvas, 22, 42, app->rx_disp);
-    canvas_draw_str(canvas, 2,  62, "[BACK] exit");
+    canvas_draw_line(canvas, 2, 47, 125, 47);
+    canvas_draw_str(canvas, 2, 62, app->bridge_mode ? "USB BRIDGE  [BACK]" : "USB JSON     [BACK]");
 }
 static void input_cb(InputEvent* ev, void* ctx) {
     Pen15App* app = ctx;
@@ -1103,6 +1114,9 @@ int32_t pen15_app(void* p) {
     app->tx_sem      = furi_semaphore_alloc(1, 1);
     app->uart_rx_buf = furi_stream_buffer_alloc(UART_RX_BUF, 1);
     app->hw_state    = HwIdle;
+    app->ui_pulse    = 0;
+    app->ui_invert   = false;
+    app->ui_compact  = false;
 
     strncpy(app->status,   "WAIT", sizeof(app->status)   - 1);
     strncpy(app->cmd_disp, "---",  sizeof(app->cmd_disp) - 1);
@@ -1124,7 +1138,7 @@ int32_t pen15_app(void* p) {
 
     /* Main event loop */
     while(true) {
-        uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, 250);
+        uint32_t evts = furi_thread_flags_wait(ALL_EVENTS, FuriFlagWaitAny, UI_FRAME_MS);
 
         if(evts & FuriFlagError) {
             /* Timeout tick — check hw deadline */
@@ -1200,6 +1214,8 @@ int32_t pen15_app(void* p) {
         }
 
         app->spin++;
+        if(app->ui_pulse >= UI_PULSE_MAX) app->ui_pulse = 0;
+        else app->ui_pulse++;
         view_port_update(app->vp);
     }
 
